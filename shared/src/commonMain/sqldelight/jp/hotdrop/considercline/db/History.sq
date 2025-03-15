@@ -1,0 +1,15 @@
+CREATE TABLE History (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dateTime TEXT NOT NULL,
+    point INTEGER NOT NULL,
+    detail TEXT NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM History
+ORDER BY dateTime DESC;
+
+insert:
+INSERT INTO History (dateTime, point, detail)
+VALUES (?, ?, ?);
