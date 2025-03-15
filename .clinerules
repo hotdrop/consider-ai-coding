@@ -1,0 +1,49 @@
+# Expected answer
+- Please provide the implementation code in its entirety without omitting it
+- Please provide a detailed explanation in Japanese
+
+# Design document
+## Overview
+This app is an app that earns and uses points by designing coffee or tea according to ProductFlavor. Since this is a sample app to verify the extent to which Android and iOS code can be shared with "Kotlin MultiPlatform" (KMP), it does not actually execute external APIs and uses Fake HttpClient.
+The Dart code in the sampleprj directory is the completed version of this app created with Flutter. Please migrate this app to Android and iOS applications using KMP.
+The scope of KMP will be limited to business logic, and the UI layer will be implemented as Android and iOS native code.
+
+## Directory structure
+- "shared/src"
+- "commonMain/": Implement platform-independent shared logic, Repositories, and Models in this directory. "commonMain/" functions as the core, and platform-specific logic will be placed in "androidMain/" and "iosMain/".
+- "androidMain/": Android-specific logic
+- "iosMain/": iOS-specific logic
+- "androidApp/": Android native implementation, please implement the UI layer here
+- "iosApp/": iOS native implementation, please implement the UI layer here
+- "sampleprj/": This is the completed version of the app made with Flutter. Please refer to the dart code of this project and implement the common logic, Android, and iOS code.
+
+## Architecture
+As with the structure of the "sampleprj/" directory, use the repository pattern for processing to retrieve data from local storage and external sources, and use MVVM for the UI layer.
+
+## Libraries used
+Of the libraries used in the Flutter code in the "sampleprj/" directory, which library should be used for the common logic ("commonMain/")?
+- API
+  - dio -> Ktor
+- Local storage
+  - Hive -> SQLDelight
+  - shared_preferences -> multiplatform-settings
+- Dependency injection (DI)
+  - Riverpod -> Koin
+
+## Implementation guidelines
+- Common logic ("commonMain/")
+  - Use FakeHttpClient to mock API calls.
+  - Use Koin for dependency injection for all classes except model classes.
+  - Implement all public functions in the "suspend" function.
+- "androidApp/"
+  - Use "Jetpack Compose" to implement the UI.
+  - Use "Jetpack ViewModel" for the ViewModel.
+  - Use Flow for View and ViewModel.
+
+## Handling sensitive files
+Do not read or modify the following files
+- ".env" file
+- ".keystore" file
+- Files containing tokens
+- Files containing secrets
+- Files containing passwords
