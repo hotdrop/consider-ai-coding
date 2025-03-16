@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="point_unit">P</string>
+    <string name="splash_title">起動</string>
+    <string name="splash_user_id_label">ユーザーID: </string>
+    <string name="splash_first_time_button">はじめる</string>
+    <string name="splash_error_Label">エラーです。アプリを再度実行してください。</string>
+    <string name="start_title">はじめに</string>
+    <string name="start_overview">ユーザー情報を登録します。</string>
+    <string name="start_nick_name_field_label">ニックネーム</string>
+    <string name="start_email_field_label">メールアドレス</string>
+    <string name="start_register_button">この内容で登録する</string>
+    <string name="email_validation_error">XXX＠YYY.ZZの形式で入力してください。</string>
+    <string name="home_title">ホーム</string>
+    <string name="home_un_setting_nickname">ニックネーム未設定</string>
+    <string name="home_un_setting_email">Email未設定</string>
+    <string name="home_menu_get_point">ポイント獲得</string>
+    <string name="home_menu_use_point">ポイント利用</string>
+    <string name="home_loading_error_label">エラーが発生しました。</string>
+    <string name="point_get_title">ポイント獲得</string>
+    <string name="point_get_input_overview">現在保持しているポイント数</string>
+    <string name="point_get_input_attention">(※最大で保持できるポイントは%d1です)</string>
+    <string name="point_get_input_error">エラーです。</string>
+    <string name="point_get_input_text_field_label">ポイントを入力</string>
+    <string name="point_get_input_text_field_error_over_max_point">獲得できる残ポイントは%d1までです。</string>
+    <string name="point_get_input_confirm_button">確認画面へ進む</string>
+    <string name="point_get_confirm_overview">ポイントを獲得します！</string>
+    <string name="point_get_confirm_detail">よろしければ「ポイントを獲得する」ボタンをタップしてください。</string>
+    <string name="point_get_confirm_point_label">獲得ポイント</string>
+    <string name="point_get_confirm_execute_button">ポイントを獲得する</string>
+    <string name="point_use_title">ポイント利用</string>
+    <string name="point_use_input_error">エラーです。</string>
+    <string name="point_use_input_overview">現在保持しているポイント数</string>
+    <string name="point_use_iInput_text_field_label">利用ポイント入力</string>
+    <string name="point_use_input_text_field_error_over_point">保有ポイントが不足しています。</string>
+    <string name="point_use_input_confirm_button">確認画面へ進む</string>
+    <string name="point_use_confirm_overview">ポイントを使用します。</string>
+    <string name="point_use_confirm_detail">よろしければ「ポイントを使用する」ボタンをタップしてください。</string>
+    <string name="point_use_confirm_point_label">使用ポイント</string>
+    <string name="point_use_confirm_execute_button">ポイントを使用する</string>
+    <string name="point_history_acquire">ポイント獲得</string>
+    <string name="point_history_use">ポイント使用</string>
+    <string name="dialog_cancel">キャンセル</string>
+    <string name="dialog_ok">OK</string>
+</resources>
