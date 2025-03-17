@@ -1,8 +1,6 @@
 package jp.hotdrop.considercline.repository.local
 
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.get
-import com.russhwolf.settings.set
 
 interface SettingDao {
     suspend fun getUserId(): String?
