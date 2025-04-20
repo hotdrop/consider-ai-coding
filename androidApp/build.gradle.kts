@@ -7,6 +7,7 @@ plugins {
 android {
     namespace = "jp.hotdrop.considercline.android"
     compileSdk = 35
+
     defaultConfig {
         applicationId = "jp.hotdrop.considercline.android"
         minSdk = 26
@@ -15,7 +16,7 @@ android {
         versionName = "1.0"
     }
     buildFeatures {
-        compose = true
+        viewBinding = true
     }
     packaging {
         resources {
@@ -49,5 +50,9 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.lifecycle.runtime.compose.android)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.constraintlayout.core)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
     debugImplementation(libs.compose.ui.tooling)
 }

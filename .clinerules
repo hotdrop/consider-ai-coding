@@ -1,49 +1,38 @@
-# Expected answer
-- Please provide the implementation code in its entirety without omitting it
-- Please provide a detailed explanation in Japanese
+# 期待する回答
+- 実装コードは省略せず、完全な形で提供してください
+- 日本語での詳細な説明をしてください
 
-# Design document
-## Overview
-This app is an app that earns and uses points by designing coffee or tea according to ProductFlavor. Since this is a sample app to verify the extent to which Android and iOS code can be shared with "Kotlin MultiPlatform" (KMP), it does not actually execute external APIs and uses Fake HttpClient.
-The Dart code in the sampleprj directory is the completed version of this app created with Flutter. Please migrate this app to Android and iOS applications using KMP.
-The scope of KMP will be limited to business logic, and the UI layer will be implemented as Android and iOS native code.
+# 設計書
+- Viewレイヤー(ネイティブ)
+  - MVVMアーキテクチャを採用しAndroid/iOSそれぞれネイティブでViewおよびViewModelを実装します。
+- データレイヤー(KMP)
+  - UseCaseとデータレイヤーはKMPで共通化します。ただし、AndroidのSharedPreferecesとiOSのUserDefaultを利用するlocalのデータレイヤーやKMPでインタフェースを提供するのみで、実装は各々のネイティブOS出行います。
 
-## Directory structure
-- "shared/src"
-- "commonMain/": Implement platform-independent shared logic, Repositories, and Models in this directory. "commonMain/" functions as the core, and platform-specific logic will be placed in "androidMain/" and "iosMain/".
-- "androidMain/": Android-specific logic
-- "iosMain/": iOS-specific logic
-- "androidApp/": Android native implementation, please implement the UI layer here
-- "iosApp/": iOS native implementation, please implement the UI layer here
-- "sampleprj/": This is the completed version of the app made with Flutter. Please refer to the dart code of this project and implement the common logic, Android, and iOS code.
+# ディレクトリ構成
+- shared/src
+  - commonMain/  :プラットフォームに依存しない共有ロジック、RepositoryやModelはこのディレクトリに実装してください。"commonMain/"がコアとして機能し、プラットフォーム固有のロジックは"androidMain/"と"iosMain/"に配置されます。
+  - androidMain/  : Android 固有のロジックです
+  - iosMain/      : iOS 固有のロジックです
+- androidApp/  : Androidネイティブ実装です
+- iosApp/      : iOSネイティブ実装です
 
-## Architecture
-As with the structure of the "sampleprj/" directory, use the repository pattern for processing to retrieve data from local storage and external sources, and use MVVM for the UI layer.
+# 利用ライブラリ
+- Koin: Modelクラス以外は全てDI対象とします
+- Ktor: API通信はKtorを使います
+- SQLDelight: 履歴の管理に使います
 
-## Libraries used
-Of the libraries used in the Flutter code in the "sampleprj/" directory, which library should be used for the common logic ("commonMain/")?
-- API
-  - dio -> Ktor
-- Local storage
-  - Hive -> SQLDelight
-  - shared_preferences -> multiplatform-settings
-- Dependency injection (DI)
-  - Riverpod -> Koin
+## 実装ガイドライン
+- 共通ロジック(commonMain)
+  - FakeHttpClient を使用して API 呼び出しをモックします。
+  - モデル クラスを除くすべてのクラスは、依存性注入に Koin を使用してください
+  - すべてのpublic関数は"suspend"関数で実装してください。
+- androidAppおよびiosApp
+  - ネイティブ実装は指示がない限り実装しないでください。
 
-## Implementation guidelines
-- Common logic ("commonMain/")
-  - Use FakeHttpClient to mock API calls.
-  - Use Koin for dependency injection for all classes except model classes.
-  - Implement all public functions in the "suspend" function.
-- "androidApp/"
-  - Use "Jetpack Compose" to implement the UI.
-  - Use "Jetpack ViewModel" for the ViewModel.
-  - Use Flow for View and ViewModel.
-
-## Handling sensitive files
-Do not read or modify the following files
-- ".env" file
-- ".keystore" file
-- Files containing tokens
-- Files containing secrets
-- Files containing passwords
+## 機密ファイルの扱い
+次のファイルは読み取ったり変更したりしないでください
+- .envファイル
+- .keystoreファイル
+- トークンを含むファイル
+- シークレットを含むファイル
+- パスワードを含むファイル

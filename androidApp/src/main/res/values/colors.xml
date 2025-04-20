@@ -2,4 +2,6 @@
 <resources>
     <color name="primary">#906c56</color>
     <color name="appbarColor">#955719</color>
+
+    <color name="white">#FFFFFF</color>
 </resources>

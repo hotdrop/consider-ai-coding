@@ -48,8 +48,8 @@ class StartViewModel(
     }
 
     companion object {
-        val module = module {
-            viewModel { StartViewModel(get()) }
-        }
+//        val module = module {
+//            viewModel { StartViewModel(get()) }
+//        }
     }
 }
