@@ -5,15 +5,6 @@ import jp.hotdrop.considercline.repository.AppSettingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
-
-data class StartUiState(
-    val nickName: String = "",
-    val email: String = "",
-    val isLoading: Boolean = false,
-    val error: String? = null
-)
 
 class StartViewModel(
     private val appSettingRepository: AppSettingRepository
@@ -53,3 +44,11 @@ class StartViewModel(
 //        }
     }
 }
+
+
+data class StartUiState(
+    val nickName: String = "",
+    val email: String = "",
+    val isLoading: Boolean = false,
+    val error: String? = null
+)

@@ -4,8 +4,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
 import jp.hotdrop.considercline.model.AppSetting
 import jp.hotdrop.considercline.repository.AppSettingRepository
 
@@ -30,8 +28,4 @@ class MainViewModel (
             }
         }
     }
-}
-
-val splashModule = module {
-    viewModel { MainViewModel(get()) }
 }

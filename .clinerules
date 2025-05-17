@@ -1,38 +1,75 @@
 # 期待する回答
-- 実装コードは省略せず、完全な形で提供してください
-- 日本語での詳細な説明をしてください
+- 実装コードは省略せず、完全な形で提供してください。
+- 日本語での詳細な説明をしてください。
+- 変更点や実装の意図について、明確な根拠や理由を説明してください。
 
-# 設計書
-- Viewレイヤー(ネイティブ)
-  - MVVMアーキテクチャを採用しAndroid/iOSそれぞれネイティブでViewおよびViewModelを実装します。
-- データレイヤー(KMP)
-  - UseCaseとデータレイヤーはKMPで共通化します。ただし、AndroidのSharedPreferecesとiOSのUserDefaultを利用するlocalのデータレイヤーやKMPでインタフェースを提供するのみで、実装は各々のネイティブOS出行います。
+# Memory Bank (Cline's Memory)
+- 重要: `cline_docs/`ディレクトリが存在しない、または必要なファイル (`productContext.md`, `activeContext.md`, `systemPatterns.md`, `techContext.md`, `progress.md`)が不足している場合は、作業を開始する前に必ず作成・更新してください。
+- 作業開始時は、必ず`cline_docs/`内の全てのファイルを読み込み、現在のプロジェクト状況、作業内容、技術的背景を完全に理解してから開発に着手してください。
+- 開発中の重要な変更（アーキテクチャ変更、主要機能の実装完了など）があった場合は、関連する`Memory Bank`ファイルを更新してください。特に `activeContext.md` と `progress.md` は最新の状態を保つようにしてください。
+- ユーザーから "update memory bank" の指示があった場合は、現在の作業状況、次のステップ、未解決の問題などを詳細に`activeContext.md`に記録し、他のドキュメントも必要に応じて更新してください。
+
+# 設計思想とアーキテクチャ
+- 全体: Kotlin Multiplatform を最大限活用し、プラットフォーム間で可能な限りコードを共通化します。あなたが主に担当するのは`shared`モジュール内の共通ロジックです。
+- Viewレイヤー (ネイティブ):
+    - 重要: あなたは原則としてこのレイヤーの実装を行いません。ネイティブ実装は `Android Studio`や`Xcode`など、それぞれのプラットフォームに適したIDEで行う必要があります。
+    - Android(`androidApp/`): Android View (XMLレイアウト) を使用して View を実装します。
+    - iOS(`iosApp/`): Storyboard または Xib を使用して View を実装します。
+    - MVVM (Model-View-ViewModel) アーキテクチャを採用します。ViewModel は各プラットフォームで実装しますが、ビジネスロジックは `shared` モジュールの UseCase を利用します。ViewModel の実装も、原則として Cline は行いません。
+- UseCase レイヤー (KMP共通 - `shared/src/commonMain`):
+    - Cline の主な実装範囲です。
+    - アプリケーション固有のビジネスロジックを実装します。
+    - 1つ以上のRepositoryを組み合わせて特定の機能を提供します。
+    - ネイティブのViewModelから呼び出されることを想定します。
+- データレイヤー (KMP共通 - `shared/src/commonMain`):
+    - Cline の主な実装範囲です。
+    - Repository パターンを採用します。
+    - Repository は、データソース（Remote/Local）を抽象化し、UseCase に一貫したインターフェースを提供します。
+    - Remote: Ktor を使用して API 通信を行います。API クライアントの実装は `shared/src/commonMain` に配置します。
+    - Local:
+        - データベース: SQLDelight を使用して、構造化されたデータを永続化します（例: 履歴）。DB スキーマ (`.sq` ファイル) と生成されるインターフェースは `shared/src/commonMain` に配置します。
+        - Key-Valueストア: 設定値などの単純なデータの保存には、プラットフォーム固有の機能（Android: Jetpack DataStore/SharedPreferences, iOS: UserDefaults）を利用します。`expect`/`actual` を使用して `commonMain` でインターフェースを定義し、`androidMain`/`iosMain` で実装を提供します (`actual` 実装も Cline の実装範囲です)。
 
 # ディレクトリ構成
-- shared/src
-  - commonMain/  :プラットフォームに依存しない共有ロジック、RepositoryやModelはこのディレクトリに実装してください。"commonMain/"がコアとして機能し、プラットフォーム固有のロジックは"androidMain/"と"iosMain/"に配置されます。
-  - androidMain/  : Android 固有のロジックです
-  - iosMain/      : iOS 固有のロジックです
-- androidApp/  : Androidネイティブ実装です
-- iosApp/      : iOSネイティブ実装です
+- `shared/src`: KMP 共通モジュール (Cline の主な作業ディレクトリ)
+    - `commonMain/`: プラットフォームに依存しない共通ロジック (Model, Repository インターフェース, UseCase, Ktor Client, SQLDelight スキーマ/クエリ, `expect` 宣言など)
+    - `androidMain/`: Android 固有の実装 (`actual` 実装 - 例: `DriverFactory`, `SettingDao` 実装, Android固有API連携)
+    - `iosMain/`: iOS 固有の実装 (`actual` 実装 - 例: `DriverFactory`, `SettingDao` 実装, iOS固有API連携)
+    - `commonTest/`: `commonMain` のユニットテスト
+    - `androidTest/`: `androidMain` のユニットテスト、および Android 固有のテスト
+    - `iosTest/`: `iosMain` のユニットテスト、および iOS 固有のテスト
+- `androidApp/`: Android アプリケーションモジュール (原則として Cline は変更しません)
+- `iosApp/`: iOS アプリケーションモジュール (原則として Cline は変更しません)
+- `cline_docs/`: Cline の Memory Bank ドキュメント (必須)
+- `gradle/`: Gradle 設定関連 ( `libs.versions.toml` を含む)
 
-# 利用ライブラリ
-- Koin: Modelクラス以外は全てDI対象とします
-- Ktor: API通信はKtorを使います
-- SQLDelight: 履歴の管理に使います
+# 利用ライブラリとバージョン管理
+- DI: Koin (Modelクラス以外は全てDI対象とする。DI設定は `shared` モジュール内で行うことを基本とする)
+- API通信: Ktor
+- データベース: SQLDelight
+- 非同期処理: kotlinx.coroutines (標準ライブラリの一部として積極的に活用)
+- テスト: kotlin.test, MockK (モックが必要な場合)
+- バージョン管理: `gradle/libs.versions.toml` を使用して、全ての依存ライブラリのバージョンを一元管理してください。新しいライブラリを追加/更新する際は、必ずこのファイルを更新してください。
 
-## 実装ガイドライン
-- 共通ロジック(commonMain)
-  - FakeHttpClient を使用して API 呼び出しをモックします。
-  - モデル クラスを除くすべてのクラスは、依存性注入に Koin を使用してください
-  - すべてのpublic関数は"suspend"関数で実装してください。
-- androidAppおよびiosApp
-  - ネイティブ実装は指示がない限り実装しないでください。
+# 実装ガイドライン
+- 共通 (`shared/src`)
+    - 最重要: Cline は `shared` モジュール内のコードのみを実装・変更します。 `androidApp` および `iosApp` ディレクトリ内のコードは、ユーザーからの明確な指示がない限り、絶対に編集しないでください。
+    - `expect`/`actual`: プラットフォーム固有APIへのアクセスが必要な場合に限定して使用します。可能な限りインターフェースと実装の分離で対応できないか検討してください。`actual` 実装は `androidMain`/`iosMain` に配置し、Cline が実装を担当します。
+    - 非同期処理: public な I/O 処理や時間のかかる処理は、原則として `suspend` 関数として実装してください。コルーチンスコープとディスパッチャの管理に注意してください (`viewModelScope` はネイティブ側で管理される想定、`Dispatchers.IO`, `Dispatchers.Default` など)。
+    - エラーハンドリング: `Result` クラス (Kotlin標準または自作) の使用を検討し、エラー状態を明確に伝搬させてください。UseCase 層で例外をキャッチし、ネイティブの ViewModel 層に分かりやすいエラー情報を提供するように努めてください。
+    - イミュータビリティ:可能な限りイミュータブルなデータクラスを使用してください。
+    - モック: API 呼び出しのテストには `FakeHttpClient` や MockK を使用してください。
+    - DI: Koin モジュールは機能ごとに分割し、`commonMain`, `androidMain`, `iosMain` で適切に定義してください。ネイティブ側の DI 設定は原則として Cline は触りません。
+    - ドキュメンテーション: public なクラス、関数、プロパティには KDoc コメントを記述してください。
+- ネイティブ (`androidApp/`, `iosApp/`)
+    - Cline の実装範囲外: 前述の通り、Cline はこれらのディレクトリ内のコードを原則として編集しません。これは、ネイティブ開発には専用の IDE (Android Studio, Xcode) が必要であり、Cline の動作環境 (VSCode) では適切な開発・デバッグが困難なためです。
+    - UIフレームワーク: Android は Android View (XML), iOS は Storyboard/Xib を使用します。
+- コーディングスタイル: Kotlin 公式のコーディング規約に従ってください ([https://kotlinlang.org/docs/coding-conventions.html](https://kotlinlang.org/docs/coding-conventions.html))。
 
-## 機密ファイルの扱い
-次のファイルは読み取ったり変更したりしないでください
-- .envファイル
-- .keystoreファイル
-- トークンを含むファイル
-- シークレットを含むファイル
-- パスワードを含むファイル
+# テスト
+- ユニットテスト: `commonMain` のロジック (UseCase, Repository の共通部分など) に対しては `commonTest` にユニットテストを作成してください。プラットフォーム固有の `actual` 実装に対しては、`androidTest`/`iosTest` にテストを作成してください。
+- カバレッジ: 重要なビジネスロジックについては、高いテストカバレッジを目指してください。
+
+# 機密ファイルの扱いと `.clineignore`
+- 機密情報: `.env`, `.keystore`, APIキー、トークン、シークレット、パスワードを含むファイルは絶対に読み取ったり変更したりしないでください。
+- `.clineignore`: プロジェクトルートの `.clineignore` ファイルに記載されているファイルやディレクトリ（ビルド成果物、機密ファイル、OS固有ファイルなど）にはアクセスしないでください。`list_files` で 🔒 が付いているファイルはアクセス禁止です。
