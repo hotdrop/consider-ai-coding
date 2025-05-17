@@ -54,7 +54,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout.core)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation("com.google.dagger:hilt-android:2.56.2")
-    ksp("com.google.dagger:hilt-compiler:2.56.2")
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
     debugImplementation(libs.compose.ui.tooling)
 }

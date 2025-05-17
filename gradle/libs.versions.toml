@@ -18,7 +18,8 @@ constraintlayoutCore = "1.1.0"
 lifecycleViewmodel = "2.8.7"
 lifecycleLivedataKtx = "2.8.7"
 appcompat = "1.7.0"
-daggerAndroid = "2.56.2"
+#daggerAndroid = "2.56.2"
+hiltAndroid = "2.56.2"
 hiltAndroidCompiler = "2.56.2"
 
 [libraries]
@@ -53,7 +54,8 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-constraintlayout-core = { group = "androidx.constraintlayout", name = "constraintlayout-core", version.ref = "constraintlayoutCore" }
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycleViewmodel" }
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
-dagger-android = { group = "com.google.dagger", name = "dagger-android", version.ref = "daggerAndroid" }
+#dagger-android = { group = "com.google.dagger", name = "dagger-android", version.ref = "daggerAndroid" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 

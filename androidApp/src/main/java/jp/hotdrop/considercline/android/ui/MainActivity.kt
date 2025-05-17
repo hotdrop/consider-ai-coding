@@ -1,6 +1,7 @@
 package jp.hotdrop.considercline.android.ui
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
