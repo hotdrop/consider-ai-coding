@@ -8,9 +8,9 @@
     <string name="splash_error_label">エラーです。アプリを再度実行してください。</string>
     <string name="splash_image_contents_description">起動時のコーヒー画像です</string>
     <string name="start_title">はじめに</string>
-    <string name="start_overview">ユーザー情報を登録します。</string>
-    <string name="start_nick_name_field_label">ニックネーム</string>
-    <string name="start_email_field_label">メールアドレス</string>
+    <string name="start_overview">ユーザー情報を登録します。入力せずに進んでください。</string>
+    <string name="start_nick_name_field_label">ニックネーム(省略可能)</string>
+    <string name="start_email_field_label">メールアドレス(省略可能)</string>
     <string name="start_register_button">この内容で登録する</string>
     <string name="email_validation_error">XXX＠YYY.ZZの形式で入力してください。</string>
     <string name="home_title">ホーム</string>

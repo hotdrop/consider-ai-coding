@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.databinding.ActivityMainBinding
+import jp.hotdrop.considercline.android.ui.start.StartActivity
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -17,7 +18,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        initView()
         observe()
+    }
+
+    private fun initView() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.run {
+            setDisplayHomeAsUpEnabled(false)
+            setDisplayShowTitleEnabled(false)
+        }
     }
 
     private fun observe() {
@@ -30,7 +40,7 @@ class MainActivity : AppCompatActivity() {
                 binding.progressBar.isVisible = false
                 binding.firstStartGroup.isVisible = true
                 binding.startButton.setOnClickListener {
-                    // TODO Login画面へ遷移
+                    StartActivity.startActivity(this)
                 }
             }
         }

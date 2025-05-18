@@ -1,105 +1,41 @@
 package jp.hotdrop.considercline.android.ui.start
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import jp.hotdrop.considercline.android.R
-import kotlinx.coroutines.launch
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
+import jp.hotdrop.considercline.android.databinding.ActivityStartBinding
 
-@Composable
-fun StartScreen(
-    onNavigateToHome: () -> Unit
-) {
-    // TODO AndroidViewで書き直し
-//
-//    val scope = rememberCoroutineScope()
-//
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text(stringResource(R.string.start_title)) }
-//            )
-//        }
-//    ) { paddingValues ->
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(paddingValues)
-//        ) {
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(16.dp)
-//            ) {
-//                Text(stringResource(R.string.start_overview))
-//                Spacer(modifier = Modifier.height(16.dp))
-//
-//                OutlinedTextField(
-//                    value = uiState.nickName,
-//                    onValueChange = viewModel::onNickNameChanged,
-//                    label = { Text(stringResource(R.string.start_nick_name_field_label)) },
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//
-//                Spacer(modifier = Modifier.height(24.dp))
-//
-//                OutlinedTextField(
-//                    value = uiState.email,
-//                    onValueChange = viewModel::onEmailChanged,
-//                    label = { Text(stringResource(R.string.start_email_field_label)) },
-//                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//
-//                Spacer(modifier = Modifier.height(24.dp))
-//
-//                Button(
-//                    onClick = {
-//                        scope.launch {
-//                            viewModel.save()
-//                            if (uiState.error == null) {
-//                                onNavigateToHome()
-//                            }
-//                        }
-//                    },
-//                    enabled = uiState.nickName.isNotEmpty() && uiState.email.isNotEmpty(),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 36.dp)
-//                ) {
-//                    Text(stringResource(R.string.start_register_button))
-//                }
-//            }
-//
-//            if (uiState.isLoading) {
-//                Box(
-//                    modifier = Modifier.fillMaxSize(),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    CircularProgressIndicator()
-//                }
-//            }
-//
-//            uiState.error?.let {
-//                // TODO ダイアログ実装
-////                AlertDialog(
-////                    onDismissRequest = { viewModel.onErrorDismissed() },
-////                    title = { Text(stringResource(R.string.error_dialog_title)) },
-////                    text = { Text(error) },
-////                    confirmButton = {
-////                        TextButton(onClick = { viewModel.onErrorDismissed() }) {
-////                            Text(stringResource(R.string.error_dialog_ok))
-////                        }
-////                    }
-////                )
-//            }
-//        }
-//    }
+@AndroidEntryPoint
+class StartActivity : AppCompatActivity() {
+    private val binding by lazy { ActivityStartBinding.inflate(layoutInflater) }
+    private val viewModel: StartViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(binding.root)
+
+        initView()
+    }
+
+    private fun initView() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.run {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowTitleEnabled(false)
+        }
+
+        // TODO メールアドレスの入力
+        // TODO ニックネームの入力
+        // TODO 登録ボタンのリスナー
+    }
+
+    private fun observe() {
+        lifecycle.addObserver(viewModel)
+    }
+
+    companion object {
+        fun startActivity(activity: AppCompatActivity) = activity.startActivity(Intent(activity, StartActivity::class.java))
+    }
 }

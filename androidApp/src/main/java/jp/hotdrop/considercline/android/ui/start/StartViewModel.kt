@@ -1,54 +1,67 @@
 package jp.hotdrop.considercline.android.ui.start
 
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.hotdrop.considercline.android.ui.BaseViewModel
 import jp.hotdrop.considercline.repository.AppSettingRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class StartViewModel(
+@HiltViewModel
+class StartViewModel @Inject constructor(
     private val appSettingRepository: AppSettingRepository
-) : ViewModel() {
-    private val _uiState = MutableStateFlow(StartUiState())
-    val uiState = _uiState.asStateFlow()
+) : BaseViewModel() {
+    private val mutableUiState = MutableLiveData<StartUiState>()
+    val uiStateLiveData: LiveData<StartUiState> = mutableUiState
+
+    private val mutableError = MutableLiveData<String?>()
+    val errorLiveData: LiveData<String?> = mutableError
+
+    private var _uiState = StartUiState()
 
     fun onNickNameChanged(newValue: String) {
-        _uiState.update { it.copy(nickName = newValue) }
+        _uiState = _uiState.copyWith(nickName = newValue)
     }
 
     fun onEmailChanged(newValue: String) {
-        _uiState.update { it.copy(email = newValue) }
+        _uiState = _uiState.copyWith(email = newValue)
     }
 
     fun onErrorDismissed() {
-        _uiState.update { it.copy(error = null) }
+        mutableError.postValue(null)
     }
 
-    suspend fun save() {
-        _uiState.update { it.copy(isLoading = true, error = null) }
-        try {
-            appSettingRepository.registerUser(
-                _uiState.value.nickName,
-                _uiState.value.email
-            )
-        } catch (e: Exception) {
-            _uiState.update { it.copy(error = e.message) }
-        } finally {
-            _uiState.update { it.copy(isLoading = false) }
+    fun save() {
+        _uiState = _uiState.copyWith(isLoading = true)
+        mutableUiState.postValue(_uiState)
+        launch {
+            try {
+                appSettingRepository.registerUser(_uiState.nickName, _uiState.email)
+            } catch (e: Exception) {
+                mutableError.postValue(e.message)
+            } finally {
+                _uiState = _uiState.copyWith(isLoading = false)
+                mutableUiState.postValue(_uiState)
+            }
         }
     }
-
-    companion object {
-//        val module = module {
-//            viewModel { StartViewModel(get()) }
-//        }
-    }
 }
-
 
 data class StartUiState(
     val nickName: String = "",
     val email: String = "",
-    val isLoading: Boolean = false,
-    val error: String? = null
-)
+    val isLoading: Boolean = false
+) {
+    fun copyWith(
+        nickName: String? = null,
+        email: String? = null,
+        isLoading: Boolean? = null
+    ): StartUiState {
+        return StartUiState(
+            nickName = nickName ?: this.nickName,
+            email = email ?: this.email,
+            isLoading = isLoading ?: this.isLoading
+        )
+    }
+}
