@@ -32,8 +32,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.datetime)
-            implementation(libs.multiplatform.settings)
-            implementation(libs.multiplatform.settings.coroutines)
             implementation(libs.sqldelight.runtime)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.cio)
