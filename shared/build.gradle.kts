@@ -34,7 +34,6 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.multiplatform.settings)
             implementation(libs.multiplatform.settings.coroutines)
-            implementation(libs.koin.core)
             implementation(libs.sqldelight.runtime)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.cio)
@@ -47,7 +46,6 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.sqldelight.android.driver)
             implementation(libs.ktor.client.android)
-            implementation(libs.koin.android)
         }
 
         iosMain.dependencies {

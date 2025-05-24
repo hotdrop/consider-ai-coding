@@ -4,14 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.android.ui.BaseViewModel
-import jp.hotdrop.considercline.repository.AppSettingRepository
+import jp.hotdrop.considercline.di.KmpUseCaseFactory
+import jp.hotdrop.considercline.usecase.AppSettingUseCase
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class StartViewModel @Inject constructor(
-    private val appSettingRepository: AppSettingRepository
-) : BaseViewModel() {
+class StartViewModel @Inject constructor() : BaseViewModel() {
+    private val appSettingUseCase: AppSettingUseCase by lazy { KmpUseCaseFactory.appSettingUseCase }
+
     private val mutableUiState = MutableLiveData<StartUiState>()
     val uiStateLiveData: LiveData<StartUiState> = mutableUiState
 
@@ -37,7 +38,7 @@ class StartViewModel @Inject constructor(
         mutableUiState.postValue(_uiState)
         launch {
             try {
-                appSettingRepository.registerUser(_uiState.nickName, _uiState.email)
+                appSettingUseCase.registerUser(_uiState.nickName, _uiState.email)
             } catch (e: Exception) {
                 mutableError.postValue(e.message)
             } finally {

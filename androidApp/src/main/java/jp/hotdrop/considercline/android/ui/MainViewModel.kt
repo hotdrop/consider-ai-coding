@@ -3,13 +3,16 @@ package jp.hotdrop.considercline.android.ui
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.hotdrop.considercline.di.KmpUseCaseFactory
 import kotlinx.coroutines.launch
 import jp.hotdrop.considercline.model.AppSetting
-import jp.hotdrop.considercline.repository.AppSettingRepository
+import jp.hotdrop.considercline.usecase.AppSettingUseCase
+import javax.inject.Inject
 
-class MainViewModel (
-    private val appSettingRepository: AppSettingRepository
-) : BaseViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor() : BaseViewModel() {
+    private val appSettingUseCase: AppSettingUseCase by lazy { KmpUseCaseFactory.appSettingUseCase }
 
     private val mutableAppSetting = MutableLiveData<AppSetting>()
     val appSettingLiveData: LiveData<AppSetting> = mutableAppSetting
@@ -21,7 +24,7 @@ class MainViewModel (
         super.onCreate(owner)
         launch {
             try {
-                val appSetting = appSettingRepository.find()
+                val appSetting = appSettingUseCase.find()
                 mutableAppSetting.postValue(appSetting)
             } catch (e: Exception) {
                 mutableError.postValue(e.message ?: "Unknown error")

@@ -4,15 +4,13 @@ import jp.hotdrop.considercline.db.ConsiderClineDatabase
 import jp.hotdrop.considercline.model.History
 import kotlinx.datetime.Clock
 import kotlinx.datetime.toLocalDateTime
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * ポイント履歴のデータアクセスクラス
  */
-class HistoryDao : KoinComponent {
-
-    private val database: ConsiderClineDatabase by inject()
+class HistoryDao(
+    private val database: ConsiderClineDatabase
+) {
 
     /**
      * 全ての履歴を取得する
