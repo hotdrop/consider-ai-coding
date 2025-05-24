@@ -16,6 +16,7 @@ import jp.hotdrop.considercline.repository.PointRepository
 import jp.hotdrop.considercline.repository.local.HistoryDao
 import jp.hotdrop.considercline.repository.local.KmpSharedPreferences
 import jp.hotdrop.considercline.repository.local.SettingDao
+import jp.hotdrop.considercline.repository.remote.FakeHttpClient
 import jp.hotdrop.considercline.repository.remote.HttpClient
 import jp.hotdrop.considercline.repository.remote.KtorHttpClient
 import jp.hotdrop.considercline.repository.remote.api.PointApi
@@ -74,7 +75,8 @@ object KmpUseCaseFactory {
     }
 
     // API
-    private val httpClient: HttpClient by lazy { KtorHttpClient(ktorNativeClient) }
+//    private val httpClient: HttpClient by lazy { KtorHttpClient(ktorNativeClient) }
+    private val httpClient: HttpClient by lazy { FakeHttpClient(sharedPreferences) }
     private val pointApi: PointApi by lazy { PointApi(httpClient) }
     private val userApi: UserApi by lazy { UserApi(httpClient) }
 

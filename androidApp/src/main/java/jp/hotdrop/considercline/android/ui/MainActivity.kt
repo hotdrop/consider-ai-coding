@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.databinding.ActivityMainBinding
+import jp.hotdrop.considercline.android.ui.home.HomeActivity
 import jp.hotdrop.considercline.android.ui.start.StartActivity
 
 @AndroidEntryPoint
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             if (it.isInitialized()) {
                 binding.userId.text = getString(R.string.splash_user_id_label, it.userId)
                 binding.userId.isVisible = true
-                // TODO Home画面へ遷移
+                navigationToHome()
             } else {
                 binding.progressBar.isVisible = false
                 binding.firstStartGroup.isVisible = true
@@ -45,5 +46,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
         lifecycle.addObserver(viewModel)
+    }
+
+    private fun navigationToHome() {
+        HomeActivity.start(this)
+        finish()
     }
 }

@@ -29,16 +29,13 @@ class StartViewModel @Inject constructor() : BaseViewModel() {
         _uiState = _uiState.copyWith(email = newValue)
     }
 
-    fun onErrorDismissed() {
-        mutableError.postValue(null)
-    }
-
     fun save() {
         _uiState = _uiState.copyWith(isLoading = true)
         mutableUiState.postValue(_uiState)
         launch {
             try {
                 appSettingUseCase.registerUser(_uiState.nickName, _uiState.email)
+                _uiState = _uiState.copyWith(isComplete = true)
             } catch (e: Exception) {
                 mutableError.postValue(e.message)
             } finally {
@@ -52,17 +49,20 @@ class StartViewModel @Inject constructor() : BaseViewModel() {
 data class StartUiState(
     val nickName: String = "",
     val email: String = "",
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isComplete: Boolean = false
 ) {
     fun copyWith(
         nickName: String? = null,
         email: String? = null,
-        isLoading: Boolean? = null
+        isLoading: Boolean? = null,
+        isComplete: Boolean? = null
     ): StartUiState {
         return StartUiState(
             nickName = nickName ?: this.nickName,
             email = email ?: this.email,
-            isLoading = isLoading ?: this.isLoading
+            isLoading = isLoading ?: this.isLoading,
+            isComplete = isComplete ?: this.isComplete
         )
     }
 }

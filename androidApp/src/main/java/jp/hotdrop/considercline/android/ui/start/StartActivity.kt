@@ -4,8 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.databinding.ActivityStartBinding
+import jp.hotdrop.considercline.android.ui.home.HomeActivity
 
 @AndroidEntryPoint
 class StartActivity : AppCompatActivity() {
@@ -17,6 +20,7 @@ class StartActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         initView()
+        observe()
     }
 
     private fun initView() {
@@ -26,16 +30,46 @@ class StartActivity : AppCompatActivity() {
             setDisplayShowTitleEnabled(false)
         }
 
-        // TODO メールアドレスの入力
-        // TODO ニックネームの入力
-        // TODO 登録ボタンのリスナー
+        binding.emailEditText.addTextChangedListener {
+            viewModel.onEmailChanged(it.toString())
+        }
+
+        binding.nicknameEditText.addTextChangedListener {
+            viewModel.onNickNameChanged(it.toString())
+        }
+
+        binding.registerButton.setOnClickListener {
+            viewModel.save()
+        }
     }
 
     private fun observe() {
+        viewModel.uiStateLiveData.observe(this) {
+            when {
+                it.isComplete -> navigationToHome()
+                it.isLoading -> {
+                    binding.registerButton.isVisible = false
+                    binding.progressBar.isVisible = true
+                }
+                else -> {
+                    binding.registerButton.isVisible = true
+                    binding.progressBar.isVisible = false
+                }
+            }
+        }
+        viewModel.errorLiveData.observe(this) {
+            // TODO エラーダイアログポップアップ
+        }
         lifecycle.addObserver(viewModel)
     }
 
+    private fun navigationToHome() {
+        HomeActivity.start(this)
+        finish()
+    }
+
     companion object {
-        fun startActivity(activity: AppCompatActivity) = activity.startActivity(Intent(activity, StartActivity::class.java))
+        fun startActivity(activity: AppCompatActivity) =
+            activity.startActivity(Intent(activity, StartActivity::class.java))
     }
 }
