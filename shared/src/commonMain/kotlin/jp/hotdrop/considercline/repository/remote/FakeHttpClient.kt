@@ -1,16 +1,15 @@
 package jp.hotdrop.considercline.repository.remote
 
-import com.russhwolf.settings.Settings
+import jp.hotdrop.considercline.repository.local.KmpSharedPreferences
 import jp.hotdrop.considercline.repository.remote.models.Request
 import kotlinx.coroutines.delay
 
 class FakeHttpClient(
-  private val settings: Settings
+    private val sharedPreferences: KmpSharedPreferences
 ) : HttpClient {
 
     companion object {
         private const val FAKE_COFFEE_USER_ID = "4d58da01395bcaf9"
-        private const val FAKE_LOCAL_STORE_POINT_KEY = "key101"
         private const val FAKE_USER_RESPONSE = """
             {
                 "id": "$FAKE_COFFEE_USER_ID",
@@ -33,7 +32,7 @@ class FakeHttpClient(
                 )
             }
             "/point" -> {
-                val currentPoint = settings.getInt(FAKE_LOCAL_STORE_POINT_KEY, 0)
+                val currentPoint = sharedPreferences.getPoint()
                 mapOf("point" to currentPoint)
             }
             else -> throw HttpError("未実装のエンドポイントです: $endpoint")
@@ -68,13 +67,13 @@ class FakeHttpClient(
         }
     }
 
-    private fun acquirePoint(inputPoint: Int) {
-        val currentPoint = settings.getInt(FAKE_LOCAL_STORE_POINT_KEY, 0)
-        settings.putInt(FAKE_LOCAL_STORE_POINT_KEY, currentPoint + inputPoint)
+    private suspend fun acquirePoint(inputPoint: Int) {
+        val currentPoint = sharedPreferences.getPoint()
+        sharedPreferences.savePoint(currentPoint + inputPoint)
     }
 
-    private fun usePoint(inputPoint: Int) {
-        val currentPoint = settings.getInt(FAKE_LOCAL_STORE_POINT_KEY, 0)
-        settings.putInt(FAKE_LOCAL_STORE_POINT_KEY, currentPoint - inputPoint)
+    private suspend fun usePoint(inputPoint: Int) {
+        val currentPoint = sharedPreferences.getPoint()
+        sharedPreferences.savePoint(currentPoint - inputPoint)
     }
 }

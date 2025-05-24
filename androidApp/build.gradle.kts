@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.runtime)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 }

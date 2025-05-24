@@ -1,10 +1,12 @@
 package jp.hotdrop.considercline.repository.local
 
-expect class KmpSharedPreferences {
-    fun getUserId(): String?
-    fun saveUserId(newVal: String)
-    fun getNickName(): String?
-    fun saveNickName(newVal: String)
-    fun getEmail(): String?
-    fun saveEmail(newVal: String)
+interface KmpSharedPreferences {
+    suspend fun getUserId(): String?
+    suspend fun saveUserId(newVal: String)
+    suspend fun getNickName(): String?
+    suspend fun saveNickName(newVal: String)
+    suspend fun getEmail(): String?
+    suspend fun saveEmail(newVal: String)
+    suspend fun getPoint(): Int
+    suspend fun savePoint(newVal: Int)
 }
