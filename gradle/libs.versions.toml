@@ -1,20 +1,25 @@
 [versions]
 agp = "8.8.0"
 kotlin = "2.0.21"
-kotlinx-datetime = "0.5.0"
-sqldelight = "2.0.1"
-ktor = "2.3.8"
-kotlinx-serialization = "1.6.2"
+activityKtx = "1.10.1"
+appcompat = "1.7.0"
+material = "1.12.0"
 lifecycle = "2.8.7"
 constraintlayout = "2.2.0"
 constraintlayoutCore = "1.1.0"
 lifecycleViewmodel = "2.8.7"
 lifecycleLivedataKtx = "2.8.7"
-appcompat = "1.7.0"
+compose = "1.5.4"
+androidx-activityCompose = "1.8.0"
+navigation = "2.7.7"
+compose-material = "1.5.4"
+lifecycleRuntimeComposeAndroid = "2.8.7"
 hiltAndroid = "2.56.2"
-material = "1.12.0"
-activityKtx = "1.10.1"
 datastorePreferences = "1.1.7"
+kotlinx-datetime = "0.5.0"
+sqldelight = "2.0.1"
+ktor = "2.3.8"
+kotlinx-serialization = "1.6.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -42,6 +47,14 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+compose-material = { module = "androidx.compose.material:material", version.ref = "compose-material" }
+androidx-lifecycle-runtime-compose-android = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose-android", version.ref = "lifecycleRuntimeComposeAndroid" }
 
 [plugins]
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
@@ -52,3 +65,4 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version = "2.0.21-1.0.27" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

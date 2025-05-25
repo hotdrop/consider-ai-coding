@@ -18,7 +18,6 @@ import jp.hotdrop.considercline.repository.local.KmpSharedPreferences
 import jp.hotdrop.considercline.repository.local.SettingDao
 import jp.hotdrop.considercline.repository.remote.FakeHttpClient
 import jp.hotdrop.considercline.repository.remote.HttpClient
-import jp.hotdrop.considercline.repository.remote.KtorHttpClient
 import jp.hotdrop.considercline.repository.remote.api.PointApi
 import jp.hotdrop.considercline.repository.remote.api.UserApi
 import jp.hotdrop.considercline.usecase.AppSettingUseCase
@@ -43,7 +42,7 @@ object KmpUseCaseFactory {
     // UserCase
     val appSettingUseCase: AppSettingUseCase by lazy { AppSettingUseCase(appSettingRepository) }
     val historyUseCase: HistoryUseCase by lazy { HistoryUseCase(historyRepository) }
-    val pointUseCase: PointUseCase by lazy { PointUseCase(pointRepository) }
+    val pointUseCase: PointUseCase by lazy { PointUseCase(pointRepository, historyRepository) }
 
     // Repositories
     private val appSettingRepository: AppSettingRepository by lazy { AppSettingRepository(settingDao, userApi) }

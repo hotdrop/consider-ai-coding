@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
@@ -47,9 +48,20 @@ dependencies {
     implementation(libs.androidx.constraintlayout.core)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.navigation.compose)
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.runtime.compose.android)
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.runtime)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    debugImplementation(libs.compose.ui.tooling)
 }
