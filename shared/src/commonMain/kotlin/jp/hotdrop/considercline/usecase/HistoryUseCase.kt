@@ -9,12 +9,4 @@ class HistoryUseCase(
     suspend fun findAll(): List<History> {
         return repository.findAll()
     }
-
-    suspend fun saveAcquire(value: Int) {
-        repository.saveAcquire(value)
-    }
-
-    suspend fun saveUse(value: Int) {
-        repository.saveUse(value)
-    }
 }

@@ -33,6 +33,7 @@
     <string name="point_get_confirm_detail">よろしければ「ポイントを獲得する」ボタンをタップしてください。</string>
     <string name="point_get_confirm_point_label">獲得ポイント</string>
     <string name="point_get_confirm_execute_button">ポイントを獲得する</string>
+    <string name="point_get_confirm_complete_dialog_message">ポイントを獲得しました！</string>
     <string name="point_use_title">ポイント利用</string>
     <string name="point_use_input_error">エラーです。</string>
     <string name="point_use_input_overview">現在保持しているポイント数</string>
