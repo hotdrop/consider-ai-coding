@@ -41,8 +41,7 @@
             android:id="@+id/point_card_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
+            app:cardElevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -70,10 +69,10 @@
                     android:layout_marginTop="16dp"
                     android:textColor="@color/white"
                     android:textSize="24sp"
+                    android:text="@string/home_point_value_default"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/current_date_label"
-                    tools:text="1,200ポイント" />
+                    app:layout_constraintTop_toBottomOf="@+id/current_date_label" />
 
                 <TextView
                     android:id="@+id/nickname"

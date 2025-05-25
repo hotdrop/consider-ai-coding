@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">KMPアプリ</string>
     <string name="point_unit">P</string>
     <string name="splash_title">起動</string>
     <string name="splash_user_id_label">ユーザーID: %s1</string>
@@ -14,7 +15,8 @@
     <string name="start_register_button">この内容で登録する</string>
     <string name="email_validation_error">XXX＠YYY.ZZの形式で入力してください。</string>
     <string name="home_title">ホーム</string>
-    <string name="home_point_value">%s1ポイント</string>
+    <string name="home_point_value">%s1 ポイント</string>
+    <string name="home_point_value_default">0 ポイント</string>
     <string name="home_un_setting_nickname">ニックネーム未設定</string>
     <string name="home_un_setting_email">Email未設定</string>
     <string name="home_menu_get_point">ポイント獲得</string>

@@ -6,6 +6,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.databinding.ActivityStartBinding
 import jp.hotdrop.considercline.android.ui.home.HomeActivity
@@ -58,7 +59,10 @@ class StartActivity : AppCompatActivity() {
             }
         }
         viewModel.errorLiveData.observe(this) {
-            // TODO エラーダイアログポップアップ
+            MaterialAlertDialogBuilder(this)
+                .setMessage(it)
+                .setPositiveButton("OK", null)
+                .show()
         }
         lifecycle.addObserver(viewModel)
     }

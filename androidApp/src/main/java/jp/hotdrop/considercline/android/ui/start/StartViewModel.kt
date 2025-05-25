@@ -34,7 +34,7 @@ class StartViewModel @Inject constructor() : BaseViewModel() {
         mutableUiState.postValue(_uiState)
         launch {
             try {
-                appSettingUseCase.registerUser(_uiState.nickName, _uiState.email)
+                appSettingUseCase.registerUser(_uiState.inputNickName, _uiState.inputEmail)
                 _uiState = _uiState.copyWith(isComplete = true)
             } catch (e: Exception) {
                 mutableError.postValue(e.message)
@@ -47,8 +47,8 @@ class StartViewModel @Inject constructor() : BaseViewModel() {
 }
 
 data class StartUiState(
-    val nickName: String = "",
-    val email: String = "",
+    val inputNickName: String = "",
+    val inputEmail: String = "",
     val isLoading: Boolean = false,
     val isComplete: Boolean = false
 ) {
@@ -59,8 +59,8 @@ data class StartUiState(
         isComplete: Boolean? = null
     ): StartUiState {
         return StartUiState(
-            nickName = nickName ?: this.nickName,
-            email = email ?: this.email,
+            inputNickName = nickName ?: this.inputNickName,
+            inputEmail = email ?: this.inputEmail,
             isLoading = isLoading ?: this.isLoading,
             isComplete = isComplete ?: this.isComplete
         )

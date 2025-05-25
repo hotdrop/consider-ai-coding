@@ -21,7 +21,7 @@ class FakeHttpClient(
 
     override suspend fun get(endpoint: String, request: Request?): Map<String, Any?> {
         // 通信しているような雰囲気を出すため遅延を入れる
-        delay(500)
+        delay(2000)
 
         return when (endpoint) {
             "/user/$FAKE_COFFEE_USER_ID" -> {
@@ -41,7 +41,7 @@ class FakeHttpClient(
 
     override suspend fun post(endpoint: String, request: Request): Map<String, Any?> {
         // 通信しているような雰囲気を出すため遅延を入れる
-        delay(1000)
+        delay(2000)
 
         return when (endpoint) {
             "/user" -> {

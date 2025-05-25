@@ -6,6 +6,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.databinding.ActivityHomeBinding
+import jp.hotdrop.considercline.model.AppSetting
+import jp.hotdrop.considercline.model.History
+import jp.hotdrop.considercline.model.Point
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
@@ -26,12 +31,49 @@ class HomeActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(false)
             setDisplayShowTitleEnabled(false)
         }
+        val now = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
+        binding.currentDateLabel.text = now.format(formatter)
 
-        // TODO Pointカードを構築
+        binding.pointGetButton.setOnClickListener {
+            // TODO Jetpack Compose を使ってPointGetScreenを実装する
+        }
+        binding.pointUseButton.setOnClickListener {
+            // TODO Jetpack Compose を使ってPointUseScreenを実装する
+        }
+
+        onRefreshData()
     }
 
     private fun observe() {
+        viewModel.uiStateLiveData.observe(this) { uiState ->
+            viewUserInfo(uiState.appSetting)
+            uiState.currentPoint?.let { viewCurrentPoint(it) }
+            uiState.histories?.let { viewHistories(it) }
+        }
         lifecycle.addObserver(viewModel)
+    }
+
+    private fun viewUserInfo(appSetting: AppSetting) {
+        if (!appSetting.nickName.isNullOrEmpty()) {
+            binding.nickname.text = appSetting.nickName
+        }
+        if (!appSetting.email.isNullOrEmpty()) {
+            binding.email.text = appSetting.email
+        }
+    }
+
+    private fun viewCurrentPoint(point: Point) {
+        binding.pointValue.text = point.toString()
+    }
+
+    private fun viewHistories(histories: List<History>) {
+        // TODO RecyclerViewを設定
+    }
+
+    private fun onRefreshData() {
+        viewModel.onLoadCurrentPoint()
+        viewModel.onLoadHistory()
     }
 
     companion object {
