@@ -25,7 +25,7 @@
     <string name="point_get_title">ポイント獲得</string>
     <string name="point_get_input_overview">現在保持しているポイント数</string>
     <string name="point_get_input_attention">(※最大で保持できるポイントは%d1です)</string>
-    <string name="point_get_input_error">エラーです。</string>
+    <string name="point_get_input_max_over_error">最大で保持できるポイントを超えています。</string>
     <string name="point_get_input_text_field_label">ポイントを入力</string>
     <string name="point_get_input_text_field_error_over_max_point">獲得できる残ポイントは%d1までです。</string>
     <string name="point_get_input_confirm_button">確認画面へ進む</string>
