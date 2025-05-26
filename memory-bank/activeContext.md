@@ -14,26 +14,25 @@
 *   `initView` 関数の `binding.pointGetButton.setOnClickListener()` 内に、ポイント入力画面 (Compose Activity) への遷移処理を実装しました。
 *   Activity Result API ( `registerForActivityResult` ) を利用した画面遷移と結果のコールバック処理を実装し、ポイント獲得完了後に `HomeActivity` の `onRefreshData()` を呼び出すようにしました。
 
-### 3. ポイント入力画面 (新規 Jetpack Compose Activity)
+### 3. ポイント入力画面 (新規 Jetpack Compose Activity) (完了)
 *   **ファイル作成:**
-    *   `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetInputActivity.kt` (Activity)
-    *   `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetInputViewModel.kt` (ViewModel)
-    *   `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetInputScreen.kt` (Composable関数)
+    *   `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetInputActivity.kt` (Activity) - 作成済み
+    *   `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetInputViewModel.kt` (ViewModel) - 作成済み
+    *   `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetInputScreen.kt` (Composable関数) - 作成済み
 *   **ViewModel (`PointGetInputViewModel.kt`):**
-    *   `KmpUseCaseFactory.pointUseCase` を利用して現在のポイント残高 (`balance`) を取得します。
-    *   `androidApp/src/main/res/values/integers.xml` から `max_point` の値 (5000) を取得します。
-    *   `point.getMaxAvailablePoint(max_pointの値)` を呼び出して、保持可能な最大ポイントを計算します。
-    *   入力されたポイント数を保持する `StateFlow<String>` を持ちます。
-    *   入力ポイントのバリデーションロジックを実装します (0以上、かつ保持可能な最大ポイント未満)。
-    *   エラーメッセージ (`point_get_input_max_over_error`) の表示状態を管理する `StateFlow<Boolean>` を持ちます。
-    *   「確認画面へ進む」ボタンの活性状態を管理する `StateFlow<Boolean>` を持ちます。
+    *   `KmpUseCaseFactory.pointUseCase` を利用して現在のポイント残高 (`balance`) を取得します。 - 実装済み
+    *   入力されたポイント数を保持する `StateFlow<String>` を持ちます。 - 実装済み
+    *   入力ポイントのバリデーションロジックを実装します (0以上、かつ保持可能な最大ポイント未満)。 - 実装済み (最大ポイントはUIから渡される)
+    *   エラーメッセージ (`point_get_input_max_over_error`) の表示状態を管理する `StateFlow<Boolean>` を持ちます。 - 実装済み
+    *   「確認画面へ進む」ボタンの活性状態を管理する `StateFlow<Boolean>` を持ちます。 - 実装済み
 *   **Screen (`PointGetInputScreen.kt`):**
-    *   `strings.xml` の `point_get_input_` で始まるラベルを表示します。
-    *   ポイント入力用の `TextField` を配置 (数値のみ、4桁制限)。
-    *   エラーメッセージを赤色フォントで表示。
-    *   「確認画面へ進む」ボタンを配置し、活性/非活性を制御。クリックでポイント確認画面へ遷移。
+    *   `strings.xml` の `point_get_input_` で始まるラベルを表示します。 - 実装済み
+    *   ポイント入力用の `TextField` を配置 (数値のみ、4桁制限)。 - 実装済み
+    *   エラーメッセージを赤色フォントで表示。 - 実装済み
+    *   「確認画面へ進む」ボタンを配置し、活性/非活性を制御。クリックでポイント確認画面へ遷移。 - 実装済み (Activityで遷移処理を実装)
+    *   `androidApp/src/main/res/values/integers.xml` から `max_point` の値 (5000) を取得し、`point.getMaxAvailablePoint(max_pointの値)` を呼び出して、保持可能な最大ポイントを計算します。 - 実装済み
 *   **Activity (`PointGetInputActivity.kt`):**
-    *   ViewModelをインジェクト (Hilt) し、`PointGetInputScreen` を呼び出します。
+    *   ViewModelをインジェクト (Hilt) し、`PointGetInputScreen` を呼び出します。 - 実装済み
 
 ### 4. ポイント確認画面 (新規 Jetpack Compose Activity)
 *   **ファイル作成:**
