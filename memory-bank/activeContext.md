@@ -4,18 +4,10 @@
 
 `nextTask.md` の指示に基づき、ポイント獲得機能を実装します。主な実装内容は以下の通りです。
 
-### 1. `shared/src/commonMain/kotlin/jp/hotdrop/considercline/model/Point.kt` の修正
-*   `companion object` 内の `private const val MAX_POINT = 1000` を削除します。
-*   既存の `maxAvailablePoint` プロパティを削除します。
-*   以下の通り `getMaxAvailablePoint(maxPoint: Int)` 関数を新たに追加します。
-    ```kt
-    fun getMaxAvailablePoint(maxPoint: Int): Int {
-      if (maxPoint <= balance) {
-        return 0
-      }
-      return maxPoint - balance
-    }
-    ```
+### 1. `shared/src/commonMain/kotlin/jp/hotdrop/considercline/model/Point.kt` の修正 (完了)
+*   `companion object` 内の `private const val MAX_POINT = 1000` を削除しました。
+*   既存の `maxAvailablePoint` プロパティを削除しました。
+*   `getMaxAvailablePoint(maxPoint: Int)` 関数を新たに追加しました。
 
 ### 2. ホーム画面 (`HomeActivity.kt`) の修正
 *   `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/home/HomeActivity.kt`

@@ -10,13 +10,10 @@ data class Point(
     /**
      * 利用可能な最大ポイント
      */
-    val maxAvailablePoint: Int
-        get() = MAX_POINT - balance
-
-    companion object {
-        /**
-         * ポイントの最大値
-         */
-        private const val MAX_POINT = 1000
+    fun getMaxAvailablePoint(maxPoint: Int): Int {
+        if (maxPoint <= balance) {
+            return 0
+        }
+        return maxPoint - balance
     }
 }
