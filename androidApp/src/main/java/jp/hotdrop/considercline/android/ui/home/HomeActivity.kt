@@ -2,10 +2,12 @@ package jp.hotdrop.considercline.android.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.databinding.ActivityHomeBinding
+import jp.hotdrop.considercline.android.ui.pointget.PointGetInputActivity
 import jp.hotdrop.considercline.model.AppSetting
 import jp.hotdrop.considercline.model.History
 import jp.hotdrop.considercline.model.Point
@@ -36,7 +38,7 @@ class HomeActivity : AppCompatActivity() {
         binding.currentDateLabel.text = now.format(formatter)
 
         binding.pointGetButton.setOnClickListener {
-            // TODO Jetpack Compose を使ってPointGetScreenを実装する
+            pointGetInputLauncher.launch(Intent(this, PointGetInputActivity::class.java))
         }
         binding.pointUseButton.setOnClickListener {
             // TODO Jetpack Compose を使ってPointUseScreenを実装する
@@ -74,6 +76,12 @@ class HomeActivity : AppCompatActivity() {
     private fun onRefreshData() {
         viewModel.onLoadCurrentPoint()
         viewModel.onLoadHistory()
+    }
+
+    private val pointGetInputLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            onRefreshData()
+        }
     }
 
     companion object {

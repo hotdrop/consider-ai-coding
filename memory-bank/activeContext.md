@@ -9,10 +9,10 @@
 *   既存の `maxAvailablePoint` プロパティを削除しました。
 *   `getMaxAvailablePoint(maxPoint: Int)` 関数を新たに追加しました。
 
-### 2. ホーム画面 (`HomeActivity.kt`) の修正
+### 2. ホーム画面 (`HomeActivity.kt`) の修正 (完了)
 *   `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/home/HomeActivity.kt`
-*   `initView` 関数の `binding.pointGetButton.setOnClickListener()` 内に、ポイント入力画面 (Compose Activity) への遷移処理を実装します。
-*   Activity Result API ( `registerForActivityResult` ) を利用した画面遷移と結果のコールバック処理を実装し、ポイント獲得完了後に `HomeActivity` の `onRefreshData()` を呼び出します。
+*   `initView` 関数の `binding.pointGetButton.setOnClickListener()` 内に、ポイント入力画面 (Compose Activity) への遷移処理を実装しました。
+*   Activity Result API ( `registerForActivityResult` ) を利用した画面遷移と結果のコールバック処理を実装し、ポイント獲得完了後に `HomeActivity` の `onRefreshData()` を呼び出すようにしました。
 
 ### 3. ポイント入力画面 (新規 Jetpack Compose Activity)
 *   **ファイル作成:**
