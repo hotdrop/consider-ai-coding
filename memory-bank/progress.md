@@ -1,24 +1,15 @@
 # 作業進捗
 
-## Koin除去タスク
+## Memory Bank ドキュメント作成タスク
 
 ### 現在の状況
-- T7: ユニットテストの修正 はユーザーの指示によりスキップ。
-- **T8: 変更内容のドキュメント化 (進行中)**
-    - `SharedFactory` の使用方法について、`AppSettingUseCase` を例に説明を準備中。
+- プロジェクトの理解とメンテナンス性向上のため、Memory Bankのコアとなるドキュメント群を作成・整備しました。
+    - `memory-bank/projectbrief.md` (新規作成)
+    - `memory-bank/productContext.md` (新規作成)
+    - `memory-bank/systemPatterns.md` (新規作成)
+    - `memory-bank/techContext.md` (新規作成)
+- 既存の `memory-bank/activeContext.md` を更新し、現在の主要タスクを反映しました。
+- この `memory-bank/progress.md` を更新し、Memory Bankドキュメント作成タスクの完了を記録しました。
 
-### 次のステップ (計画より T8継続)
-- `SharedFactory` の使用方法をユーザーに説明します。
-- 必要に応じて、関連ドキュメント (例: `README.md` や設計ドキュメント) にKoin除去と手動DIへの移行に関する記述を追記します。
-
-### 完了したタスク
-- T1: Koin利用状況の調査
-- T2: 依存関係の洗い出し
-- T3: Koinライブラリの削除
-- T4: Koinモジュールファイルの削除
-- T5: コンストラクタインジェクションへの変更
-- T6: 依存性解決のためのファクトリ/初期化処理の実装
-
-### 未完了のタスク (計画より抜粋)
-- T8: 変更内容のドキュメント化
-- T9: ビルドとテストの実行
+### 次のステップ
+- `/nextTask.md`の内容を読む
