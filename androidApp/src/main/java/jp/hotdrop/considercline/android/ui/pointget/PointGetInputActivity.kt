@@ -6,21 +6,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
 
 @AndroidEntryPoint
 class PointGetInputActivity : ComponentActivity() {
-
-    private val viewModel: PointGetInputViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ConsiderClineTheme {
                 PointGetInputScreen(
-                    viewModel = viewModel,
                     onNavigateToConfirm = { point ->
                         // TODO ポイント確認画面へ遷移する
 //                        val intent = Intent(this, PointGetConfirmActivity::class.java).apply {

@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun ConsiderClineTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false, //isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) {
@@ -29,6 +29,7 @@ fun ConsiderClineTheme(
             primary = Color(0xFF906c56),
         )
     }
+
     val typography = Typography(
         body1 = TextStyle(
             fontFamily = FontFamily.Default,
