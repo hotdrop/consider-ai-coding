@@ -19,6 +19,12 @@ class HomeActivity : AppCompatActivity() {
     private val binding by lazy { ActivityHomeBinding.inflate(layoutInflater) }
     private val viewModel: HomeViewModel by viewModels()
 
+    private val pointRefreshLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            onRefreshData()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -38,8 +44,9 @@ class HomeActivity : AppCompatActivity() {
         binding.currentDateLabel.text = now.format(formatter)
 
         binding.pointGetButton.setOnClickListener {
-            pointGetInputLauncher.launch(Intent(this, PointGetInputActivity::class.java))
+            PointGetInputActivity.startForResult(this, pointRefreshLauncher)
         }
+
         binding.pointUseButton.setOnClickListener {
             // TODO Jetpack Compose を使ってPointUseScreenを実装する
         }
@@ -76,12 +83,6 @@ class HomeActivity : AppCompatActivity() {
     private fun onRefreshData() {
         viewModel.onLoadCurrentPoint()
         viewModel.onLoadHistory()
-    }
-
-    private val pointGetInputLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            onRefreshData()
-        }
     }
 
     companion object {

@@ -1,9 +1,11 @@
 package jp.hotdrop.considercline.android.ui.pointget
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
@@ -20,14 +22,24 @@ class PointGetInputActivity : ComponentActivity() {
                 PointGetInputScreen(
                     viewModel = viewModel,
                     onNavigateToConfirm = { point ->
-                        val intent = Intent(this, PointGetConfirmActivity::class.java).apply {
-                            putExtra(PointGetConfirmActivity.EXTRA_POINT_AMOUNT, point)
-                        }
-                        startActivity(intent)
+                        // TODO ポイント確認画面へ遷移する
+//                        val intent = Intent(this, PointGetConfirmActivity::class.java).apply {
+//                            putExtra(PointGetConfirmActivity.EXTRA_POINT_AMOUNT, point)
+//                        }
+//                        startActivity(intent)
                     },
                     onBack = { finish() }
                 )
             }
         }
+    }
+
+    companion object {
+        fun startForResult(
+            activity: Activity,
+            launcher: ActivityResultLauncher<Intent>
+        ) = launcher.launch(
+            Intent(activity, PointGetInputActivity::class.java)
+        )
     }
 }

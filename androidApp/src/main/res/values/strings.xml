@@ -15,7 +15,7 @@
     <string name="start_register_button">この内容で登録する</string>
     <string name="email_validation_error">XXX＠YYY.ZZの形式で入力してください。</string>
     <string name="home_title">ホーム</string>
-    <string name="home_point_value">%s1 ポイント</string>
+    <string name="home_point_value">%1$s ポイント</string>
     <string name="home_point_value_default">0 ポイント</string>
     <string name="home_un_setting_nickname">ニックネーム未設定</string>
     <string name="home_un_setting_email">Email未設定</string>
@@ -23,11 +23,11 @@
     <string name="home_menu_use_point">ポイント利用</string>
     <string name="home_loading_error_label">エラーが発生しました。</string>
     <string name="point_get_title">ポイント獲得</string>
+    <string name="point_get_input_back_button_content_description">ホーム画面に戻るボタンです</string>
     <string name="point_get_input_overview">現在保持しているポイント数</string>
-    <string name="point_get_input_attention">(※最大で保持できるポイントは%d1です)</string>
+    <string name="point_get_input_attention">(※最大で保持できるポイントは%1$dです)</string>
     <string name="point_get_input_max_over_error">最大で保持できるポイントを超えています。</string>
     <string name="point_get_input_text_field_label">ポイントを入力</string>
-    <string name="point_get_input_text_field_error_over_max_point">獲得できる残ポイントは%d1までです。</string>
     <string name="point_get_input_confirm_button">確認画面へ進む</string>
     <string name="point_get_confirm_overview">ポイントを獲得します！</string>
     <string name="point_get_confirm_detail">よろしければ「ポイントを獲得する」ボタンをタップしてください。</string>
