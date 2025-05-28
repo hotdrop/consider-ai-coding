@@ -53,32 +53,7 @@ fun PointGetInputScreen(
     val maxAvailablePoint = currentPoint.getMaxAvailablePoint(maxPoint)
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().padding(end = 48.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.point_get_title),
-                            color = AppColor.White
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.point_get_input_back_button_content_description),
-                            tint = AppColor.White
-                        )
-                    }
-                },
-                backgroundColor = AppColor.PrimaryColor,
-                modifier = Modifier.statusBarsPadding()
-            )
-        },
+        topBar = { PointGetTopBar(onBack) },
         backgroundColor = AppColor.PrimaryColor
     ) { paddingValues ->
         Box(
@@ -92,72 +67,125 @@ fun PointGetInputScreen(
                     .fillMaxSize()
                     .padding(16.dp),
             ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.point_get_input_overview),
-                        color = MaterialTheme.colors.primary,
-                        style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
-                    )
-                }
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = currentPoint.balance.toString(),
-                        color = MaterialTheme.colors.primary,
-                        style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold)
-                    )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.point_get_input_attention, maxAvailablePoint),
-                        color = AppColor.Black,
-                        style = MaterialTheme.typography.body1
-                    )
-                }
-                Spacer(modifier = Modifier.height(24.dp))
-                OutlinedTextField(
-                    value = inputPoint,
-                    singleLine = true,
-                    onValueChange = { newValue ->
-                        if (newValue.length <= maxPoint.toString().length && newValue.all { it.isDigit() }) {
-                            viewModel.inputPoint(newValue, maxAvailablePoint)
-                        }
-                    },
-                    label = { Text(stringResource(id = R.string.point_get_input_text_field_label)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = showError,
-                    modifier = Modifier.fillMaxWidth()
+                PointGetOverview(
+                    balance = currentPoint.balance,
+                    maxAvailable = maxAvailablePoint
                 )
-                if (showError) {
-                    Text(
-                        text = stringResource(id = R.string.point_get_input_max_over_error),
-                        color = Color.Red,
-                        style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(start = 4.dp, top = 4.dp)
-                    )
-                }
+                Spacer(modifier = Modifier.height(24.dp))
+                PointGetInputField(
+                    inputPoint = inputPoint,
+                    showError = showError,
+                    maxLength = maxPoint.toString().length,
+                    onValueChange = { newValue ->
+                        viewModel.inputPoint(newValue, maxAvailablePoint)
+                    }
+                )
                 Spacer(modifier = Modifier.height(32.dp))
-                Button(
-                    onClick = { onNavigateToConfirm(inputPoint.toInt()) },
-                    enabled = isButtonEnabled,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.point_get_input_confirm_button),
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                }
+                PointGetConfirmButton(
+                    inputPoint = inputPoint,
+                    isEnabled = isButtonEnabled,
+                    onNavigateToConfirm = onNavigateToConfirm
+                )
             }
         }
+    }
+}
+
+@Composable
+fun PointGetTopBar(onBack: () -> Unit) {
+    TopAppBar(
+        title = {
+            Box(Modifier.fillMaxWidth().padding(end = 48.dp), Alignment.Center) {
+                Text(
+                    text = stringResource(R.string.point_get_title),
+                    color = AppColor.White
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector    = Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.point_get_input_back_button_content_description),
+                    tint           = AppColor.White
+                )
+            }
+        },
+        backgroundColor = AppColor.PrimaryColor,
+        modifier        = Modifier.statusBarsPadding()
+    )
+}
+
+@Composable
+fun PointGetOverview(balance: Int, maxAvailable: Int) {
+    Column(
+        Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally)
+    {
+        Text(
+            text  = stringResource(R.string.point_get_input_overview),
+            color = MaterialTheme.colors.primary,
+            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
+        )
+        Text(
+            text  = balance.toString(),
+            color = MaterialTheme.colors.primary,
+            style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold)
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text  = stringResource(R.string.point_get_input_attention, maxAvailable),
+            color = AppColor.Black,
+            style = MaterialTheme.typography.body1
+        )
+    }
+}
+
+@Composable
+fun PointGetInputField(
+    inputPoint: String,
+    showError: Boolean,
+    maxLength: Int,
+    onValueChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = inputPoint,
+        singleLine = true,
+        onValueChange = { newValue ->
+            if (newValue.length <= maxLength && newValue.all { it.isDigit() }) {
+                onValueChange(newValue)
+            }
+        },
+        label = { Text(stringResource(id = R.string.point_get_input_text_field_label)) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        isError = showError,
+        modifier = Modifier.fillMaxWidth()
+    )
+    if (showError) {
+        Text(
+            text = stringResource(R.string.point_get_input_max_over_error),
+            color = Color.Red,
+            style = MaterialTheme.typography.body2,
+            modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+        )
+    }
+}
+
+@Composable
+fun PointGetConfirmButton(
+    inputPoint: String,
+    isEnabled: Boolean,
+    onNavigateToConfirm: (Int) -> Unit
+) {
+    Button(
+        onClick = { onNavigateToConfirm(inputPoint.toInt()) },
+        enabled = isEnabled,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(id = R.string.point_get_input_confirm_button),
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
     }
 }
 

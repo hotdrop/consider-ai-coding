@@ -15,16 +15,7 @@ class PointGetInputActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ConsiderClineTheme {
-                PointGetInputScreen(
-                    onNavigateToConfirm = { point ->
-                        // TODO ポイント確認画面へ遷移する
-//                        val intent = Intent(this, PointGetConfirmActivity::class.java).apply {
-//                            putExtra(PointGetConfirmActivity.EXTRA_POINT_AMOUNT, point)
-//                        }
-//                        startActivity(intent)
-                    },
-                    onBack = { finish() }
-                )
+                PointGetNavigationHost()
             }
         }
     }
