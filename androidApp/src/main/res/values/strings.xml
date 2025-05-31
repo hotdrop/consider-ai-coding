@@ -15,7 +15,7 @@
     <string name="start_register_button">この内容で登録する</string>
     <string name="email_validation_error">XXX＠YYY.ZZの形式で入力してください。</string>
     <string name="home_title">ホーム</string>
-    <string name="home_point_value">%1$s ポイント</string>
+    <string name="home_point_value">%1$d ポイント</string>
     <string name="home_point_value_default">0 ポイント</string>
     <string name="home_un_setting_nickname">ニックネーム未設定</string>
     <string name="home_un_setting_email">Email未設定</string>

@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
+import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.databinding.ActivityHomeBinding
 import jp.hotdrop.considercline.android.ui.pointget.PointGetActivity
 import jp.hotdrop.considercline.model.AppSetting
@@ -50,8 +52,6 @@ class HomeActivity : AppCompatActivity() {
         binding.pointUseButton.setOnClickListener {
             // TODO Jetpack Compose を使ってPointUseScreenを実装する
         }
-
-        onRefreshData()
     }
 
     private fun observe() {
@@ -70,10 +70,13 @@ class HomeActivity : AppCompatActivity() {
         if (!appSetting.email.isNullOrEmpty()) {
             binding.email.text = appSetting.email
         }
+        binding.homeCardProgressBar.isVisible = false
+        binding.homeContentsGroup.isVisible = true
     }
 
     private fun viewCurrentPoint(point: Point) {
-        binding.pointValue.text = point.toString()
+        val pointLabel = getString(R.string.home_point_value, point.balance)
+        binding.pointValue.text = pointLabel
     }
 
     private fun viewHistories(histories: List<History>) {

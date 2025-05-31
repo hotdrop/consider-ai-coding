@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -157,6 +158,7 @@ fun PointGetInputField(
             }
         },
         label = { Text(stringResource(id = R.string.point_get_input_text_field_label)) },
+        textStyle = TextStyle(color = AppColor.Black),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         isError = showError,
         modifier = Modifier.fillMaxWidth()

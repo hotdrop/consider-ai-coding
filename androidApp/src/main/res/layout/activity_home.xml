@@ -52,6 +52,22 @@
                 android:background="@drawable/home_card"
                 android:padding="16dp">
 
+                <ProgressBar
+                    android:id="@+id/home_card_progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/home_contents_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible"
+                    app:constraint_referenced_ids="current_date_label, point_value, nickname, email" />
+
                 <TextView
                     android:id="@+id/current_date_label"
                     android:layout_width="0dp"
@@ -68,7 +84,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:textColor="@color/white"
-                    android:textSize="24sp"
+                    android:textSize="32sp"
                     android:text="@string/home_point_value_default"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
