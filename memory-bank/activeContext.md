@@ -26,7 +26,7 @@
         *   `KmpUseCaseFactory` を経由して `PointUseCase` のインスタンスを取得します。
         *   `acquire` 関数の実行結果に応じて、UIの状態（ローディング、成功、エラー）を更新する処理を実装します。
 
-4. [ ] ポイント獲得完了ダイアログ表示と画面遷移 (`PointGetConfirmScreen.kt`, `PointGetViewModel.kt`, `PointGetActivity.kt`)
+4. [x] ポイント獲得完了ダイアログ表示と画面遷移 (`PointGetConfirmScreen.kt`, `PointGetViewModel.kt`, `PointGetActivity.kt`) - ✅完了
     *   ポイント獲得処理が正常に完了した場合、`PointGetConfirmScreen.kt` で `strings.xml` の `point_get_confirm_complete_dialog_message` をメッセージとするダイアログを表示します。
     *   ダイアログが閉じられたら、`PointGetActivity.kt` に処理結果を通知します。
         *   `PointGetViewModel` に、ポイント獲得処理の成功を通知するための `SharedFlow` または同様の仕組みを追加します。

@@ -15,7 +15,12 @@ class PointGetActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ConsiderClineTheme {
-                PointGetNavigationHost()
+                PointGetNavigationHost(
+                    onNavigateToHome = {
+                        setResult(Activity.RESULT_OK)
+                        finish()
+                    }
+                )
             }
         }
     }

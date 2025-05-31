@@ -29,16 +29,34 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+
+@Composable
 fun PointGetConfirmScreen(
     viewModel: PointGetViewModel = hiltViewModel(),
-    onComplete: () -> Unit // タスク4で利用
+    onComplete: () -> Unit
 ) {
     val inputPoint by viewModel.inputPoint.collectAsState()
-    // TODO: viewModelからローディング状態やエラー状態を取得してUIに反映する
+    val isLoading by viewModel.isLoading.collectAsState()
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf<Throwable?>(null) }
 
-    // タスク4で実装するダイアログ表示のためのState
-    // val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
-    // val showErrorDialog by viewModel.showErrorDialog.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.pointAcquisitionSuccess.collect {
+            showSuccessDialog = true
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.pointAcquisitionError.collect {
+            showErrorDialog = it
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -75,25 +93,58 @@ fun PointGetConfirmScreen(
                 color = AppColor.PrimaryColor
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Button(onClick = { viewModel.acquirePoint() }) { // viewModelの関数を直接呼び出す
-                Text(text = stringResource(id = R.string.point_get_confirm_execute_button))
+            Button(
+                onClick = { viewModel.acquirePoint() },
+                enabled = !isLoading // ローディング中は無効
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    Text(text = stringResource(id = R.string.point_get_confirm_execute_button))
+                }
             }
         }
     }
 
-    // TODO: タスク4でダイアログ表示を実装
-    // if (showSuccessDialog) { AlertDialog(...) }
-    // if (showErrorDialog) { AlertDialog(...) }
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showSuccessDialog = false
+                onComplete() // ダイアログを閉じたら完了処理
+            },
+            title = { Text(text = stringResource(id = R.string.point_get_title)) },
+            text = { Text(text = stringResource(id = R.string.point_get_confirm_complete_dialog_message)) },
+            confirmButton = {
+                Button(onClick = {
+                    showSuccessDialog = false
+                    onComplete() // ダイアログを閉じたら完了処理
+                }) {
+                    Text(stringResource(id = R.string.dialog_ok))
+                }
+            }
+        )
+    }
+
+    showErrorDialog?.let { error ->
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = null },
+            title = { Text(text = stringResource(id = R.string.splash_error_label)) }, // 汎用エラータイトル
+            text = { Text(text = error.message ?: stringResource(id = R.string.home_loading_error_label)) }, // エラーメッセージ表示
+            confirmButton = {
+                Button(onClick = { showErrorDialog = null }) {
+                    Text(stringResource(id = R.string.dialog_ok))
+                }
+            }
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PointGetConfirmScreenPreview() {
     val dummyViewModel = PointGetViewModel().apply {
-        // Preview用にinputPointの値を設定したい場合は、
-        // PointGetViewModelにデバッグ用の関数を追加するか、
-        // MutableStateFlowを直接操作できるような仕組みが必要。
-        // ここではデフォルト値で表示される。
+        // Preview用にisLoadingやエラー、成功の状態を操作できるようにするには、
+        // ViewModelにデバッグ用の関数を追加するか、MutableStateFlowを直接操作できる仕組みが必要。
     }
     ConsiderClineTheme {
         PointGetConfirmScreen(
