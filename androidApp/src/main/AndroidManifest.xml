@@ -17,11 +17,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.start.StartActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ui.home.HomeActivity"
-            android:exported="true" />
+        <activity android:name=".ui.start.StartActivity" />
+        <activity android:name=".ui.home.HomeActivity" />
+        <activity android:name=".ui.pointget.PointGetActivity" />
     </application>
 </manifest>

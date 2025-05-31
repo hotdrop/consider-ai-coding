@@ -28,7 +28,9 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
         super.onCreate(owner)
         launch {
             val uiState = HomeUiState(
-                appSetting = appSettingUseCase.find()
+                appSetting = appSettingUseCase.find(),
+                currentPoint = pointUseCase.find(),
+                histories = historyUseCase.findAll()
             )
             mutableUiState.postValue(uiState)
         }

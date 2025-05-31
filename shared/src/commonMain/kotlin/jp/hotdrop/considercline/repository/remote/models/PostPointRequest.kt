@@ -9,6 +9,6 @@ class PostPointRequest(
     override fun urlParam(): Map<String, Any?>? = null
     override fun body(): Map<String, Any?> = mapOf(
         "userId" to userId,
-        "point" to point
+        "inputPoint" to point
     )
 }
