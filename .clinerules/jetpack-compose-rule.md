@@ -1,29 +1,40 @@
 # Project Architecture and Best Practices
 1. マテリアルデザイン2のガイドラインとコンポーネントに従う
 2. 非同期操作には`Kotlin Coroutine`と`Flow`を使用する
-3. 各機能は1つのActivityと1つのViewModel、それに対して画面数だけComposeでScreen関数を作る。例えばポイント獲得（PointGet）画面の場合は以下のような構成となる
-   1. 画面構成数: 2つ
-   2. 画面遷移: ポイント入力画面 -> ポイント確認画面
-   3. 実装するクラスまたは関数
-      1. Activity: PointGetActivity
-      2. ViewModel: PointGetViewModel
-      3. Composeで作成する画面: PointGetInputScreen, PointGetConfirmScreen
-4. Composeで作成した画面は`NavHostController`を使って画面遷移する
-5. ViewModelは`Dagger Hilt`を使用して依存性注入を実装する。具体的には、各Compose画面(Screen)のコンストラクタ引数で`hiltViewModel()`を使って利用する
-6. ViewModelと`UI State`を使用して単方向データフローに従う
-7. 適切な`State hoisting`と`composition`を実装する
+3. 各機能は、1つのActivity、1つのViewModel、1つのNavigationHost、画面数分のScreen関数(Composeで実装)という構成にすること。
+   1. ポイント獲得（PointGet）機能の例: 
+      1. Activity: PointGetActivity.kt
+      2. ViewModel: PointGetViewModel.kt
+      3. NavigationHost: PointGetNavigationHost.kt
+      4. 画面UI: PointGetInputScreen, PointGetConfirmScreen
+      5. 画面遷移: ポイント入力画面 -> ポイント確認画面
+4. Composeで作成した画面は`NavHostController`を使って画面遷移する。
+5. ViewModelは`Dagger Hilt`を使用してDIする。Activityスコープで生存させ、Composeで実装された各Screenの状態は全てViewModelで持つ。画面遷移時に引数を渡すことは基本しない。ただし、可読性や保守性を加味してそちらの方が良いと判断した場合は引数で渡す実装をしても良い。
+6. `NavHostController`のコンストラクタ引数で`hiltViewModel()`を使いViewModelを定義する。
+7. ViewModelと`UI State`を使用して単方向データフローに従う。
 
 # Compose UI Guideline
 1. remember と derivedStateOf を適切に使用する
-2. 適切な再コンポジション最適化を実装する
+2. 1つの関数に全てのコンポーネントを実装するのではなく、適切に意味のある単位で分けること。例えば概要ラベルとTextFieldはそれぞれ関数を分けて可読性を保つ
 3. Compose 修飾子の順序を適切に使用する
-4. コンポーズ可能な関数の命名規則に従う規約
+4. Compose 可能な関数の命名規則に従う規約
 5. 適切な`@Preview(showBackground = true)`を実装する
 6. MutableState による適切な状態管理を使用する
 7. 適切なエラー処理と読み込み状態を実装する
 8. `Activity`でComposeで実装する画面をsetContentする場合、必ず`ConsiderClineTheme`を使用する
 9. アクセシビリティガイドラインに従う
 10. 適切なアニメーションパターンを実装する
+
+# edge-to-egde対応
+基本的に画面のcontents部分は以下のBoxで括り`fillMaxSize`を指定してedge-to-edge対応すること
+```kt
+Box(
+    modifier = Modifier
+        .fillMaxSize()
+        .background(Color.White)
+        .padding(paddingValues)
+)
+```
 
 # Test Guideline
 1. Compose テストフレームワークを使用して UI テストを実装する
