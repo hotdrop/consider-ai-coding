@@ -1,7 +1,10 @@
 package jp.hotdrop.considercline.android.ui.home
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +15,8 @@ import jp.hotdrop.considercline.android.databinding.ActivityHomeBinding
 import jp.hotdrop.considercline.android.ui.pointget.PointGetActivity
 import jp.hotdrop.considercline.model.AppSetting
 import jp.hotdrop.considercline.model.History
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import jp.hotdrop.considercline.android.databinding.HistoryRowBinding
 import jp.hotdrop.considercline.model.Point
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -85,9 +89,7 @@ class HomeActivity : AppCompatActivity() {
             return
         }
 
-        binding.historyRecyclerView.apply {
-            adapter = HistoryAdapter(histories)
-        }
+        binding.historyRecyclerView.adapter = HistoryAdapter(this, histories)
         binding.historyTopBorder.isVisible = true
         binding.historyRecyclerView.isVisible = true
     }
@@ -95,6 +97,31 @@ class HomeActivity : AppCompatActivity() {
     private fun onRefreshData() {
         viewModel.onLoadCurrentPoint()
         viewModel.onLoadHistory()
+    }
+
+    /**
+     * ポイント履歴を表示するためのアダプター
+     * @property histories 表示する履歴リスト
+     */
+    class HistoryAdapter(
+        private val context: Context,
+        private val histories: List<History>
+    ) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
+        class HistoryViewHolder(val binding: HistoryRowBinding) : RecyclerView.ViewHolder(binding.root)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
+            val binding = HistoryRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return HistoryViewHolder(binding)
+        }
+
+        override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
+            val history = histories[position]
+            holder.binding.dateLabel.text = history.toStringDateTime()
+            holder.binding.historyLabel.text = history.detail
+            holder.binding.historyPoint.text = context.getString(R.string.point_history_point_label, history.point)
+        }
+
+        override fun getItemCount(): Int = histories.size
     }
 
     companion object {

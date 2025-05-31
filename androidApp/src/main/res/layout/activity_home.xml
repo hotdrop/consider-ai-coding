@@ -147,6 +147,7 @@
             style="@style/BorderView"
             android:layout_marginTop="8dp"
             android:visibility="gone"
+            tools:visibility="visible"
             app:layout_constraintTop_toBottomOf="@+id/point_use_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -160,6 +161,7 @@
             app:layout_constraintTop_toBottomOf="@+id/history_top_border"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible"
             tools:itemCount="2"
             tools:listitem="@layout/history_row" />
 
