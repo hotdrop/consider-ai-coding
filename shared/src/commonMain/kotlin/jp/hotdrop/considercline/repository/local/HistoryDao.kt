@@ -3,6 +3,8 @@ package jp.hotdrop.considercline.repository.local
 import jp.hotdrop.considercline.db.ConsiderClineDatabase
 import jp.hotdrop.considercline.model.History
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 /**
@@ -19,7 +21,7 @@ class HistoryDao(
     suspend fun findAll(): List<History> {
         return database.historyQueries.selectAll().executeAsList().map { entity ->
             History(
-                dateTime = entity.dateTime.toLocalDateTime(),
+                dateTime = Instant.parse(entity.dateTime).toLocalDateTime(TimeZone.currentSystemDefault()),
                 point = entity.point.toInt(),
                 detail = entity.detail
             )
