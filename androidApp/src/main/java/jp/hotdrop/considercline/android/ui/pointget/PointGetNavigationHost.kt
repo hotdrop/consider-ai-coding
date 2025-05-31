@@ -1,7 +1,8 @@
 package jp.hotdrop.considercline.android.ui.pointget
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,11 +31,13 @@ fun PointGetNavigationHost(
             )
         }
 
-        composable(confirmDestination) {
+        composable(confirmDestination) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(inputDestination)
+            }
+            val viewModel : PointGetViewModel = hiltViewModel(parentEntry)
             PointGetConfirmScreen(
-                // ViewModelはPointGetConfirmScreen内部でhiltViewModel()により取得される
-                // onExecuteClickはPointGetConfirmScreen内部でviewModelの関数を呼ぶ
-                // onCompleteはタスク4で実装. Activityのfinishを呼び出す
+                viewModel = viewModel,
                 onComplete = onNavigateToHome
             )
         }

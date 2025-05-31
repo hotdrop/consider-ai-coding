@@ -25,17 +25,12 @@ import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.ui.theme.AppColor
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-
-@Composable
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 
 @Composable
 fun PointGetConfirmScreen(
@@ -98,7 +93,8 @@ fun PointGetConfirmScreen(
                 enabled = !isLoading // ローディング中は無効
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator()
+                    // todo java.lang.NoSuchMethodError
+//                    CircularProgressIndicator()
                 } else {
                     Text(text = stringResource(id = R.string.point_get_confirm_execute_button))
                 }
@@ -142,13 +138,9 @@ fun PointGetConfirmScreen(
 @Preview(showBackground = true)
 @Composable
 fun PointGetConfirmScreenPreview() {
-    val dummyViewModel = PointGetViewModel().apply {
-        // Preview用にisLoadingやエラー、成功の状態を操作できるようにするには、
-        // ViewModelにデバッグ用の関数を追加するか、MutableStateFlowを直接操作できる仕組みが必要。
-    }
     ConsiderClineTheme {
         PointGetConfirmScreen(
-            viewModel = dummyViewModel,
+            viewModel = PointGetViewModel(),
             onComplete = {}
         )
     }
