@@ -12,6 +12,7 @@ import jp.hotdrop.considercline.android.databinding.ActivityHomeBinding
 import jp.hotdrop.considercline.android.ui.pointget.PointGetActivity
 import jp.hotdrop.considercline.model.AppSetting
 import jp.hotdrop.considercline.model.History
+import androidx.recyclerview.widget.LinearLayoutManager
 import jp.hotdrop.considercline.model.Point
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -80,7 +81,15 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun viewHistories(histories: List<History>) {
-        // TODO RecyclerViewを設定
+        if (histories.isEmpty()) {
+            return
+        }
+
+        binding.historyRecyclerView.apply {
+            adapter = HistoryAdapter(histories)
+        }
+        binding.historyTopBorder.isVisible = true
+        binding.historyRecyclerView.isVisible = true
     }
 
     private fun onRefreshData() {

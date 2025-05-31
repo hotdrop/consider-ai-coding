@@ -47,6 +47,4 @@ TODO iOSアプリ側
 エラーは少なく、少し修正したらそれなりのものができた。やり取りする中で最初の実装計画が誤っていたりKMP側の実装が誤っている箇所があった。
 
 次にやること
-- PointConfirmScreenで発生している`CircularProgressIndicator`エラーの解消
 - PointConfirmScreenのコンポーネント分け
-- ホーム画面のRecyclerViewの実装
