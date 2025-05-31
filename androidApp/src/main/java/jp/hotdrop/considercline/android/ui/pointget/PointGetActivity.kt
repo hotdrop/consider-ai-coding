@@ -16,8 +16,9 @@ class PointGetActivity : ComponentActivity() {
         setContent {
             ConsiderClineTheme {
                 PointGetNavigationHost(
+                    onClose = { finish() },
                     onNavigateToHome = {
-                        setResult(Activity.RESULT_OK)
+                        setResult(RESULT_OK)
                         finish()
                     }
                 )

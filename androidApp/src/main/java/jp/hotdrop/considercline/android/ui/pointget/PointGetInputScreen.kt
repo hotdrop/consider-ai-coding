@@ -33,14 +33,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.ui.theme.AppColor
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
 
 @Composable
 fun PointGetInputScreen(
-    viewModel: PointGetViewModel = hiltViewModel(),
+    viewModel: PointGetViewModel,
     onNavigateToConfirm: (Int) -> Unit,
     onBack: () -> Unit
 ) {

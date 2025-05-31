@@ -11,6 +11,8 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun PointGetNavigationHost(
     navController: NavHostController = rememberNavController(),
+    viewModel: PointGetViewModel = hiltViewModel(),
+    onClose: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {
     val inputDestination = "pointGetInput"
@@ -22,20 +24,17 @@ fun PointGetNavigationHost(
     ) {
         composable(inputDestination) {
             PointGetInputScreen(
+                viewModel = viewModel,
                 onNavigateToConfirm = {
                     // PointGetViewModelのinputPointはPointGetInputScreen側で更新されている
                     // ナビゲーション引数は不要
                     navController.navigate(confirmDestination)
                 },
-                onBack = { navController.popBackStack() } // PointGetActivityのfinishを呼び出すべきか確認
+                onBack = onClose
             )
         }
 
-        composable(confirmDestination) { backStackEntry ->
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(inputDestination)
-            }
-            val viewModel : PointGetViewModel = hiltViewModel(parentEntry)
+        composable(confirmDestination) {
             PointGetConfirmScreen(
                 viewModel = viewModel,
                 onComplete = onNavigateToHome

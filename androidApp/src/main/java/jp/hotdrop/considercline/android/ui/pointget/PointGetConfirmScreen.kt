@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.ui.theme.AppColor
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.LaunchedEffect
@@ -34,7 +33,7 @@ import androidx.compose.runtime.setValue
 
 @Composable
 fun PointGetConfirmScreen(
-    viewModel: PointGetViewModel = hiltViewModel(),
+    viewModel: PointGetViewModel,
     onComplete: () -> Unit
 ) {
     val inputPoint by viewModel.inputPoint.collectAsState()
