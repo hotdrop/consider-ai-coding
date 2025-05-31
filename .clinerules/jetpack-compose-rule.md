@@ -18,7 +18,7 @@
 2. 適切な再コンポジション最適化を実装する
 3. Compose 修飾子の順序を適切に使用する
 4. コンポーズ可能な関数の命名規則に従う規約
-5. 適切なプレビューアノテーションを実装する
+5. 適切な`@Preview(showBackground = true)`を実装する
 6. MutableState による適切な状態管理を使用する
 7. 適切なエラー処理と読み込み状態を実装する
 8. `Activity`でComposeで実装する画面をsetContentする場合、必ず`ConsiderClineTheme`を使用する
