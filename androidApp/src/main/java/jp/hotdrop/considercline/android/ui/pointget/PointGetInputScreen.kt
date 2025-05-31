@@ -39,7 +39,7 @@ import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
 
 @Composable
 fun PointGetInputScreen(
-    viewModel: PointGetInputViewModel = hiltViewModel(),
+    viewModel: PointGetViewModel = hiltViewModel(),
     onNavigateToConfirm: (Int) -> Unit,
     onBack: () -> Unit
 ) {
@@ -194,7 +194,7 @@ fun PointGetConfirmButton(
 fun PreviewPointGetInputScreen() {
     ConsiderClineTheme {
         PointGetInputScreen(
-            viewModel = PointGetInputViewModel(),
+            viewModel = PointGetViewModel(),
             onNavigateToConfirm = {},
             onBack = {}
         )

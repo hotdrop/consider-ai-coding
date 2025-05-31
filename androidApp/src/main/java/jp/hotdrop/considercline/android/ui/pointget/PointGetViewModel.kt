@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PointGetInputViewModel @Inject constructor() : BaseViewModel() {
+class PointGetViewModel @Inject constructor() : BaseViewModel() {
     private val pointUseCase: PointUseCase by lazy { KmpUseCaseFactory.pointUseCase }
 
     private val _currentPoint = MutableStateFlow(Point(0))

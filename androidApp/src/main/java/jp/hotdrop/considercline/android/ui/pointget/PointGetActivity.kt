@@ -10,7 +10,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
 
 @AndroidEntryPoint
-class PointGetInputActivity : ComponentActivity() {
+class PointGetActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -25,7 +25,7 @@ class PointGetInputActivity : ComponentActivity() {
             activity: Activity,
             launcher: ActivityResultLauncher<Intent>
         ) = launcher.launch(
-            Intent(activity, PointGetInputActivity::class.java)
+            Intent(activity, PointGetActivity::class.java)
         )
     }
 }

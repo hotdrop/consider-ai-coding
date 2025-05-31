@@ -19,6 +19,6 @@
         </activity>
         <activity android:name=".ui.start.StartActivity" />
         <activity android:name=".ui.home.HomeActivity" />
-        <activity android:name=".ui.pointget.PointGetInputActivity" />
+        <activity android:name=".ui.pointget.PointGetActivity" />
     </application>
 </manifest>

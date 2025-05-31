@@ -7,7 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.databinding.ActivityHomeBinding
-import jp.hotdrop.considercline.android.ui.pointget.PointGetInputActivity
+import jp.hotdrop.considercline.android.ui.pointget.PointGetActivity
 import jp.hotdrop.considercline.model.AppSetting
 import jp.hotdrop.considercline.model.History
 import jp.hotdrop.considercline.model.Point
@@ -44,7 +44,7 @@ class HomeActivity : AppCompatActivity() {
         binding.currentDateLabel.text = now.format(formatter)
 
         binding.pointGetButton.setOnClickListener {
-            PointGetInputActivity.startForResult(this, pointRefreshLauncher)
+            PointGetActivity.startForResult(this, pointRefreshLauncher)
         }
 
         binding.pointUseButton.setOnClickListener {
