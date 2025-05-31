@@ -1,16 +1,16 @@
 package jp.hotdrop.considercline.android.ui.pointget
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 
 @Composable
 fun PointGetNavigationHost(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    onNavigateToHome: () -> Unit
 ) {
     val inputDestination = "pointGetInput"
     val confirmDestination = "pointGetConfirm"
@@ -21,23 +21,22 @@ fun PointGetNavigationHost(
     ) {
         composable(inputDestination) {
             PointGetInputScreen(
-                onNavigateToConfirm = { point ->
-                    navController.navigate("$confirmDestination/$point")
+                onNavigateToConfirm = {
+                    // PointGetViewModelのinputPointはPointGetInputScreen側で更新されている
+                    // ナビゲーション引数は不要
+                    navController.navigate(confirmDestination)
                 },
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() } // PointGetActivityのfinishを呼び出すべきか確認
             )
         }
 
-        composable(
-            "$confirmDestination/{point}",
-            arguments = listOf(navArgument("point") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val point = backStackEntry.arguments?.getInt("point") ?: 0
-            // TODO PointGetConfirmScreenを実装する
-//            PointGetConfirmScreen(
-//                point = point,
-//                onBack = { navController.popBackStack() }
-//            )
+        composable(confirmDestination) {
+            PointGetConfirmScreen(
+                // ViewModelはPointGetConfirmScreen内部でhiltViewModel()により取得される
+                // onExecuteClickはPointGetConfirmScreen内部でviewModelの関数を呼ぶ
+                // onCompleteはタスク4で実装. Activityのfinishを呼び出す
+                onComplete = onNavigateToHome
+            )
         }
     }
 }
