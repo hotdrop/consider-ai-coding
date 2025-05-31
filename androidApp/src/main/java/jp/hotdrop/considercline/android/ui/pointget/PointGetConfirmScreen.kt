@@ -1,11 +1,14 @@
 package jp.hotdrop.considercline.android.ui.pointget
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -22,115 +25,196 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jp.hotdrop.considercline.android.R
-import jp.hotdrop.considercline.android.ui.theme.AppColor
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+
+@Composable
+fun PointConfirmTopBar(onBack: () -> Unit) {
+    TopAppBar(
+        title = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 48.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.point_get_title),
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.point_get_confirm_back_button_content_description),
+
+                )
+            }
+        },
+        backgroundColor = MaterialTheme.colors.primary,
+        modifier = Modifier.statusBarsPadding()
+    )
+}
 
 @Composable
 fun PointGetConfirmScreen(
     viewModel: PointGetViewModel,
+    onBack: () -> Unit,
     onComplete: () -> Unit
 ) {
     val inputPoint by viewModel.inputPoint.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    var isLoading by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf<Throwable?>(null) }
 
-    LaunchedEffect(Unit) {
-        viewModel.pointAcquisitionSuccess.collect {
-            showSuccessDialog = true
-        }
-    }
-    LaunchedEffect(Unit) {
-        viewModel.pointAcquisitionError.collect {
-            showErrorDialog = it
+    LaunchedEffect(viewModel.uiEventFlow) {
+        viewModel.uiEventFlow.collect { event ->
+            when (event) {
+                PointAcquireEvent.NowLoading -> isLoading = true
+                is PointAcquireEvent.ShowErrorDialog -> {
+                    isLoading = false
+                    showErrorDialog = event.throwable
+                }
+                PointAcquireEvent.ShowSuccessDialog -> {
+                    isLoading = false
+                    showSuccessDialog = true
+                }
+            }
         }
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text(stringResource(id = R.string.point_get_title)) })
-        }
+        topBar = { PointConfirmTopBar(onBack) },
+        backgroundColor = MaterialTheme.colors.primary
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = stringResource(id = R.string.point_get_confirm_overview),
-                style = MaterialTheme.typography.h6
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(id = R.string.point_get_confirm_detail),
-                style = MaterialTheme.typography.body1
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                text = stringResource(id = R.string.point_get_confirm_point_label),
-                style = MaterialTheme.typography.subtitle1
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "$inputPoint ${stringResource(id = R.string.point_unit)}",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = AppColor.PrimaryColor
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            Button(
-                onClick = { viewModel.acquirePoint() },
-                enabled = !isLoading // ローディング中は無効
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator()
-                } else {
-                    Text(text = stringResource(id = R.string.point_get_confirm_execute_button))
+                PointConfirmOverview(inputPoint = inputPoint)
+                Spacer(modifier = Modifier.height(32.dp))
+                PointGetAcquireButton(isLoading = isLoading) {
+                    viewModel.acquirePoint(inputPoint)
                 }
             }
         }
     }
 
     if (showSuccessDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showSuccessDialog = false
-                onComplete() // ダイアログを閉じたら完了処理
-            },
-            title = { Text(text = stringResource(id = R.string.point_get_title)) },
-            text = { Text(text = stringResource(id = R.string.point_get_confirm_complete_dialog_message)) },
-            confirmButton = {
-                Button(onClick = {
-                    showSuccessDialog = false
-                    onComplete() // ダイアログを閉じたら完了処理
-                }) {
-                    Text(stringResource(id = R.string.dialog_ok))
-                }
-            }
-        )
+        SuccessDialog {
+            showSuccessDialog = false
+            onComplete()
+        }
     }
 
     showErrorDialog?.let { error ->
-        AlertDialog(
-            onDismissRequest = { showErrorDialog = null },
-            title = { Text(text = stringResource(id = R.string.splash_error_label)) }, // 汎用エラータイトル
-            text = { Text(text = error.message ?: stringResource(id = R.string.home_loading_error_label)) }, // エラーメッセージ表示
-            confirmButton = {
-                Button(onClick = { showErrorDialog = null }) {
-                    Text(stringResource(id = R.string.dialog_ok))
-                }
-            }
+        ErrorDialog(error) {
+            showErrorDialog = null
+        }
+    }
+}
+
+@Composable
+fun PointConfirmOverview(
+    inputPoint: Int
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(id = R.string.point_get_confirm_overview),
+            color = Color.Black,
+            style = MaterialTheme.typography.h6,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(id = R.string.point_get_confirm_detail),
+            color = Color.Black,
+            style = MaterialTheme.typography.body1,
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            text = stringResource(id = R.string.point_get_confirm_point_label),
+            style = MaterialTheme.typography.h5,
+            color = MaterialTheme.colors.primary
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = inputPoint.toString(),
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colors.primary
         )
     }
+}
+
+@Composable
+fun PointGetAcquireButton(
+    isLoading: Boolean,
+    onClick: () -> Unit
+) {
+    // ローディング中は無効にする
+    Button(
+        onClick = onClick,
+        enabled = !isLoading,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator()
+        } else {
+            Text(
+                text = stringResource(id = R.string.point_get_confirm_execute_button),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun SuccessDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(id = R.string.point_get_title)) },
+        text = { Text(text = stringResource(id = R.string.point_get_confirm_complete_dialog_message)) },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text(stringResource(id = R.string.dialog_ok))
+            }
+        }
+    )
+}
+
+@Composable
+fun ErrorDialog(error: Throwable, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(id = R.string.splash_error_label)) }, // 汎用エラータイトル
+        text = { Text(text = error.message ?: stringResource(id = R.string.home_loading_error_label)) }, // エラーメッセージ表示
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text(stringResource(id = R.string.dialog_ok))
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true)
@@ -139,6 +223,7 @@ fun PointGetConfirmScreenPreview() {
     ConsiderClineTheme {
         PointGetConfirmScreen(
             viewModel = PointGetViewModel(),
+            onBack = {},
             onComplete = {}
         )
     }

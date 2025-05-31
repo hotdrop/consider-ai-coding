@@ -25,11 +25,7 @@ fun PointGetNavigationHost(
         composable(inputDestination) {
             PointGetInputScreen(
                 viewModel = viewModel,
-                onNavigateToConfirm = {
-                    // PointGetViewModelのinputPointはPointGetInputScreen側で更新されている
-                    // ナビゲーション引数は不要
-                    navController.navigate(confirmDestination)
-                },
+                onNavigateToConfirm = { navController.navigate(confirmDestination) },
                 onBack = onClose
             )
         }
@@ -37,6 +33,7 @@ fun PointGetNavigationHost(
         composable(confirmDestination) {
             PointGetConfirmScreen(
                 viewModel = viewModel,
+                onBack = { navController.popBackStack() },
                 onComplete = onNavigateToHome
             )
         }

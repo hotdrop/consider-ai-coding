@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">KMPアプリ</string>
-    <string name="point_unit">P</string>
     <string name="splash_title">起動</string>
     <string name="splash_user_id_label">ユーザーID: %s1</string>
     <string name="splash_app_label">コーヒータイプのアプリです</string>
@@ -29,6 +28,7 @@
     <string name="point_get_input_max_over_error">最大で保持できるポイントを超えています。</string>
     <string name="point_get_input_text_field_label">ポイントを入力</string>
     <string name="point_get_input_confirm_button">確認画面へ進む</string>
+    <string name="point_get_confirm_back_button_content_description">ポイント入力画面に戻るボタンです</string>
     <string name="point_get_confirm_overview">ポイントを獲得します！</string>
     <string name="point_get_confirm_detail">よろしければ「ポイントを獲得する」ボタンをタップしてください。</string>
     <string name="point_get_confirm_point_label">獲得ポイント</string>

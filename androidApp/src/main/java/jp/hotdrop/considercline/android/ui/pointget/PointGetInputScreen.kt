@@ -32,15 +32,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import jp.hotdrop.considercline.android.R
-import jp.hotdrop.considercline.android.ui.theme.AppColor
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
 
 @Composable
 fun PointGetInputScreen(
     viewModel: PointGetViewModel,
-    onNavigateToConfirm: (Int) -> Unit,
+    onNavigateToConfirm: () -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -54,7 +55,7 @@ fun PointGetInputScreen(
 
     Scaffold(
         topBar = { PointGetTopBar(onBack) },
-        backgroundColor = AppColor.PrimaryColor
+        backgroundColor = MaterialTheme.colors.primary
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -82,7 +83,6 @@ fun PointGetInputScreen(
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 PointGetConfirmButton(
-                    inputPoint = inputPoint,
                     isEnabled = isButtonEnabled,
                     onNavigateToConfirm = onNavigateToConfirm
                 )
@@ -95,47 +95,48 @@ fun PointGetInputScreen(
 fun PointGetTopBar(onBack: () -> Unit) {
     TopAppBar(
         title = {
-            Box(Modifier.fillMaxWidth().padding(end = 48.dp), Alignment.Center) {
+            Box(
+                modifier = Modifier.fillMaxWidth().padding(end = 48.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = stringResource(R.string.point_get_title),
-                    color = AppColor.White
                 )
             }
         },
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(
-                    imageVector    = Icons.Filled.ArrowBack,
+                    imageVector = Icons.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.point_get_input_back_button_content_description),
-                    tint           = AppColor.White
                 )
             }
         },
-        backgroundColor = AppColor.PrimaryColor,
-        modifier        = Modifier.statusBarsPadding()
+        backgroundColor = MaterialTheme.colors.primary,
+        modifier = Modifier.statusBarsPadding()
     )
 }
 
 @Composable
 fun PointGetOverview(balance: Int, maxAvailable: Int) {
     Column(
-        Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally)
     {
         Text(
-            text  = stringResource(R.string.point_get_input_overview),
+            text = stringResource(R.string.point_get_input_overview),
             color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
         )
         Text(
-            text  = balance.toString(),
+            text = balance.toString(),
             color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold)
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text  = stringResource(R.string.point_get_input_attention, maxAvailable),
-            color = AppColor.Black,
+            text = stringResource(R.string.point_get_input_attention, maxAvailable),
+            color = Color.Black,
             style = MaterialTheme.typography.body1
         )
     }
@@ -143,21 +144,22 @@ fun PointGetOverview(balance: Int, maxAvailable: Int) {
 
 @Composable
 fun PointGetInputField(
-    inputPoint: String,
+    inputPoint: Int,
     showError: Boolean,
     maxLength: Int,
-    onValueChange: (String) -> Unit
+    onValueChange: (Int) -> Unit
 ) {
     OutlinedTextField(
-        value = inputPoint,
+        value = if (inputPoint > 0) inputPoint.toString() else "",
         singleLine = true,
         onValueChange = { newValue ->
             if (newValue.length <= maxLength && newValue.all { it.isDigit() }) {
-                onValueChange(newValue)
+                val newValWithInt = newValue.toIntOrNull() ?: 0
+                onValueChange(newValWithInt)
             }
         },
         label = { Text(stringResource(id = R.string.point_get_input_text_field_label)) },
-        textStyle = TextStyle(color = AppColor.Black),
+        textStyle = TextStyle(color = Color.Black, fontSize = 20.sp),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         isError = showError,
         modifier = Modifier.fillMaxWidth()
@@ -174,12 +176,11 @@ fun PointGetInputField(
 
 @Composable
 fun PointGetConfirmButton(
-    inputPoint: String,
     isEnabled: Boolean,
-    onNavigateToConfirm: (Int) -> Unit
+    onNavigateToConfirm: () -> Unit
 ) {
     Button(
-        onClick = { onNavigateToConfirm(inputPoint.toInt()) },
+        onClick = { onNavigateToConfirm() },
         enabled = isEnabled,
         modifier = Modifier.fillMaxWidth()
     ) {
