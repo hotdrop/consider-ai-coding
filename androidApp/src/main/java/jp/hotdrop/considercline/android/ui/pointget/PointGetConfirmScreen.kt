@@ -92,8 +92,7 @@ fun PointGetConfirmScreen(
                 enabled = !isLoading // ローディング中は無効
             ) {
                 if (isLoading) {
-                    // todo java.lang.NoSuchMethodError
-//                    CircularProgressIndicator()
+                    CircularProgressIndicator()
                 } else {
                     Text(text = stringResource(id = R.string.point_get_confirm_execute_button))
                 }
