@@ -31,9 +31,14 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun PointGetConfirmScreen(
     viewModel: PointGetViewModel = hiltViewModel(),
-    onExecuteClick: () -> Unit
+    onComplete: () -> Unit // タスク4で利用
 ) {
     val inputPoint by viewModel.inputPoint.collectAsState()
+    // TODO: viewModelからローディング状態やエラー状態を取得してUIに反映する
+
+    // タスク4で実装するダイアログ表示のためのState
+    // val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
+    // val showErrorDialog by viewModel.showErrorDialog.collectAsState()
 
     Scaffold(
         topBar = {
@@ -70,33 +75,30 @@ fun PointGetConfirmScreen(
                 color = AppColor.PrimaryColor
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Button(onClick = onExecuteClick) {
+            Button(onClick = { viewModel.acquirePoint() }) { // viewModelの関数を直接呼び出す
                 Text(text = stringResource(id = R.string.point_get_confirm_execute_button))
             }
         }
     }
+
+    // TODO: タスク4でダイアログ表示を実装
+    // if (showSuccessDialog) { AlertDialog(...) }
+    // if (showErrorDialog) { AlertDialog(...) }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PointGetConfirmScreenPreview() {
-    // Preview用のダミーViewModelを直接生成
-    // PointGetViewModelのコンストラクタにデフォルト引数 KmpUseCaseFactory.get() があるため、
-    // Previewでは引数なしで呼び出し可能
     val dummyViewModel = PointGetViewModel().apply {
-        // 必要に応じてStateFlowの値を設定
-        // (例) override val inputPoint: StateFlow<String> = MutableStateFlow("1000")
-        // ただし、PointGetViewModelのinputPointはfinalなので直接overrideはできない。
-        // PreviewのためだけにViewModelの構造を変えるのは避ける。
-        // 現状のPointGetViewModelの実装では、inputPointはコンストラクタで初期化されるか、
-        // initブロックや特定の関数呼び出しで値が設定される想定。
-        // ここではデフォルトの "0" が表示されることになる。
-        // もしPreviewで特定の値を表示したい場合は、ViewModel側の対応が必要。
+        // Preview用にinputPointの値を設定したい場合は、
+        // PointGetViewModelにデバッグ用の関数を追加するか、
+        // MutableStateFlowを直接操作できるような仕組みが必要。
+        // ここではデフォルト値で表示される。
     }
     ConsiderClineTheme {
         PointGetConfirmScreen(
             viewModel = dummyViewModel,
-            onExecuteClick = {}
+            onComplete = {}
         )
     }
 }

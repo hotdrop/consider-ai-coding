@@ -20,7 +20,7 @@
     *   `PointGetInputScreen.kt` から `PointGetConfirmScreen.kt` へ遷移できるように、`PointGetNavigationHost.kt` に新しいルートを追加します。
     *   既存のTODOコメントとコメントアウトされたコードは全て無視してください。
 
-3. [ ] ポイント獲得処理の実装 (`PointGetViewModel.kt`, `PointGetConfirmScreen.kt`)
+3. [x] ポイント獲得処理の実装 (`PointGetViewModel.kt`, `PointGetConfirmScreen.kt`) - ✅完了
     *   `PointGetConfirmScreen.kt` の「ポイントを獲得する」ボタンが押された際に、`PointGetViewModel.kt` の関数を呼び出します。
     *   `PointGetViewModel.kt` に、`PointUseCase` の `acquire` 関数を呼び出す処理を実装します。
         *   `KmpUseCaseFactory` を経由して `PointUseCase` のインスタンスを取得します。
