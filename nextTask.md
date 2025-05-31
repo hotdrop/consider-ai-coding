@@ -2,15 +2,7 @@
 このファイルは次の実行タスクで追加してほしい機能や修正内容を詳細に記載するドキュメントです。ユーザーに更新権限があり、あなたは更新しないでください。
 
 # やりたいこと
-ポイント獲得機能を実装してください。なお、ポイント入力画面は実装済みです。実装したいものは以下の通りです
-- ポイント入力画面からポイント確認画面への遷移
-- ポイント確認画面のUI実装
-- ポイント獲得実行処理の呼び出し処理実装
-- ポイント獲得完了ダイアログ表示
-- ダイアログを閉じたらホーム画面へ戻る
+androidAppの`HomeActivity`の`viewHistories`関数を実装する。この関数は引数で受け取った履歴リストをRecyclerViewに表示する処理を担当する。履歴1つ1つのRowレイアウトは`history_row.xml`を使用する
 
-## ポイント確認画面
-この画面で表示するLabelは`androidApp/src/main/res/values/strings.xml`の`point_get_confirm_`で始まる文字列定義を利用します。ダイアログメッセージ以外は全て画面上に表示してください。
-`point_get_confirm_point_label`の下に大きなフォントサイズで「前画面であるポイント入力画面で入力した有効な獲得ポイント数」をフォントカラー`ApppColor.PrimaryColor`で表示してください。
-「ポイントを獲得する」ボタンを押すと`PointUseCase`の`acquire`関数を実行し、正常終了したらポイントを獲得しました(`point_get_confirm_complete_dialog_message`)メッセージをダイアログでポップアップ表示しホーム画面に戻ります。
-ホーム画面では`HomeActivity`の`onRefreshData`関数を実行します。（ここは実装済み）
+- RecyclerView: binding.historyRecyclerView
+- RecyclerView内に表示する各履歴のitem: history_row.xml
