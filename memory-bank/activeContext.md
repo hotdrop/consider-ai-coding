@@ -7,39 +7,35 @@
 iOSアプリの初期画面（アプリ起動画面、アプリ開始画面）をSwiftUIで実装する。
 
 ### やりたいこと
-1.  **リソースファイルの移植:**
-    *   画像ファイル (`home_card.png`, `start.png`) をiOSプロジェクトの `Assets.xcassets` に追加する。
-    *   `./commonResource/` 配下のSVGアイコンファイル2点をiOSプロジェクトの `Assets.xcassets` にベクター画像として追加する。
+1.  **カラー定義の移植:**
     *   Androidの `colors.xml` の内容をiOSプロジェクトの `Assets.xcassets` にColor Setとして定義する。
+2.  **文字列定義の移植:**
     *   Androidの `strings.xml` の内容をiOSプロジェクトの `Localizable.strings` に定義する。
-2.  **アプリ起動画面の実装:**
+3.  **アプリ起動画面の実装:**
     *   `iosApp/iosApp/Sources/Views/App/MainView.swift` を作成し、SwiftUIでUIを構築する。
     *   `iosApp/iosApp/Sources/ViewModels/App/MainViewModel.swift` を作成し、KMPのUseCaseを利用したロジックを実装する。
-3.  **アプリ開始画面の実装:**
+4.  **アプリ開始画面の実装:**
     *   `iosApp/iosApp/Sources/Views/App/StartView.swift` を作成し、SwiftUIでUIを構築する。
     *   `iosApp/iosApp/Sources/ViewModels/App/StartViewModel.swift` を作成し、KMPのUseCaseを利用したロジックを実装する。
-4.  **`activeContext.md` の更新:**
+5.  **`activeContext.md` の更新:**
     *   上記タスクの進捗と完了状況を`activeContext.md`に反映する。
+    *   画像ファイルとSVGアイコンファイルの設定はユーザーが行う。
 
 ### 実装計画
-1.  **リソースファイルの移植:**
-    *   **画像ファイル:**
-        *   `androidApp/src/main/res/drawable/home_card.png` を `iosApp/iosApp/Assets.xcassets` に登録します。
-        *   `androidApp/src/main/res/drawable/start.png` を `iosApp/iosApp/Assets.xcassets` に登録します。
-    *   **SVGファイル (アイコン):**
-        *   `./commonResource/` に配置された `account_balance_wallet_24.svg` (仮名) を `iosApp/iosApp/Assets.xcassets` にベクター画像として登録します。
-        *   `./commonResource/` に配置された `shopping_cart_24.svg` (仮名) を `iosApp/iosApp/Assets.xcassets` にベクター画像として登録します。
-    *   **カラー定義:**
-        *   `androidApp/src/main/res/values/colors.xml` の内容を `iosApp/iosApp/Assets.xcassets` にColor Setとして定義します。
-    *   **文字列定義:**
-        *   `androidApp/src/main/res/values/strings.xml` の内容を `iosApp/iosApp/Resources/Localization/en.lproj/Localizable.strings` (英語をデフォルトとし、必要に応じて日本語リソースも作成) に定義します。
-2.  **アプリ起動画面の実装 (`MainView.swift`, `MainViewModel.swift`):**
+ユーザーが画像ファイルとSVGアイコンファイルをXcodeプロジェクトに追加するのを待つ。
+その後、以下のタスクを順に進める。
+
+1.  [x] **カラー定義の移植:** (完了)
+    *   `androidApp/src/main/res/values/colors.xml` の内容を `iosApp/iosApp/Assets.xcassets` にColor Setとして定義します。
+2.  [x] **文字列定義の移植:** (完了)
+    *   `androidApp/src/main/res/values/strings.xml` の内容を `iosApp/iosApp/Resources/Localization/en.lproj/Localizable.strings` (英語をデフォルトとし、必要に応じて日本語リソースも作成) に定義します。
+3.  **アプリ起動画面の実装 (`MainView.swift`, `MainViewModel.swift`):**
     *   `iosApp/iosApp/Sources/Views/App/MainView.swift` を作成します。
     *   `iosApp/iosApp/Sources/ViewModels/App/MainViewModel.swift` を作成します。
     *   Androidの `MainViewModel.kt` および `activity_main.xml` を参考に、SwiftUIで画面とロジックを実装します。
-3.  **アプリ開始画面の実装 (`StartView.swift`, `StartViewModel.swift`):**
+4.  **アプリ開始画面の実装 (`StartView.swift`, `StartViewModel.swift`):**
     *   `iosApp/iosApp/Sources/Views/App/StartView.swift` を作成します。
     *   `iosApp/iosApp/Sources/ViewModels/App/StartViewModel.swift` を作成します。
     *   Androidの `StartViewModel.kt` および `activity_start.xml` を参考に、SwiftUIで画面とロジックを実装します。
-4.  **`activeContext.md`の更新:**
+5.  **`activeContext.md`の更新:**
     *   上記タスクの進捗と完了状況を`activeContext.md`に反映する。
