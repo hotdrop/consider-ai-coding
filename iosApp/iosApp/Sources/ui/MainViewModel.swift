@@ -25,7 +25,12 @@ class MainViewModel: ObservableObject {
                 let appSetting = try await appSettingUseCase.find()
                 DispatchQueue.main.async {
                     if appSetting.isInitialized() {
-                        self.viewState = .loaded(appSetting.userId)
+                        if let userId = appSetting.userId {
+                            self.viewState = .loaded(userId)
+                        } else {
+                            // appSetting.isInitialized()がtrueなのにuserIdがnilの場合のハンドリング
+                            self.viewState = .error("User ID is missing despite being initialized.")
+                        }
                     } else {
                         self.viewState = .firstTime
                     }

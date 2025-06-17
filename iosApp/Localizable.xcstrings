@@ -12,6 +12,9 @@
         }
       }
     },
+    "Hello World" : {
+
+    },
     "home_menu_get_point" : {
       "extractionState" : "manual",
       "localizations" : {

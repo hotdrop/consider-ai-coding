@@ -1,5 +1,11 @@
 import SwiftUI
 
+// Identifiableなアラートアイテムを定義
+struct AlertItem: Identifiable {
+    let id = UUID()
+    let message: String
+}
+
 struct StartView: View {
     @StateObject private var viewModel = StartViewModel()
     @Environment(\.presentationMode) var presentationMode // 画面を閉じるために使用

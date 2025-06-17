@@ -11,7 +11,7 @@ struct StartUiState {
 
 class StartViewModel: ObservableObject {
     @Published var uiState: StartUiState = StartUiState()
-    @Published var errorMessage: String? = nil
+    @Published var errorMessage: AlertItem? = nil // String? から AlertItem? に変更
 
     private let appSettingUseCase: AppSettingUseCase = KmpUseCaseFactory().appSettingUseCase
 
@@ -29,14 +29,16 @@ class StartViewModel: ObservableObject {
 
         Task {
             do {
-                try await appSettingUseCase.registerUser(uiState.inputNickName, uiState.inputEmail)
+                // 引数ラベルを追加: nickname: uiState.inputNickName, email: uiState.inputEmail
+                try await appSettingUseCase.registerUser(nickname: uiState.inputNickName, email: uiState.inputEmail)
                 DispatchQueue.main.async {
                     self.uiState.isComplete = true
                     self.uiState.isLoading = false
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
+                    // AlertItemを生成して設定
+                    self.errorMessage = AlertItem(message: error.localizedDescription)
                     self.uiState.isLoading = false
                 }
             }

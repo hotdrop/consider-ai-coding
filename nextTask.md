@@ -2,19 +2,21 @@
 このファイルは次の実行タスクで追加してほしい機能や修正内容を詳細に記載するドキュメントです。ユーザーに更新権限があり、あなたは更新しないでください。
 
 # やりたいこと
-iOSで以下の画面を実装してください。既に`androidApp/`で全く同じ機能を実装しているためAndroidを参考にしてください。
+iOSで以下の画面を実装しましたがエラーがいくつか発生しているのと動作確認ができていないので修正をお願いしたいです。
 
-- アプリ起動画面
-- アプリ開始画面
+- アプリ起動画面: `iosApp/iosApp/Sources/ui/start`
+  - StartView.swift
+  - StartViewModel.swift
+- アプリ開始画面: `iosApp/iosApp/Sources/ui/`
+  - MainView.swift
+  - MainViewModel.swift
 
-## はじめにやってほしいこと
-リソースファイルをそろえてほしいです。Androidでいうと`res/`の中に定義しているdrawableの画像ファイルやアイコンファイル、`res/values`のカラー定義、文字列定義をiOSアプリ側に定義してください。
-AndroidのvectorファイルはiOS側で使えない可能性もあるので、その際はSVGファイルをお渡しします。
+# 進め方
+ClineであるあなたはVSCode上で動作するため、iOSのエラーを検知できません。ユーザーがXCode上でビルドしてエラーを摘出したり動作確認しますので、あなたはそのエラーを順番に解消してください。
 
-## アプリ起動画面
-`androidApp/`のソースコードだと`MainActivity.kt`と`MainViewModel.kt`に相当します。
-Androidのこの画面はComposeではなくAndroidViewで実装しているので、画面定義は`res/layout/activity_main.xml`を参照してください。
-
-## アプリ開始画面
-`androidApp/`のソースコードだと`StartActivity.kt`と`StartViewModel.kt`に相当します。
-Androidのこの画面はComposeではなくAndroidViewで実装しているので、画面定義は`res/layout/activity_start.xml`を参照してください。
+# 現時点で把握している問題
+- エントリポイントと思われる`iOSApp.swift`が`ContentView()`を呼び出しているが、ここは`MainView.swift`のViewにしたい。
+- Androidでは`App.kt`で`KmpUseCaseFactory.init(AndroidPlatformDependencies(this))`を実行している。iOSでも同様の初期化処理が必要ではないか？
+- `MainViewModel.swift`の28行目`self.viewState = .loaded(appSetting.userId)`でuserIdが`Value of optional type 'String?' must be unwrapped to a value of type 'String'`エラーになっている
+- `StartView.swift`の69行目で`.alert`が`Instance method 'alert(item:content:)' requires that 'String' conform to 'Identifiable'`エラーになっている
+- `StartViewModel.swift`の32行目で`try await appSettingUseCase.registerUser(uiState.inputNickName, uiState.inputEmail)`で`Missing argument labels 'nickname:email:' in call`エラーになっている
