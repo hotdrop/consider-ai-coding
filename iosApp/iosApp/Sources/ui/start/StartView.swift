@@ -72,8 +72,8 @@ struct StartView: View {
             }
             .background(Color("appbarColor").ignoresSafeArea(edges: .top)) // ツールバーの背景色
             .background(Color("white").ignoresSafeArea(edges: .bottom)) // 下部の背景色
-            .alert(item: $viewModel.errorMessage) { errorMessage in
-                Alert(title: Text("エラー"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+            .alert(item: $viewModel.errorMessage) { alertItem in
+                Alert(title: Text("エラー"), message: Text(alertItem.message), dismissButton: .default(Text("OK")))
             }
             .onChange(of: viewModel.uiState.isComplete) { isComplete in
                 if isComplete {

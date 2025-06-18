@@ -9,6 +9,7 @@ struct StartUiState {
     var isComplete: Bool = false
 }
 
+@MainActor
 class StartViewModel: ObservableObject {
     @Published var uiState: StartUiState = StartUiState()
     @Published var errorMessage: AlertItem? = nil // String? から AlertItem? に変更

@@ -1,48 +1,92 @@
 import Foundation
 import shared
 
-class IosPlatformDependencies: PlatformDependencies {
-    let driverFactory: DriverFactory
-    let sharedPrefs: KmpSharedPreferences
+public class IosUserDefaultsStore: KmpSharedPreferences {
+    // MARK: — Keys
+    private let userIdKey   = "key001"
+    private let nickNameKey = "key002"
+    private let emailKey    = "key003"
+    private let pointKey    = "key004"
 
-    init() {
-        driverFactory = DriverFactory()
-        sharedPrefs = IosKmpSharedPreferences()
+    public func getUserId() async throws -> String? {
+        return UserDefaults.standard.string(forKey: userIdKey)
     }
-}
-
-class IosKmpSharedPreferences: KmpSharedPreferences {
-    private let userDefaults = UserDefaults.standard
-
-    func getUserId() async -> String? {
-        return userDefaults.string(forKey: "userId")
+    public func getNickName() async throws -> String? {
+        return UserDefaults.standard.string(forKey: nickNameKey)
     }
-
-    func saveUserId(newVal: String) async {
-        userDefaults.set(newVal, forKey: "userId")
+    public func getEmail() async throws -> String? {
+        return UserDefaults.standard.string(forKey: emailKey)
     }
-
-    func getNickName() async -> String? {
-        return userDefaults.string(forKey: "nickName")
+    public func getPoint() async throws -> KotlinInt {
+        // UserDefaults.integer は未設定時 0 を返す
+        return KotlinInt(integerLiteral: UserDefaults.standard.integer(forKey: pointKey))
     }
 
-    func saveNickName(newVal: String) async {
-        userDefaults.set(newVal, forKey: "nickName")
+    @discardableResult
+    public func saveUserId(newVal: String) async throws -> KotlinUnit {
+        UserDefaults.standard.set(newVal, forKey: userIdKey)
+        return KotlinUnit()
+    }
+    
+    public func saveUserId(newVal: String, completionHandler: @escaping (Error?) -> Void) {
+        Task {
+            do {
+                _ = try await saveUserId(newVal: newVal)
+                completionHandler(nil)
+            } catch {
+                completionHandler(error)
+            }
+        }
+    }
+    
+    @discardableResult
+    public func saveNickName(newVal: String) async throws -> KotlinUnit {
+        UserDefaults.standard.set(newVal, forKey: nickNameKey)
+        return KotlinUnit()
+    }
+    
+    public func saveNickName(newVal: String, completionHandler: @escaping (Error?) -> Void) {
+        Task {
+            do {
+                _ = try await saveNickName(newVal: newVal)
+                completionHandler(nil)
+            } catch {
+                completionHandler(error)
+            }
+        }
+    }
+    
+    @discardableResult
+    public func saveEmail(newVal: String) async throws -> KotlinUnit {
+        UserDefaults.standard.set(newVal, forKey: emailKey)
+        return KotlinUnit()
     }
 
-    func getEmail() async -> String? {
-        return userDefaults.string(forKey: "email")
+    public func saveEmail(newVal: String, completionHandler: @escaping (Error?) -> Void) {
+        Task {
+            do {
+                _ = try await saveEmail(newVal: newVal)
+                completionHandler(nil)
+            } catch {
+                completionHandler(error)
+            }
+        }
     }
-
-    func saveEmail(newVal: String) async {
-        userDefaults.set(newVal, forKey: "email")
+    
+    @discardableResult
+    public func savePoint(newVal: Int32) async throws -> KotlinUnit {
+        UserDefaults.standard.set(newVal, forKey: pointKey)
+        return KotlinUnit()
     }
-
-    func getPoint() async -> Int {
-        return userDefaults.integer(forKey: "point")
-    }
-
-    func savePoint(newVal: Int) async {
-        userDefaults.set(newVal, forKey: "point")
+    
+    public func savePoint(newVal: Int32, completionHandler: @escaping ((any Error)?) -> Void) {
+        Task {
+            do {
+                _ = try await savePoint(newVal: newVal)
+                completionHandler(nil)
+            } catch {
+                completionHandler(error)
+            }
+        }
     }
 }

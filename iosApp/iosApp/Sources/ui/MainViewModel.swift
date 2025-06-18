@@ -9,6 +9,7 @@ enum MainViewState {
     case error(String)
 }
 
+@MainActor // MainActorを追加
 class MainViewModel: ObservableObject {
     @Published var viewState: MainViewState = .loading
 
@@ -23,22 +24,20 @@ class MainViewModel: ObservableObject {
         Task {
             do {
                 let appSetting = try await appSettingUseCase.find()
-                DispatchQueue.main.async {
-                    if appSetting.isInitialized() {
-                        if let userId = appSetting.userId {
-                            self.viewState = .loaded(userId)
-                        } else {
-                            // appSetting.isInitialized()がtrueなのにuserIdがnilの場合のハンドリング
-                            self.viewState = .error("User ID is missing despite being initialized.")
-                        }
+                // @MainActorクラスなので、DispatchQueue.main.asyncは不要
+                if appSetting.isInitialized() {
+                    if let userId = appSetting.userId {
+                        self.viewState = .loaded(userId)
                     } else {
-                        self.viewState = .firstTime
+                        // appSetting.isInitialized()がtrueなのにuserIdがnilの場合のハンドリング
+                        self.viewState = .error("User ID is missing despite being initialized.")
                     }
+                } else {
+                    self.viewState = .firstTime
                 }
             } catch {
-                DispatchQueue.main.async {
-                    self.viewState = .error(error.localizedDescription)
-                }
+                // @MainActorクラスなので、DispatchQueue.main.asyncは不要
+                self.viewState = .error(error.localizedDescription)
             }
         }
     }

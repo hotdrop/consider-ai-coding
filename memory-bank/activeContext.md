@@ -17,8 +17,12 @@ iOSアプリの初期画面（アプリ起動画面、アプリ開始画面）�
     *   `iosApp/iosApp/iOSApp.swift`の`body`プロパティが`MainView()`を返すように修正しました。
 - **`MainViewModel.swift`のエラー修正**
     *   `appSetting.userId`がオプショナル型であることによるエラーを、安全なアンラップ（`if let`）と、`userId`が`nil`の場合のエラーハンドリングを追加することで修正しました。
+    *   `MainViewModel`クラスに`@MainActor`を追加し、`DispatchQueue.main.async`を削除することで、`Capture of 'self' with non-sendable type`および`Capture of 'appSetting' with non-sendable type`の警告を解消しました。
 - **`StartView.swift`のエラー修正**
     *   `.alert`モディファイアが`Identifiable`プロトコルに準拠したオブジェクトを要求するため、`StartView.swift`内に`Identifiable`な`AlertItem`構造体を定義しました。
+    *   `Alert`の`message`引数に`errorMessage.message`を渡すように修正し、`Initializer 'init(_:)' requires that 'AlertItem' conform to 'StringProtocol'`のエラーを解消しました。
 - **`StartViewModel.swift`のエラー修正**
     *   `errorMessage`プロパティの型を`String?`から`AlertItem?`に変更し、エラーメッセージを設定する箇所を`AlertItem(message: error.localizedDescription)`でラップするように修正しました。
     *   `appSettingUseCase.registerUser`メソッドの呼び出し時に不足していた引数ラベル（`nickname:email:`）を追加しました。
+- **`PlatformDependencies.swift`のエラー修正**
+    *   `IosKmpSharedPreferences`クラスの各メソッドから`async`キーワードを削除し、`Type 'IosKmpSharedPreferences' does not conform to protocol 'KmpSharedPreferences'`のエラーを解消しました。
