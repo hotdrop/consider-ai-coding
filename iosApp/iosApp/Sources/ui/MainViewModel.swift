@@ -13,12 +13,22 @@ class MainViewModel: ObservableObject {
     @Published var viewState: MainViewState = .loading
 
     private let useCase: AppSettingUseCaseProtocol
+    private let loadAction: (() async -> Void)?
 
-    init(appSettingUseCase: AppSettingUseCaseProtocol = KmpUseCaseFactory.shared.appSettingUseCase) {
+    init(appSettingUseCase: AppSettingUseCaseProtocol = KmpUseCaseFactory.shared.appSettingUseCase,
+         loadAction: (() async -> Void)? = nil
+    ) {
         self.useCase = appSettingUseCase
+        self.loadAction = loadAction
     }
 
     func load() async {
+        if Task.isCancelled { return }
+        if let customLoad = loadAction {
+            await customLoad()
+            return
+        }
+        
         viewState = .loading
         do {
             let appSetting = try await useCase.find()
@@ -42,7 +52,7 @@ class MainViewModel: ObservableObject {
 // Mock
 extension MainViewModel {
     static func mock(_ state: MainViewState) -> MainViewModel {
-        let vm = MainViewModel(appSettingUseCase: DummyAppSettingUseCase())
+        let vm = MainViewModel(appSettingUseCase: DummyAppSettingUseCase(), loadAction: {})
         vm.viewState = state
         return vm
     }
