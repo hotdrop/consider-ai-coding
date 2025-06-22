@@ -2,47 +2,55 @@ import Foundation
 import Combine
 import shared
 
-struct StartUiState {
-    var inputNickName: String = ""
-    var inputEmail: String = ""
-    var isLoading: Bool = false
-    var isComplete: Bool = false
+enum ViewState {
+    case idle
+    case loading
+    case success
+    case error(String)
 }
 
-@MainActor
 class StartViewModel: ObservableObject {
-    @Published var uiState: StartUiState = StartUiState()
-    @Published var errorMessage: AlertItem? = nil // String? から AlertItem? に変更
+    @Published var viewState: ViewState = .idle
 
-    private let appSettingUseCase: AppSettingUseCase = KmpUseCaseFactory().appSettingUseCase
+    private let appSettingUseCase: AppSettingUseCaseProtocol
 
-    func onNickNameChanged(newValue: String) {
-        uiState.inputNickName = newValue
+    init(appSettingUseCase: AppSettingUseCaseProtocol = KmpUseCaseFactory().appSettingUseCase) {
+        self.appSettingUseCase = appSettingUseCase
     }
 
-    func onEmailChanged(newValue: String) {
-        uiState.inputEmail = newValue
-    }
-
-    func save() {
-        uiState.isLoading = true
-        errorMessage = nil // エラーメッセージをリセット
-
-        Task {
-            do {
-                // 引数ラベルを追加: nickname: uiState.inputNickName, email: uiState.inputEmail
-                try await appSettingUseCase.registerUser(nickname: uiState.inputNickName, email: uiState.inputEmail)
-                DispatchQueue.main.async {
-                    self.uiState.isComplete = true
-                    self.uiState.isLoading = false
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    // AlertItemを生成して設定
-                    self.errorMessage = AlertItem(message: error.localizedDescription)
-                    self.uiState.isLoading = false
-                }
+    func registerUser(nickname: String, email: String) async {
+        do {
+            await MainActor.run {
+                viewState = .loading
+            }
+            
+            try await appSettingUseCase.registerUser(nickname: nickname, email: email)
+            await MainActor.run {
+                viewState = .success
+            }
+        } catch {
+            await MainActor.run {
+                viewState = .error(error.localizedDescription)
             }
         }
+    }
+}
+
+// Mock
+extension StartViewModel {
+    static func mock(_ state: ViewState) -> StartViewModel {
+        let vm = StartViewModel(appSettingUseCase: DummyAppSettingUseCase())
+        vm.viewState = state
+        return vm
+    }
+}
+
+class DummyAppSettingForStartUseCase: AppSettingUseCaseProtocol {
+    func find() async throws -> AppSetting {
+        return AppSetting(userId: "dummy", nickName: "dummy", email: "dummy@example.com")
+    }
+
+    func registerUser(nickname: String?, email: String?) async throws {
+        
     }
 }

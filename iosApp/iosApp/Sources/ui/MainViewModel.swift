@@ -29,8 +29,11 @@ class MainViewModel: ObservableObject {
             return
         }
         
-        viewState = .loading
         do {
+            await MainActor.run {
+                viewState = .loading
+            }
+            
             let appSetting = try await useCase.find()
             await MainActor.run {
                 if appSetting.isInitialized(), let userId = appSetting.userId {
@@ -63,4 +66,5 @@ class DummyAppSettingUseCase: AppSettingUseCaseProtocol {
         let appSetting = AppSetting(userId: "preview001", nickName: "preview name", email: "preview@email.com")
         return appSetting
     }
+    func registerUser(nickname: String?, email: String?) async throws {}
 }
