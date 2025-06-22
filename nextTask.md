@@ -2,5 +2,6 @@
 このファイルは次の実行タスクで追加してほしい機能や修正内容を詳細に記載するドキュメントです。ユーザーに更新権限があり、あなたは更新しないでください。
 
 # やりたいこと
-`MainView.swift`において`MainViewModel.swift`のload()関数呼び出し、実行結果の状態に応じたUI生成をするよう修正してほしい。
-最初は`MainViewModel.swift`の`init`関数でload()関数を読んでいたが、init関数でファーストビューに必要なデータをロードすると、仮にViewから引数が必要になった場合に対応できないので、全体の設計としてViewModelの初回ロード処理はViewから呼び出すようにしたい
+`MainView.swift`において、stateが`firstTime`の場合の画面がandroidのものと違います。Imageやラベルの配置は良いのですが、色合いが全く違っているようです。以下のスクショをもとに、androidのUIと同等になるよう`MainView.swift`を修正してください
+- androidのスクショ（正しいUI）: `./taskImages/android.png`
+- iOSのスクショ（間違っているUI）: `./taskImages/iOS.png`
