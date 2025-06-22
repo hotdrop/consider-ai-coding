@@ -2,11 +2,16 @@ import Foundation
 import Combine
 import shared
 
-enum ViewState {
+struct ErrorAlertItem: Identifiable, Equatable {
+    let id = UUID()
+    let message: String
+}
+
+enum ViewState: Equatable {
     case idle
     case loading
     case success
-    case error(String)
+    case error(ErrorAlertItem)
 }
 
 class StartViewModel: ObservableObject {
@@ -30,7 +35,7 @@ class StartViewModel: ObservableObject {
             }
         } catch {
             await MainActor.run {
-                viewState = .error(error.localizedDescription)
+                viewState = .error(ErrorAlertItem(message: error.localizedDescription))
             }
         }
     }

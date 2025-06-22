@@ -16,19 +16,23 @@
 *   プレビューやテストのために、`mock` extension と `DummyAppSettingUseCase` を追加した。
 → **完了済み**
 
-#### Step 2: `StartView.swift` のリファクタリング (次の作業)
+#### Step 2: `StartView.swift` のリファクタリング
 1.  **背景色の修正:**
-    *   `NavigationView` 全体の背景色指定を見直し、`Toolbar` 部分の背景が `appbarColor` に、コンテンツ部分の背景が `white` になるように修正する。
-    *   既存の誤った `.background()` 指定を削除する。
+    *   `NavigationView` 全体の背景色指定を見直し、`Toolbar` 部分の背景が `appbarColor` に、コンテンツ部分の背景が `white` になるように修正した。
+    *   既存の誤った `.background()` 指定を削除した。
 2.  **`Toolbar` の修正:**
-    *   `NavigationView` と `.toolbar` 修飾子を継続して使用する。
-    *   `.toolbar` 内で、`ToolbarItem(placement: .navigationBarLeading)` を使って戻るボタンを配置する。
-    *   `ToolbarItem(placement: .principal)` を使って中央揃えのタイトルを配置する。
-    *   `.navigationBarTitleDisplayMode(.inline)` と `.navigationBarBackButtonHidden(true)` を設定する。
+    *   `NavigationView` と `.toolbar` 修飾子を継続して使用した。
+    *   `.toolbar` 内で、`ToolbarItem(placement: .navigationBarLeading)` を使って戻るボタンを配置した。
+    *   `ToolbarItem(placement: .principal)` を使って中央揃えのタイトルを配置した。
+    *   `.navigationBarTitleDisplayMode(.inline)` と `.navigationBarBackButtonHidden(true)` を設定した。
 3.  **責務の分離:**
-    *   `@Environment(\.presentationMode)` を削除し、親Viewから `onBack` と `onSuccess` クロージャを受け取るようにする。
+    *   `@Environment(\.presentationMode)` を削除し、親Viewから `onBack` と `onSuccess` クロージャを受け取るようにした。
 4.  **ViewModelとの連携:**
-    *   ボタンのアクションで `Task { await viewModel.registerUser(...) }` を呼び出すようにする。
-    *   `viewModel.viewState` の変更を `.onChange` で監視し、`.success` の場合に `onSuccess()` を呼び出す。
-    *   `viewModel.viewState` が `.error` の場合に `.alert` を表示する。
-    *   `viewModel.viewState` が `.loading` の場合にボタンを無効化し、ボタン内に `ProgressView` を表示する。
+    *   ボタンのアクションで `Task { await viewModel.registerUser(...) }` を呼び出すようにした。
+    *   `viewModel.viewState` の変更を `.onChange` で監視し、`.success` の場合に `onSuccess()` を呼び出すようにした。
+    *   `viewModel.viewState` が `.error` の場合に `.alert` を表示するようにした。
+    *   `viewModel.viewState` が `.loading` の場合にボタンを無効化し、ボタン内に `ProgressView` を表示するようにした。
+    *   `ViewState` enum を `Equatable` に準拠させ、`alert(item:)` のエラーを解消した。
+    *   `StartView_Previews` を `viewState` に応じて表示を切り替えるように修正した。
+    *   `TextField` のプレースホルダーの視認性を向上させるため、`ZStack` を使って黒い `Text` を重ねるように修正した。
+→ **完了済み**
