@@ -10,69 +10,80 @@ struct MainView: View {
     var body: some View {
         NavigationView {
             VStack {
+                Image("start")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 264, height: 264)
+                    .padding(.vertical, 32)
+                
                 switch viewModel.viewState {
                 case .loading:
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color("primary")))
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
                 case .loaded(let userId):
-                    // TODO: HomeViewへの遷移ロジックを実装
-                    Text("ユーザーID: \(userId)")
-                        .font(.title)
-                        .foregroundColor(Color("themeColor"))
-                        .onAppear {
-                            // TODO 実際にはここでHomeViewへ遷移
-                            print("Navigate to HomeView with userId: \(userId)")
+                    LoadedView(userId: userId)
+                        .task(id: userId) {
+                            // onAppearはViewが再描画されるたびに実行されるため、idが変化した時だけ遷移処理を実行する
+                            // TODO: HomeViewへの遷移ロジックを実装
                         }
                 case .firstTime:
-                    ZStack {
-                        Color.white.ignoresSafeArea()
-                        VStack {
-                            Image("start")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 264, height: 264)
-                                .padding(.vertical, 32)
-
-                            Text(NSLocalizedString("splash_app_label", comment: ""))
-                                .font(.title2)
-                                .foregroundColor(Color("themeColor"))
-                                .padding(.top, 32)
-
-                            Button(action: {
-                                // TODO: StartViewへの遷移ロジックを実装
-                                print("Navigate to StartView")
-                            }) {
-                                Text(NSLocalizedString("splash_first_time_button", comment: ""))
-                                    .font(.headline)
-                                    .foregroundColor(Color("white"))
-                                    .padding()
-                                    .frame(maxWidth: .infinity)
-                                    .background(Color("themeColor"))
-                                    .cornerRadius(8)
-                            }
-                            .padding(.horizontal, 32)
-                            .padding(.top, 32)
-                        }
+                    FirstTimeView {
+                        // TODO: StartViewへの遷移ロジックを実装
+                        print("Navigate to StartView")
                     }
                 case .error(let message):
                     Text("エラー: \(message)")
                         .foregroundColor(.red)
                 }
             }
-            .navigationBarHidden(true) // ツールバーはカスタムで実装するため非表示
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text(NSLocalizedString("splash_title", comment: ""))
-                        .font(.system(size: 20))
-                        .foregroundColor(Color("white"))
-                }
-            }
-            .background(Color("appbarColor").ignoresSafeArea(edges: .top)) // ツールバーの背景色
+            .navigationTitle(NSLocalizedString("splash_title", comment: ""))
+            .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear {
             Task {
                 await viewModel.load()
             }
+        }
+    }
+}
+
+private struct LoadedView: View {
+    let userId: String
+    
+    var body: some View {
+        VStack {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
+            
+            Text("ユーザーID: \(userId)")
+                .foregroundColor(Color("themeColor"))
+                .padding(.top, 64)
+        }
+    }
+}
+
+private struct FirstTimeView: View {
+    let onStartTapped: () -> Void
+    
+    var body: some View {
+        VStack {
+            Text(NSLocalizedString("splash_app_label", comment: ""))
+                .font(.title2)
+                .foregroundColor(Color("themeColor"))
+
+            Button(action: {
+                onStartTapped()
+            }) {
+                Text(NSLocalizedString("splash_first_time_button", comment: ""))
+                    .font(.headline)
+                    .foregroundColor(Color("white"))
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color("themeColor"))
+                    .cornerRadius(8)
+            }
+            .padding(.horizontal, 32)
+            .padding(.top, 64)
         }
     }
 }
