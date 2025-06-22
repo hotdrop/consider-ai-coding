@@ -16,27 +16,26 @@ class MainViewModel: ObservableObject {
 
     init(appSettingUseCase: AppSettingUseCaseProtocol = KmpUseCaseFactory.shared.appSettingUseCase) {
         self.useCase = appSettingUseCase
-        Task {
-            await self.load()
-        }
     }
 
-    private func load() async {
-        viewState = .loading
-        do {
-            let appSetting = try await useCase.find()
-            await MainActor.run {
-                if appSetting.isInitialized(), let userId = appSetting.userId {
-                    self.viewState = .loaded(userId)
-                } else if appSetting.isInitialized() {
-                    self.viewState = .error("User ID is missing despite being initialized.")
-                } else {
-                    self.viewState = .firstTime
+    func load() async {
+        Task {
+            viewState = .loading
+            do {
+                let appSetting = try await useCase.find()
+                await MainActor.run {
+                    if appSetting.isInitialized(), let userId = appSetting.userId {
+                        self.viewState = .loaded(userId)
+                    } else if appSetting.isInitialized() {
+                        self.viewState = .error("User ID is missing despite being initialized.")
+                    } else {
+                        self.viewState = .firstTime
+                    }
                 }
-            }
-        } catch {
-            await MainActor.run {
-                self.viewState = .error(error.localizedDescription)
+            } catch {
+                await MainActor.run {
+                    self.viewState = .error(error.localizedDescription)
+                }
             }
         }
     }
