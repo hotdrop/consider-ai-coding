@@ -22,6 +22,7 @@ class MainViewModel: ObservableObject {
         self.loadAction = loadAction
     }
 
+    @MainActor
     func load() async {
         if Task.isCancelled { return }
         if let customLoad = loadAction {
@@ -30,24 +31,18 @@ class MainViewModel: ObservableObject {
         }
         
         do {
-            await MainActor.run {
-                viewState = .loading
-            }
+            viewState = .loading
             
             let appSetting = try await useCase.find()
-            await MainActor.run {
-                if appSetting.isInitialized(), let userId = appSetting.userId {
-                    self.viewState = .loaded(userId)
-                } else if appSetting.isInitialized() {
-                    self.viewState = .error("User ID is missing despite being initialized.")
-                } else {
-                    self.viewState = .firstTime
-                }
+            if appSetting.isInitialized(), let userId = appSetting.userId {
+                self.viewState = .loaded(userId)
+            } else if appSetting.isInitialized() {
+                self.viewState = .error("User ID is missing despite being initialized.")
+            } else {
+                self.viewState = .firstTime
             }
         } catch {
-            await MainActor.run {
-                self.viewState = .error(error.localizedDescription)
-            }
+            self.viewState = .error(error.localizedDescription)
         }
     }
 }

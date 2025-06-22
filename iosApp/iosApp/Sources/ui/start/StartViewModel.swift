@@ -11,11 +11,11 @@ enum ViewState: Equatable {
     case idle
     case loading
     case success
-    case error(ErrorAlertItem)
 }
 
 class StartViewModel: ObservableObject {
     @Published var viewState: ViewState = .idle
+    @Published var errorAlertItem: ErrorAlertItem?
 
     private let appSettingUseCase: AppSettingUseCaseProtocol
 
@@ -23,39 +23,36 @@ class StartViewModel: ObservableObject {
         self.appSettingUseCase = appSettingUseCase
     }
 
+    @MainActor
     func registerUser(nickname: String, email: String) async {
+        if nickname.isEmpty {
+            errorAlertItem = ErrorAlertItem(message: NSLocalizedString("error_nickname_empty", comment: ""))
+            return
+        }
+        // 簡単なメールアドレスのバリデーション
+        if email.isEmpty || !email.contains("@") {
+            errorAlertItem = ErrorAlertItem(message: NSLocalizedString("error_email_invalid", comment: ""))
+            return
+        }
+
+        viewState = .loading
+        
         do {
-            await MainActor.run {
-                viewState = .loading
-            }
-            
             try await appSettingUseCase.registerUser(nickname: nickname, email: email)
-            await MainActor.run {
-                viewState = .success
-            }
+            viewState = .success
         } catch {
-            await MainActor.run {
-                viewState = .error(ErrorAlertItem(message: error.localizedDescription))
-            }
+            viewState = .idle
+            errorAlertItem = ErrorAlertItem(message: error.localizedDescription)
         }
     }
 }
 
 // Mock
 extension StartViewModel {
-    static func mock(_ state: ViewState) -> StartViewModel {
+    static func mock(_ state: ViewState, error: ErrorAlertItem? = nil) -> StartViewModel {
         let vm = StartViewModel(appSettingUseCase: DummyAppSettingUseCase())
         vm.viewState = state
+        vm.errorAlertItem = error
         return vm
-    }
-}
-
-class DummyAppSettingForStartUseCase: AppSettingUseCaseProtocol {
-    func find() async throws -> AppSetting {
-        return AppSetting(userId: "dummy", nickName: "dummy", email: "dummy@example.com")
-    }
-
-    func registerUser(nickname: String?, email: String?) async throws {
-        
     }
 }
