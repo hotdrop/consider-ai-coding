@@ -1,7 +1,11 @@
 import SwiftUI
 
 struct MainView: View {
-    @StateObject private var viewModel = MainViewModel()
+    @StateObject private var viewModel: MainViewModel
+    
+    init(viewModel: MainViewModel = MainViewModel()) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 
     var body: some View {
         NavigationView {
@@ -68,6 +72,18 @@ struct MainView: View {
 
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
-        MainView()
+        Group {
+            MainView(viewModel: MainViewModel.mock(.loading))
+                .previewDisplayName("読み込み中")
+
+            MainView(viewModel: MainViewModel.mock(.loaded("preview_user_123")))
+                .previewDisplayName("ログイン済み")
+
+            MainView(viewModel: MainViewModel.mock(.firstTime))
+                .previewDisplayName("初回起動")
+
+            MainView(viewModel: MainViewModel.mock(.error("プレビュー用エラー")))
+                .previewDisplayName("エラー")
+        }
     }
 }

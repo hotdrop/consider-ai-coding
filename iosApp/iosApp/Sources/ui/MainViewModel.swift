@@ -9,36 +9,51 @@ enum MainViewState {
     case error(String)
 }
 
-@MainActor // MainActorを追加
 class MainViewModel: ObservableObject {
     @Published var viewState: MainViewState = .loading
 
-    private let appSettingUseCase: AppSettingUseCase = KmpUseCaseFactory().appSettingUseCase
+    private let useCase: AppSettingUseCaseProtocol
 
-    init() {
-        loadAppSetting()
+    init(appSettingUseCase: AppSettingUseCaseProtocol = KmpUseCaseFactory.shared.appSettingUseCase) {
+        self.useCase = appSettingUseCase
+        Task {
+            await self.load()
+        }
     }
 
-    func loadAppSetting() {
+    private func load() async {
         viewState = .loading
-        Task {
-            do {
-                let appSetting = try await appSettingUseCase.find()
-                // @MainActorクラスなので、DispatchQueue.main.asyncは不要
-                if appSetting.isInitialized() {
-                    if let userId = appSetting.userId {
-                        self.viewState = .loaded(userId)
-                    } else {
-                        // appSetting.isInitialized()がtrueなのにuserIdがnilの場合のハンドリング
-                        self.viewState = .error("User ID is missing despite being initialized.")
-                    }
+        do {
+            let appSetting = try await useCase.find()
+            await MainActor.run {
+                if appSetting.isInitialized(), let userId = appSetting.userId {
+                    self.viewState = .loaded(userId)
+                } else if appSetting.isInitialized() {
+                    self.viewState = .error("User ID is missing despite being initialized.")
                 } else {
                     self.viewState = .firstTime
                 }
-            } catch {
-                // @MainActorクラスなので、DispatchQueue.main.asyncは不要
+            }
+        } catch {
+            await MainActor.run {
                 self.viewState = .error(error.localizedDescription)
             }
         }
+    }
+}
+
+// Mock
+extension MainViewModel {
+    static func mock(_ state: MainViewState) -> MainViewModel {
+        let vm = MainViewModel(appSettingUseCase: DummyAppSettingUseCase())
+        vm.viewState = state
+        return vm
+    }
+}
+
+class DummyAppSettingUseCase: AppSettingUseCaseProtocol {
+    func find() async throws -> AppSetting {
+        let appSetting = AppSetting(userId: "preview001", nickName: "preview name", email: "preview@email.com")
+        return appSetting
     }
 }
