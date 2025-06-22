@@ -67,6 +67,11 @@ struct MainView: View {
             .background(Color("appbarColor").ignoresSafeArea(edges: .top)) // ツールバーの背景色
             .background(Color("white").ignoresSafeArea(edges: .bottom)) // 下部の背景色
         }
+        .onAppear {
+            Task {
+                await viewModel.load()
+            }
+        }
     }
 }
 
