@@ -81,6 +81,39 @@
         }
       }
     },
+    "point_history_acquire" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポイント獲得"
+          }
+        }
+      }
+    },
+    "point_history_point_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ポイント"
+          }
+        }
+      }
+    },
+    "point_history_use" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポイント使用"
+          }
+        }
+      }
+    },
     "splash_app_label" : {
       "extractionState" : "manual",
       "localizations" : {

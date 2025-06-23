@@ -6,6 +6,7 @@ struct StartView: View {
     @StateObject private var viewModel: StartViewModel
     @State private var inputNickName: String = ""
     @State private var inputEmail: String = ""
+    @State private var showHomeView: Bool = false
 
     init(viewModel: StartViewModel = StartViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -55,10 +56,17 @@ struct StartView: View {
         }
         .onChange(of: viewModel.viewState) { newState in
             if case .success = newState {
-                // TODO: 次の画面に遷移
-                presentationMode.wrappedValue.dismiss()
+                showHomeView = true
             }
         }
+        .background(
+            NavigationLink(
+                destination: HomeView(viewModel: HomeViewModel()),
+                isActive: $showHomeView,
+                label: { EmptyView() }
+            )
+            .hidden()
+        )
     }
 }
 

@@ -3,6 +3,7 @@ import SwiftUI
 struct MainView: View {
     @StateObject private var viewModel: MainViewModel
     @State private var showStartView: Bool = false
+    @State private var showHomeView: Bool = false
     
     init(viewModel: MainViewModel = MainViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -25,7 +26,7 @@ struct MainView: View {
                     LoadedView(userId: userId)
                         .task(id: userId) {
                             // onAppearはViewが再描画されるたびに実行されるため、idが変化した時だけ遷移処理を実行する
-                            // TODO: HomeViewへの遷移ロジックを実装
+                            showHomeView = true
                         }
                 case .firstTime:
                     FirstTimeView {
@@ -42,6 +43,14 @@ struct MainView: View {
                 NavigationLink(
                     destination: StartView(),
                     isActive: $showStartView,
+                    label: { EmptyView() }
+                )
+                .hidden()
+            )
+            .background(
+                NavigationLink(
+                    destination: HomeView(viewModel: HomeViewModel()),
+                    isActive: $showHomeView,
                     label: { EmptyView() }
                 )
                 .hidden()
