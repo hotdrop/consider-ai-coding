@@ -63,12 +63,16 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity)
             
             VStack(alignment: .leading, spacing: 10) {
-                if let viewState = viewModel.viewState {
-                    Text(viewState.nickname.isEmpty ? NSLocalizedString("home_un_setting_nickname", comment: "") : viewState.nickname)
+                switch viewModel.viewState {
+                case .loading:
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color("white")))
+                case .loaded(let nickname, let email, let point, let histories):
+                    Text(nickname.isEmpty ? NSLocalizedString("home_un_setting_nickname", comment: "") : nickname)
                         .font(.title3)
                         .fontWeight(.bold)
                         .foregroundColor(Color("white"))
-                    Text(viewState.email.isEmpty ? NSLocalizedString("home_un_setting_email", comment: "") : viewState.email)
+                    Text(email.isEmpty ? NSLocalizedString("home_un_setting_email", comment: "") : email)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
                     
@@ -77,23 +81,17 @@ struct HomeView: View {
                     HStack {
                         Image(systemName: "dollarsign.circle.fill")
                             .foregroundColor(Color("white"))
-                        Text(String(format: NSLocalizedString("home_point_value", comment: ""), "\(viewState.point)"))
+                        Text(String(format: NSLocalizedString("home_point_value", comment: ""), "\(point)"))
                             .font(.headline)
                             .fontWeight(.bold)
                             .foregroundColor(Color("white"))
                     }
-                } else if let error = viewModel.error {
-                    switch error {
-                    case .appSettingNotInitialized:
-                        Text(NSLocalizedString("home_error_app_setting_not_initialized", comment: ""))
-                            .foregroundColor(.red)
-                    case .unknown(let message):
-                        Text("エラー: \(message)")
-                            .foregroundColor(.red)
-                    }
-                } else {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color("white")))
+                case .appSettingNotInitialized:
+                    Text(NSLocalizedString("home_error_app_setting_not_initialized", comment: ""))
+                        .foregroundColor(.red)
+                case .error(let message):
+                    Text("エラー: \(message)")
+                        .foregroundColor(.red)
                 }
             }
             .padding(20)
@@ -141,10 +139,10 @@ struct HomeView: View {
                     ForEach(viewState.histories, id: \.self) { history in
                         HStack {
                             VStack(alignment: .leading) {
-                                Text(history.date.formatted("yyyy/MM/dd HH:mm:ss"))
+                                Text(history.toStringDateTime())
                                     .font(.caption)
                                     .foregroundColor(.gray)
-                                Text(history.type == HistoryType.acquire ? NSLocalizedString("point_history_acquire", comment: "") : NSLocalizedString("point_history_use", comment: ""))
+                                Text(history.detail)
                                     .font(.body)
                             }
                             Spacer()
@@ -175,38 +173,47 @@ struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             // 1. データ読み込み中
-            HomeView(viewModel: HomeViewModel.mock(nil, error: nil))
+            HomeView(viewModel: HomeViewModel.mock(.loading))
                 .previewDisplayName("Loading State")
 
             // 2. 正常表示
             HomeView(viewModel: HomeViewModel.mock(
-                HomeViewState(
+                .loaded(
                     nickname: "プレビューユーザー",
                     email: "preview@example.com",
                     point: 1000,
                     histories: [
-                        History(id: 1, amount: 100, type: HistoryType.acquire, date: Date().toKotlinInstant()),
-                        History(id: 2, amount: -50, type: HistoryType.use, date: Date().toKotlinInstant())
+                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                            year: 2025,
+                            monthNumber: 6,
+                            dayOfMonth: 22,
+                            hour: 15,
+                            minute: 25,
+                            second: 20,
+                            nanosecond: 0
+                        ), point: 100, detail: "獲得"),
+                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                            year: 2025,
+                            monthNumber: 6,
+                            dayOfMonth: 22,
+                            hour: 15,
+                            minute: 25,
+                            second: 20,
+                            nanosecond: 0
+                        ), point: -50, detail: "利用")
                     ]
                 )
             ))
             .previewDisplayName("Content State")
 
             // 3. エラー表示 (AppSettingNotInitialized)
-            HomeView(viewModel: HomeViewModel.mock(nil, error: .appSettingNotInitialized))
+            HomeView(viewModel: HomeViewModel.mock(.appSettingNotInitialized))
                 .previewDisplayName("Error: AppSetting Not Initialized")
 
             // 4. エラー表示 (Unknown Error)
-            HomeView(viewModel: HomeViewModel.mock(nil, error: .unknown("不明なエラーが発生しました。")))
+            HomeView(viewModel: HomeViewModel.mock(.error("不明なエラーが発生しました。")))
                 .previewDisplayName("Error: Unknown")
         }
-    }
-}
-
-extension Date {
-    func toKotlinInstant() -> shared.Instant {
-        let epochMilliseconds = Int64(self.timeIntervalSince1970 * 1000)
-        return shared.Instant(epochMilliseconds: epochMilliseconds)
     }
 }
 

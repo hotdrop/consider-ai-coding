@@ -2,21 +2,15 @@ import Foundation
 import Combine
 import shared
 
-struct HomeViewState {
-    let nickname: String
-    let email: String
-    let point: Int
-    let histories: [History]
-}
-
-enum HomeViewError: Error {
+enum HomeViewState: Equatable {
+    case loading
+    case loaded(nickname: String, email: String, point: Int, histories: [PointHistory])
+    case error(String)
     case appSettingNotInitialized
-    case unknown(String)
 }
 
 class HomeViewModel: ObservableObject {
-    @Published var viewState: HomeViewState? = nil
-    @Published var error: HomeViewError? = nil
+    @Published var viewState: HomeViewState = .loading
 
     private let appSettingUseCase: AppSettingUseCaseProtocol
     private let pointUseCase: PointUseCaseProtocol
@@ -35,30 +29,30 @@ class HomeViewModel: ObservableObject {
         if Task.isCancelled { return }
         
         do {
-            viewState = nil
-            error = nil
-            
             let appSetting = try await appSettingUseCase.find()
             let point = try await pointUseCase.find()
             let histories = try await historyUseCase.findAll()
 
             if appSetting.isInitialized(), let nickname = appSetting.nickName, let email = appSetting.email {
-                self.viewState = HomeViewState(nickname: nickname, email: email, point: Int(point.point), histories: histories)
+                self.viewState = .loaded(nickname: nickname, email: email, point: Int(point.balance), histories: histories)
             } else {
-                self.error = .appSettingNotInitialized
+                self.viewState = .appSettingNotInitialized
             }
         } catch {
-            self.error = .unknown(error.localizedDescription)
+            self.viewState = .error(error.localizedDescription)
         }
     }
 }
 
 // Mock
 extension HomeViewModel {
-    static func mock(_ state: HomeViewState? = nil, error: HomeViewError? = nil) -> HomeViewModel {
-        let vm = HomeViewModel(appSettingUseCase: DummyAppSettingUseCase())
+    static func mock(_ state: HomeViewState) -> HomeViewModel {
+        let vm = HomeViewModel(
+            appSettingUseCase: DummyAppSettingUseCase(),
+            pointUseCase: DummyPointUseCase(),
+            historyUseCase: DummyHistoryUseCase()
+        )
         vm.viewState = state
-        vm.error = error
         return vm
     }
 }

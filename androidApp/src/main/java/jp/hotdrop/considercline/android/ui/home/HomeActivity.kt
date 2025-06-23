@@ -14,7 +14,7 @@ import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.databinding.ActivityHomeBinding
 import jp.hotdrop.considercline.android.ui.pointget.PointGetActivity
 import jp.hotdrop.considercline.model.AppSetting
-import jp.hotdrop.considercline.model.History
+import jp.hotdrop.considercline.model.PointHistory
 import androidx.recyclerview.widget.RecyclerView
 import jp.hotdrop.considercline.android.databinding.HistoryRowBinding
 import jp.hotdrop.considercline.model.Point
@@ -84,7 +84,7 @@ class HomeActivity : AppCompatActivity() {
         binding.pointValue.text = pointLabel
     }
 
-    private fun viewHistories(histories: List<History>) {
+    private fun viewHistories(histories: List<PointHistory>) {
         if (histories.isEmpty()) {
             return
         }
@@ -105,7 +105,7 @@ class HomeActivity : AppCompatActivity() {
      */
     class HistoryAdapter(
         private val context: Context,
-        private val histories: List<History>
+        private val histories: List<PointHistory>
     ) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
         class HistoryViewHolder(val binding: HistoryRowBinding) : RecyclerView.ViewHolder(binding.root)
 

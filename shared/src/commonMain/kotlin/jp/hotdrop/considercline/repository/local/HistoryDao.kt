@@ -1,7 +1,7 @@
 package jp.hotdrop.considercline.repository.local
 
 import jp.hotdrop.considercline.db.ConsiderClineDatabase
-import jp.hotdrop.considercline.model.History
+import jp.hotdrop.considercline.model.PointHistory
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -18,9 +18,9 @@ class HistoryDao(
      * 全ての履歴を取得する
      * @return 履歴のリスト
      */
-    suspend fun findAll(): List<History> {
+    suspend fun findAll(): List<PointHistory> {
         return database.historyQueries.selectAll().executeAsList().map { entity ->
-            History(
+            PointHistory(
                 dateTime = Instant.parse(entity.dateTime).toLocalDateTime(TimeZone.currentSystemDefault()),
                 point = entity.point.toInt(),
                 detail = entity.detail
