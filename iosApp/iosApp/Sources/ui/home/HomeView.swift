@@ -129,14 +129,18 @@ struct HomeView: View {
             Divider()
                 .background(Color("grey"))
             
-            if let viewState = viewModel.viewState {
-                if viewState.histories.isEmpty {
+            switch viewModel.viewState {
+            case .loading:
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
+            case .loaded(_, _, _, let histories):
+                if histories.isEmpty {
                     Text(NSLocalizedString("point_history_empty", comment: ""))
                         .font(.body)
                         .foregroundColor(.gray)
                         .padding()
                 } else {
-                    ForEach(viewState.histories, id: \.self) { history in
+                    ForEach(histories, id: \.self) { (history: PointHistory) in
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(history.toStringDateTime())
@@ -146,10 +150,10 @@ struct HomeView: View {
                                     .font(.body)
                             }
                             Spacer()
-                            Text(String(format: NSLocalizedString("point_history_point_label", comment: ""), "\(history.amount > 0 ? "+" : "")\(history.amount)"))
+                            Text(String(format: NSLocalizedString("point_history_point_label", comment: ""), "\(history.point > 0 ? "+" : "")\(history.point)"))
                                 .font(.body)
                                 .fontWeight(.bold)
-                                .foregroundColor(history.amount > 0 ? .green : .red)
+                                .foregroundColor(history.point > 0 ? .green : .red)
                         }
                         .padding(.horizontal)
                         .padding(.vertical, 5)
@@ -157,9 +161,14 @@ struct HomeView: View {
                             .background(Color("grey"))
                     }
                 }
-            } else {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
+            case .appSettingNotInitialized:
+                Text(NSLocalizedString("home_error_app_setting_not_initialized", comment: ""))
+                    .foregroundColor(.red)
+                    .padding()
+            case .error(let message):
+                Text("エラー: \(message)")
+                    .foregroundColor(.red)
+                    .padding()
             }
         }
         .background(Color("white"))
