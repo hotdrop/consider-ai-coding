@@ -25,16 +25,6 @@ class StartViewModel: ObservableObject {
 
     @MainActor
     func registerUser(nickname: String, email: String) async {
-        if nickname.isEmpty {
-            errorAlertItem = ErrorAlertItem(message: NSLocalizedString("error_nickname_empty", comment: ""))
-            return
-        }
-        // 簡単なメールアドレスのバリデーション
-        if email.isEmpty || !email.contains("@") {
-            errorAlertItem = ErrorAlertItem(message: NSLocalizedString("error_email_invalid", comment: ""))
-            return
-        }
-
         viewState = .loading
         
         do {

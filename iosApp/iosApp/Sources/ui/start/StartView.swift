@@ -12,43 +12,41 @@ struct StartView: View {
     }
 
     var body: some View {
-        NavigationView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(NSLocalizedString("start_overview", comment: ""))
-                    .font(.body)
-                    .padding(.bottom, 16)
+        VStack(alignment: .leading, spacing: 16) {
+            Text(NSLocalizedString("start_overview", comment: ""))
+                .font(.body)
+                .padding(.bottom, 16)
 
-                CustomTextField(
-                    placeholder: NSLocalizedString("start_nick_name_field_label", comment: ""),
-                    text: $inputNickName
-                )
+            CustomTextField(
+                placeholder: NSLocalizedString("start_nick_name_field_label", comment: ""),
+                text: $inputNickName
+            )
 
-                CustomTextField(
-                    placeholder: NSLocalizedString("start_email_field_label", comment: ""),
-                    text: $inputEmail,
-                    keyboardType: .emailAddress,
-                    autocapitalization: .none
-                )
+            CustomTextField(
+                placeholder: NSLocalizedString("start_email_field_label", comment: ""),
+                text: $inputEmail,
+                keyboardType: .emailAddress,
+                autocapitalization: .none
+            )
 
-                RegisterButton(isLoading: viewModel.viewState == .loading) {
-                    Task {
-                        await viewModel.registerUser(nickname: inputNickName, email: inputEmail)
-                    }
+            RegisterButton(isLoading: viewModel.viewState == .loading) {
+                Task {
+                    await viewModel.registerUser(nickname: inputNickName, email: inputEmail)
                 }
-                .padding(.top, 16)
-
-                Spacer()
             }
-            .padding()
-            .navigationTitle(NSLocalizedString("start_title", comment: ""))
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                        Image(systemName: "arrow.backward")
-                            .foregroundColor(Color("white"))
-                    }
+            .padding(.top, 16)
+
+            Spacer()
+        }
+        .padding()
+        .navigationTitle(NSLocalizedString("start_title", comment: ""))
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                    Image(systemName: "arrow.backward")
+                        .foregroundColor(Color("white"))
                 }
             }
         }

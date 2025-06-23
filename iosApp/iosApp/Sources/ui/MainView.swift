@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainView: View {
     @StateObject private var viewModel: MainViewModel
+    @State private var showStartView: Bool = false
     
     init(viewModel: MainViewModel = MainViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -28,8 +29,7 @@ struct MainView: View {
                         }
                 case .firstTime:
                     FirstTimeView {
-                        // TODO: StartViewへの遷移ロジックを実装
-                        print("Navigate to StartView")
+                        showStartView = true
                     }
                 case .error(let message):
                     Text("エラー: \(message)")
@@ -38,6 +38,14 @@ struct MainView: View {
             }
             .navigationTitle(NSLocalizedString("splash_title", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
+            .background(
+                NavigationLink(
+                    destination: StartView(),
+                    isActive: $showStartView,
+                    label: { EmptyView() }
+                )
+                .hidden()
+            )
         }
         .onAppear {
             Task {

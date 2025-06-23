@@ -24,17 +24,18 @@
 - 生成コードでも即座に実戦投入できる品質
 
 ## ディレクトリ構成
+```
 iosApp/
-- iOSApp.swift  # iOSアプリのエントリポイント
-- IosPlatformDependencies.swift
-- Sources
-  - data # KMPのSharedのうちLocalDataとのIF
-  - ui
-    - start # 機能毎のディレクトリ。このディレクトリにViewとViewModel、Componentsを定義する
-    - ... # 機能毎のディレクトリをここに作成していく
-    - MainView.swift # アプリ起動時のView。このViewだけはuiディレクトリの直下におく
-    - MainViewModel.swift # アプリ起動時のViewに対応したViewModel。このViewModelだけはuiディレクトリの直下に置く
-  - usecase # SwiftUIのPreview用としてMockのUseCaseを使いたいため、このディレクトリにProtocolを定義する
+  iOSApp.swift  # iOSアプリのエントリポイント
+  IosPlatformDependencies.swift
+  Sources/
+    data/ # KMPのSharedのうちLocalDataとのIF
+    ui/   # 機能毎のUIディレクトリをここに作成していく
+      start/ # 機能毎のディレクトリ。このディレクトリにViewとViewModel、Componentsを定義する
+    MainView.swift # アプリ起動時のView。このViewだけはuiディレクトリの直下におく
+    MainViewModel.swift # アプリ起動時のViewに対応したViewModel。このViewModelだけはuiディレクトリの直下に置く
+  usecase/ # SwiftUIのPreview用としてMockのUseCaseを使いたいため、このディレクトリにProtocolを定義する
+```
 
 ## Viewルール
 ### コンポーザブルなView構成
