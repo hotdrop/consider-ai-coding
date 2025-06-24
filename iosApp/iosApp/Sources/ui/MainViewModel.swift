@@ -15,8 +15,9 @@ class MainViewModel: ObservableObject {
     private let useCase: AppSettingUseCaseProtocol
     private let loadAction: (() async -> Void)?
 
-    init(appSettingUseCase: AppSettingUseCaseProtocol = KmpUseCaseFactory.shared.appSettingUseCase,
-         loadAction: (() async -> Void)? = nil
+    init(
+        appSettingUseCase: AppSettingUseCaseProtocol = KmpUseCaseFactory.shared.appSettingUseCase,
+        loadAction: (() async -> Void)? = nil
     ) {
         self.useCase = appSettingUseCase
         self.loadAction = loadAction

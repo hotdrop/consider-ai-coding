@@ -33,7 +33,6 @@ struct HomeView: View {
                     await viewModel.load()
                 }
             }
-            .background(Color("appbarColor"))
             .navigationBarHidden(true)
         }
     }
@@ -86,9 +85,6 @@ struct HomeView: View {
                             .fontWeight(.bold)
                             .foregroundColor(Color("white"))
                     }
-                case .appSettingNotInitialized:
-                    Text(NSLocalizedString("home_error_app_setting_not_initialized", comment: ""))
-                        .foregroundColor(.red)
                 case .error(let message):
                     Text("エラー: \(message)")
                         .foregroundColor(.red)
@@ -161,10 +157,6 @@ struct HomeView: View {
                             .background(Color("grey"))
                     }
                 }
-            case .appSettingNotInitialized:
-                Text(NSLocalizedString("home_error_app_setting_not_initialized", comment: ""))
-                    .foregroundColor(.red)
-                    .padding()
             case .error(let message):
                 Text("エラー: \(message)")
                     .foregroundColor(.red)
@@ -181,11 +173,22 @@ struct HomeView: View {
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            // 1. データ読み込み中
+            // データ読み込み中
             HomeView(viewModel: HomeViewModel.mock(.loading))
-                .previewDisplayName("Loading State")
+                .previewDisplayName("ロード中")
+            
+            // 正常表示(履歴なし)
+            HomeView(viewModel: HomeViewModel.mock(
+                .loaded(
+                    nickname: "プレビューユーザー",
+                    email: "preview@example.com",
+                    point: 1000,
+                    histories: []
+                )
+            ))
+            .previewDisplayName("履歴なし")
 
-            // 2. 正常表示
+            // 正常表示(履歴あり)
             HomeView(viewModel: HomeViewModel.mock(
                 .loaded(
                     nickname: "プレビューユーザー",
@@ -213,15 +216,11 @@ struct HomeView_Previews: PreviewProvider {
                     ]
                 )
             ))
-            .previewDisplayName("Content State")
+            .previewDisplayName("履歴あり")
 
-            // 3. エラー表示 (AppSettingNotInitialized)
-            HomeView(viewModel: HomeViewModel.mock(.appSettingNotInitialized))
-                .previewDisplayName("Error: AppSetting Not Initialized")
-
-            // 4. エラー表示 (Unknown Error)
+            // エラー表示
             HomeView(viewModel: HomeViewModel.mock(.error("不明なエラーが発生しました。")))
-                .previewDisplayName("Error: Unknown")
+                .previewDisplayName("エラー")
         }
     }
 }
