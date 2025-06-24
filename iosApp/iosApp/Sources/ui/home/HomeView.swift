@@ -115,30 +115,16 @@ VStack(alignment: .leading) {
                     .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
             case .loaded(_, _, _, let histories):
                 if histories.isEmpty {
-                    Text(NSLocalizedString("point_history_empty", comment: ""))
-                        .font(.body)
-                        .foregroundColor(.gray)
-                        .padding()
+                    EmptyView()
                 } else {
+                    Divider().background(Color("grey"))
                     ForEach(histories, id: \.self) { (history: PointHistory) in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(history.toStringDateTime())
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                                Text(history.detail)
-                                    .font(.body)
-                            }
-                            Spacer()
-                            Text(String(format: NSLocalizedString("point_history_point_label", comment: ""), "\(history.point > 0 ? "+" : "")\(history.point)"))
-                                .font(.body)
-                                .fontWeight(.bold)
-                                .foregroundColor(history.point > 0 ? .green : .red)
-                        }
-                        .padding(.horizontal)
-                        .padding(.vertical, 5)
-                        Divider()
-                            .background(Color("grey"))
+                        HistoryRow(
+                            dateTime: history.toStringDateTime(),
+                            detail: history.detail,
+                            point: "\(history.point)"
+                        )
+                        Divider().background(Color("grey"))
                     }
                 }
             case .error(let message):
@@ -147,13 +133,34 @@ VStack(alignment: .leading) {
                     .padding()
             }
         }
-        .background(Color("white"))
-        .cornerRadius(10)
-        .shadow(radius: 5)
         .padding(.horizontal)
     }
 }
 
+struct HistoryRow: View {
+    let dateTime: String
+    let detail: String
+    let point: String
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(dateTime)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                Text(detail)
+                    .font(.body)
+            }
+            Spacer()
+            Text(point)
+                .font(.body)
+                .fontWeight(.bold)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 5)
+    }
+}
+ 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -196,7 +203,16 @@ struct HomeView_Previews: PreviewProvider {
                             minute: 25,
                             second: 20,
                             nanosecond: 0
-                        ), point: -50, detail: "利用")
+                        ), point: 50, detail: "利用"),
+                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                            year: 2025,
+                            monthNumber: 6,
+                            dayOfMonth: 22,
+                            hour: 18,
+                            minute: 32,
+                            second: 56,
+                            nanosecond: 0
+                        ), point: 200, detail: "利用")
                     ]
                 )
             ))

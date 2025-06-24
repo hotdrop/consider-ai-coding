@@ -13,7 +13,7 @@
 - [x] ポイント獲得・利用ボタンのスタイル修正
     - [x] ポイント獲得ボタンのアイコンを`account_balance_wallet`にし、TextButtonスタイルにする
     - [x] ポイント利用ボタンのアイコンを`shopping_cart`にし、TextButtonスタイルにする
-- [ ] `historySectionView()`のロジック修正と`HistoryRow` Viewの新規作成および適用
-    - [ ] 履歴が空の場合は何も表示しない
-    - [ ] `HistoryRow` structを定義する (dateTime, detail, point)
-    - [ ] `historySectionView()`で履歴がある場合に`HistoryRow`をリスト表示する
+- [x] `historySectionView()`のロジック修正と`HistoryRow` Viewの新規作成および適用
+    - [x] 履歴が空の場合は何も表示しない
+    - [x] `HistoryRow` structを定義する (dateTime, detail, point)
+    - [x] `historySectionView()`で履歴がある場合に`HistoryRow`をリスト表示する
