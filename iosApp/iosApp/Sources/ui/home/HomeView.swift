@@ -7,8 +7,6 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                toolbarView()
-                
                 ScrollView {
                     VStack(spacing: 20) {
                         homeCardView()
@@ -28,29 +26,15 @@ struct HomeView: View {
                     .padding(.vertical)
                 }
             }
+            .navigationTitle(NSLocalizedString("home_title", comment: ""))
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             .onAppear {
                 Task {
                     await viewModel.load()
                 }
             }
-            .navigationBarHidden(true)
         }
-    }
-    
-    @ViewBuilder
-    private func toolbarView() -> some View {
-        HStack {
-            Text(NSLocalizedString("home_title", comment: ""))
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(Color("white"))
-            Spacer()
-            Text(Date().formatted("yyyy/MM/dd HH:mm:ss")) // 現在時刻を動的に表示
-                .font(.caption)
-                .foregroundColor(Color("white"))
-        }
-        .padding()
-        .background(Color("appbarColor"))
     }
     
     @ViewBuilder
@@ -78,8 +62,6 @@ struct HomeView: View {
                     Spacer()
                     
                     HStack {
-                        Image(systemName: "dollarsign.circle.fill")
-                            .foregroundColor(Color("white"))
                         Text(String(format: NSLocalizedString("home_point_value", comment: ""), "\(point)"))
                             .font(.headline)
                             .fontWeight(.bold)
@@ -118,13 +100,6 @@ struct HomeView: View {
     @ViewBuilder
     private func historySectionView() -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(NSLocalizedString("point_history_title", comment: ""))
-                .font(.headline)
-                .padding(.horizontal)
-            
-            Divider()
-                .background(Color("grey"))
-            
             switch viewModel.viewState {
             case .loading:
                 ProgressView()
@@ -198,10 +173,10 @@ struct HomeView_Previews: PreviewProvider {
                         PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
                             year: 2025,
                             monthNumber: 6,
-                            dayOfMonth: 22,
-                            hour: 15,
-                            minute: 25,
-                            second: 20,
+                            dayOfMonth: 21,
+                            hour: 10,
+                            minute: 20,
+                            second: 10,
                             nanosecond: 0
                         ), point: 100, detail: "獲得"),
                         PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
