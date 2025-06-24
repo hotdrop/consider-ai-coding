@@ -45,31 +45,44 @@ struct HomeView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(maxWidth: .infinity)
             
-            VStack(alignment: .leading, spacing: 10) {
+VStack(alignment: .leading) {
+                Text(Date().formatted("yyyy/MM/dd HH:mm:ss"))
+                    .font(.caption)
+                    .foregroundColor(Color("white"))
+
+                HStack {
+                    Spacer()
+                    switch viewModel.viewState {
+                    case .loading:
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color("white")))
+                            .padding(.top, 64)
+                    case .loaded(_, _, let point, _):
+                        Text(String(format: NSLocalizedString("home_point_value", comment: ""), "\(point)"))
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(Color("white"))
+                    case .error(let message):
+                        Text("エラー: \(message)")
+                            .foregroundColor(.red)
+                    }
+                    Spacer()
+                }.padding(.top, 16)
+                
+                Spacer()
+
                 switch viewModel.viewState {
                 case .loading:
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color("white")))
-                case .loaded(let nickname, let email, let point, let histories):
+                    EmptyView()
+                case .loaded(let nickname, let email, _, _):
                     Text(nickname.isEmpty ? NSLocalizedString("home_un_setting_nickname", comment: "") : nickname)
-                        .font(.title3)
-                        .fontWeight(.bold)
+                        .font(.subheadline)
                         .foregroundColor(Color("white"))
                     Text(email.isEmpty ? NSLocalizedString("home_un_setting_email", comment: "") : email)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
-                    
-                    Spacer()
-                    
-                    HStack {
-                        Text(String(format: NSLocalizedString("home_point_value", comment: ""), "\(point)"))
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundColor(Color("white"))
-                    }
-                case .error(let message):
-                    Text("エラー: \(message)")
-                        .foregroundColor(.red)
+                case .error(_):
+                    EmptyView()
                 }
             }
             .padding(20)
