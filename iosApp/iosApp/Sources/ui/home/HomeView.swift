@@ -12,10 +12,10 @@ struct HomeView: View {
                         homeCardView()
                         
                         HStack(spacing: 20) {
-                            pointActionButton(title: NSLocalizedString("home_menu_get_point", comment: ""), icon: "plus.circle.fill") {
+                            pointActionButton(title: NSLocalizedString("home_menu_get_point", comment: ""), icon: "account_balance_wallet") {
                                 // TODO: ポイント獲得画面への遷移
                             }
-                            pointActionButton(title: NSLocalizedString("home_menu_use_point", comment: ""), icon: "minus.circle.fill") {
+                            pointActionButton(title: NSLocalizedString("home_menu_use_point", comment: ""), icon: "shopping_cart") {
                                 // TODO: ポイント利用画面への遷移
                             }
                         }
@@ -94,19 +94,15 @@ VStack(alignment: .leading) {
     private func pointActionButton(title: String, icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack {
-                Image(systemName: icon)
+                Image(icon)
                     .resizable()
-                    .frame(width: 40, height: 40)
+                    .frame(width: 30, height: 30)
                     .foregroundColor(Color("themeColor"))
                 Text(title)
-                    .font(.caption)
                     .foregroundColor(Color("themeColor"))
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
-            .background(Color("white"))
-            .cornerRadius(10)
-            .shadow(radius: 5)
         }
     }
     
