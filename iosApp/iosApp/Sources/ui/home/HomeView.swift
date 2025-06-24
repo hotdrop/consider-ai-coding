@@ -53,11 +53,11 @@ VStack(alignment: .leading) {
                 HStack {
                     Spacer()
                     switch viewModel.viewState {
-                    case .loading:
+                    case .initialLoading:
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: Color("white")))
                             .padding(.top, 64)
-                    case .loaded(_, _, let point, _):
+                    case .loaded(_, _, let point):
                         Text(String(format: NSLocalizedString("home_point_value", comment: ""), "\(point)"))
                             .font(.title)
                             .fontWeight(.bold)
@@ -72,9 +72,9 @@ VStack(alignment: .leading) {
                 Spacer()
 
                 switch viewModel.viewState {
-                case .loading:
+                case .initialLoading:
                     EmptyView()
-                case .loaded(let nickname, let email, _, _):
+                case .loaded(let nickname, let email, _):
                     Text(nickname.isEmpty ? NSLocalizedString("home_un_setting_nickname", comment: "") : nickname)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
@@ -109,11 +109,11 @@ VStack(alignment: .leading) {
     @ViewBuilder
     private func historySectionView() -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            switch viewModel.viewState {
+            switch viewModel.historyState {
             case .loading:
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
-            case .loaded(_, _, _, let histories):
+            case .loaded(let histories):
                 if histories.isEmpty {
                     EmptyView()
                 } else {
@@ -165,62 +165,68 @@ struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             // データ読み込み中
-            HomeView(viewModel: HomeViewModel.mock(.loading))
-                .previewDisplayName("ロード中")
+            // 初回ロード中
+            HomeView(viewModel: HomeViewModel.mock(
+                viewState: .initialLoading,
+                historyState: .loading
+            ))
+            .previewDisplayName("初回ロード中")
+
+            // 履歴ロード中
+            HomeView(viewModel: HomeViewModel.mock(
+                viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
+                historyState: .loading
+            ))
+            .previewDisplayName("履歴ロード中")
             
             // 正常表示(履歴なし)
             HomeView(viewModel: HomeViewModel.mock(
-                .loaded(
-                    nickname: "プレビューユーザー",
-                    email: "preview@example.com",
-                    point: 1000,
-                    histories: []
-                )
+                viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
+                historyState: .loaded([])
             ))
             .previewDisplayName("履歴なし")
 
             // 正常表示(履歴あり)
             HomeView(viewModel: HomeViewModel.mock(
-                .loaded(
-                    nickname: "プレビューユーザー",
-                    email: "preview@example.com",
-                    point: 1000,
-                    histories: [
-                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
-                            year: 2025,
-                            monthNumber: 6,
-                            dayOfMonth: 21,
-                            hour: 10,
-                            minute: 20,
-                            second: 10,
-                            nanosecond: 0
-                        ), point: 100, detail: "獲得"),
-                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
-                            year: 2025,
-                            monthNumber: 6,
-                            dayOfMonth: 22,
-                            hour: 15,
-                            minute: 25,
-                            second: 20,
-                            nanosecond: 0
-                        ), point: 50, detail: "利用"),
-                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
-                            year: 2025,
-                            monthNumber: 6,
-                            dayOfMonth: 22,
-                            hour: 18,
-                            minute: 32,
-                            second: 56,
-                            nanosecond: 0
-                        ), point: 200, detail: "利用")
-                    ]
-                )
+                viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
+                historyState: .loaded([
+                    PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                        year: 2025,
+                        monthNumber: 6,
+                        dayOfMonth: 21,
+                        hour: 10,
+                        minute: 20,
+                        second: 10,
+                        nanosecond: 0
+                    ), point: 100, detail: "獲得"),
+                    PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                        year: 2025,
+                        monthNumber: 6,
+                        dayOfMonth: 22,
+                        hour: 15,
+                        minute: 25,
+                        second: 20,
+                        nanosecond: 0
+                    ), point: 50, detail: "利用"),
+                    PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                        year: 2025,
+                        monthNumber: 6,
+                        dayOfMonth: 22,
+                        hour: 18,
+                        minute: 32,
+                        second: 56,
+                        nanosecond: 0
+                    ), point: 200, detail: "利用")
+                ])
             ))
             .previewDisplayName("履歴あり")
 
             // エラー表示
-            HomeView(viewModel: HomeViewModel.mock(.error("不明なエラーが発生しました。")))
-                .previewDisplayName("エラー")
+            HomeView(viewModel: HomeViewModel.mock(
+                viewState: .error("不明なエラーが発生しました。"),
+                historyState: .error("履歴の読み込みに失敗しました。")
+            ))
+            .previewDisplayName("エラー")
         }
     }
 }

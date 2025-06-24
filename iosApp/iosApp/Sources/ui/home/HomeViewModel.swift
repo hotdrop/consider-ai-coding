@@ -3,13 +3,20 @@ import Combine
 import shared
 
 enum HomeViewState: Equatable {
+    case initialLoading
+    case loaded(nickname: String, email: String, point: Int)
+    case error(String)
+}
+
+enum HistoryState: Equatable {
     case loading
-    case loaded(nickname: String, email: String, point: Int, histories: [PointHistory])
+    case loaded([PointHistory])
     case error(String)
 }
 
 class HomeViewModel: ObservableObject {
-    @Published var viewState: HomeViewState = .loading
+    @Published var viewState: HomeViewState = .initialLoading
+    @Published var historyState: HistoryState = .loading
 
     private let appSettingUseCase: AppSettingUseCaseProtocol
     private let pointUseCase: PointUseCaseProtocol
@@ -37,31 +44,43 @@ class HomeViewModel: ObservableObject {
         }
         
         do {
-            let appSetting = try await appSettingUseCase.find()
-            let point = try await pointUseCase.find()
-            let histories = try await historyUseCase.findAll()
+            self.viewState = .initialLoading
+            async let appSetting = appSettingUseCase.find()
+            async let point = pointUseCase.find()
 
-            if let nickname = appSetting.nickName, let email = appSetting.email {
-                self.viewState = .loaded(nickname: nickname, email: email, point: Int(point.balance), histories: histories)
+            let (appSettingResult, pointResult) = try await (appSetting, point)
+
+            if let nickname = appSettingResult.nickName, let email = appSettingResult.email {
+                self.viewState = .loaded(nickname: nickname, email: email, point: Int(pointResult.balance))
             } else {
                 self.viewState = .error("NickNameとEmailが不正です")
             }
         } catch {
             self.viewState = .error(error.localizedDescription)
+            return
+        }
+
+        do {
+            self.historyState = .loading
+            let histories = try await historyUseCase.findAll()
+            self.historyState = .loaded(histories)
+        } catch {
+            self.historyState = .error(error.localizedDescription)
         }
     }
 }
 
 // Mock
 extension HomeViewModel {
-    static func mock(_ state: HomeViewState) -> HomeViewModel {
+    static func mock(viewState: HomeViewState, historyState: HistoryState) -> HomeViewModel {
         let vm = HomeViewModel(
             appSettingUseCase: DummyAppSettingUseCase(),
             pointUseCase: DummyPointUseCase(),
             historyUseCase: DummyHistoryUseCase(),
             loadAction: {}
         )
-        vm.viewState = state
+        vm.viewState = viewState
+        vm.historyState = historyState
         return vm
     }
 }
