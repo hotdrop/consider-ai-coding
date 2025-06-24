@@ -56,10 +56,8 @@ struct MainView: View {
                 .hidden()
             )
         }
-        .onAppear {
-            Task {
-                await viewModel.load()
-            }
+        .task {
+            await viewModel.load()
         }
     }
 }
