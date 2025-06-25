@@ -33,11 +33,11 @@ struct MainView: View {
                         showStartView = true
                     }
                 case .error(let message):
-                    Text("エラー: \(message)")
+                    Text("\(message)")
                         .foregroundColor(.red)
                 }
             }
-            .navigationTitle(NSLocalizedString("splash_title", comment: ""))
+            .navigationTitle("splash_title")
             .navigationBarTitleDisplayMode(.inline)
             .background(
                 NavigationLink(
@@ -70,7 +70,7 @@ private struct LoadedView: View {
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
             
-            Text("ユーザーID: \(userId)")
+            Text("splash_user_id_label \(userId)")
                 .foregroundColor(Color("themeColor"))
                 .padding(.top, 64)
         }
@@ -82,14 +82,14 @@ private struct FirstTimeView: View {
     
     var body: some View {
         VStack {
-            Text(NSLocalizedString("splash_app_label", comment: ""))
+            Text("splash_app_label")
                 .font(.title2)
                 .foregroundColor(Color("themeColor"))
 
             Button(action: {
                 onStartTapped()
             }) {
-                Text(NSLocalizedString("splash_first_time_button", comment: ""))
+                Text("splash_first_time_button")
                     .font(.headline)
                     .foregroundColor(Color("white"))
                     .padding()
@@ -108,9 +108,6 @@ struct MainView_Previews: PreviewProvider {
         Group {
             MainView(viewModel: MainViewModel.mock(.loading))
                 .previewDisplayName("読み込み中")
-
-            MainView(viewModel: MainViewModel.mock(.loaded("preview_user_123")))
-                .previewDisplayName("ログイン済み")
 
             MainView(viewModel: MainViewModel.mock(.firstTime))
                 .previewDisplayName("初回起動")

@@ -14,7 +14,7 @@ struct StartView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(NSLocalizedString("start_overview", comment: ""))
+            Text("start_overview")
                 .font(.body)
                 .padding(.bottom, 16)
 
@@ -40,7 +40,7 @@ struct StartView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle(NSLocalizedString("start_title", comment: ""))
+        .navigationTitle("start_title")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -52,7 +52,7 @@ struct StartView: View {
             }
         }
         .alert(item: $viewModel.errorAlertItem) { item in
-            Alert(title: Text("エラー"), message: Text(item.message), dismissButton: .default(Text("OK")))
+            Alert(title: Text("dialog_error_title"), message: Text(item.message), dismissButton: .default(Text("dialog_ok")))
         }
         .onChange(of: viewModel.viewState) { newState in
             if case .success = newState {
@@ -104,7 +104,7 @@ private struct RegisterButton: View {
                     .background(Color("themeColor"))
                     .cornerRadius(8)
             } else {
-                Text(NSLocalizedString("start_register_button", comment: ""))
+                Text("start_register_button")
                     .font(.headline)
                     .foregroundColor(Color("white"))
                     .padding()

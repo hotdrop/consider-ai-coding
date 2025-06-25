@@ -1,6 +1,26 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        }
+      }
+    },
+    "%d" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d"
+          }
+        }
+      }
+    },
     "app_name" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12,8 +32,25 @@
         }
       }
     },
-    "Hello World" : {
-
+    "dialog_error_title" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー"
+          }
+        }
+      }
+    },
+    "dialog_ok" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
     },
     "home_menu_get_point" : {
       "extractionState" : "manual",
@@ -37,13 +74,12 @@
         }
       }
     },
-    "home_point_value" : {
-      "extractionState" : "manual",
+    "home_point_value %lld" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ ポイント"
+            "value" : "%lld ポイント"
           }
         }
       }
@@ -92,13 +128,13 @@
         }
       }
     },
-    "point_history_point_label" : {
+    "point_history_point_label %d" : {
       "extractionState" : "manual",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ポイント"
+            "value" : "%d ポイント"
           }
         }
       }
@@ -158,8 +194,7 @@
         }
       }
     },
-    "splash_user_id_label" : {
-      "extractionState" : "manual",
+    "splash_user_id_label %@" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {

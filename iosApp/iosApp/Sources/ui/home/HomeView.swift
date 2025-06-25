@@ -11,42 +11,40 @@ struct HomeView: View {
     }()
     
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: 20) {
-                    HomeCardView(
-                        viewState: viewModel.viewState,
-                        dateFormatter: Self.dateFormatter
-                    )
-                    
-                    HStack(spacing: 20) {
-                        PointActionButton(
-                            titleKey: "home_menu_get_point",
-                            icon: "account_balance_wallet"
-                        ) {
-                            // TODO: ポイント獲得画面への遷移
-                        }
-                        PointActionButton(
-                            titleKey: "home_menu_use_point",
-                            icon: "shopping_cart"
-                        ) {
-                            // TODO: ポイント利用画面への遷移
-                        }
+        ScrollView {
+            LazyVStack(spacing: 20) {
+                HomeCardView(
+                    viewState: viewModel.viewState,
+                    dateFormatter: Self.dateFormatter
+                )
+                
+                HStack(spacing: 20) {
+                    PointActionButton(
+                        titleKey: "home_menu_get_point",
+                        icon: "account_balance_wallet"
+                    ) {
+                        // TODO: ポイント獲得画面への遷移
                     }
-                    .padding(.horizontal)
-                    
-                    HistorySectionView(
-                        historyState: viewModel.historyState
-                    )
+                    PointActionButton(
+                        titleKey: "home_menu_use_point",
+                        icon: "shopping_cart"
+                    ) {
+                        // TODO: ポイント利用画面への遷移
+                    }
                 }
-                .padding(.vertical)
+                .padding(.horizontal)
+                
+                HistorySectionView(
+                    historyState: viewModel.historyState
+                )
             }
-            .navigationTitle("home_title")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .task {
-                await viewModel.load()
-            }
+            .padding(.vertical)
+        }
+        .navigationTitle("home_title")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .task {
+            await viewModel.load()
         }
     }
 }
@@ -77,12 +75,12 @@ private struct HomeCardView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: Color("white")))
                             .padding(.top, 64)
                     case .loaded(_, _, let point):
-                        Text(String(format: NSLocalizedString("home_point_value", comment: ""), "\(point)"))
+                        Text("home_point_value \(point)")
                             .font(.title)
                             .fontWeight(.bold)
                             .foregroundColor(Color("white"))
                     case .error(let message):
-                        Text("エラー: \(message)")
+                        Text("\(message)")
                             .foregroundColor(.red)
                     }
                     Spacer()
@@ -94,10 +92,10 @@ private struct HomeCardView: View {
                 case .initialLoading:
                     EmptyView()
                 case .loaded(let nickname, let email, _):
-                    Text(nickname.isEmpty ? NSLocalizedString("home_un_setting_nickname", comment: "") : nickname)
+                    Text(nickname.isEmpty ? "home_un_setting_nickname" : nickname)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
-                    Text(email.isEmpty ? NSLocalizedString("home_un_setting_email", comment: "") : email)
+                    Text(email.isEmpty ? "home_un_setting_email" : email)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
                 case .error(_):
@@ -157,7 +155,7 @@ private struct HistorySectionView: View {
                     }
                 }
             case .error(let message):
-                Text("エラー: \(message)")
+                Text("\(message)")
                     .foregroundColor(.red)
                     .padding()
             }
@@ -181,7 +179,7 @@ private struct HistoryRow: View {
                     .font(.body)
             }
             Spacer()
-            Text("\(history.point)")
+            Text("point_history_point_label \(history.point)")
                 .font(.body)
                 .fontWeight(.bold)
         }
