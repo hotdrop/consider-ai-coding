@@ -85,17 +85,17 @@ private struct HomeCardView: View {
                     }
                     Spacer()
                 }.padding(.top, 16)
-                
+
                 Spacer()
 
                 switch viewState {
                 case .initialLoading:
                     EmptyView()
                 case .loaded(let nickname, let email, _):
-                    Text(nickname.isEmpty ? "home_un_setting_nickname" : nickname)
+                    Text(nickname.isEmpty ? NSLocalizedString("home_un_setting_nickname", comment: "") : nickname)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
-                    Text(email.isEmpty ? "home_un_setting_email" : email)
+                    Text(email.isEmpty ? NSLocalizedString("home_un_setting_email", comment: "") : email)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
                 case .error(_):

@@ -59,14 +59,9 @@ struct StartView: View {
                 showHomeView = true
             }
         }
-        .background(
-            NavigationLink(
-                destination: HomeView(viewModel: HomeViewModel()),
-                isActive: $showHomeView,
-                label: { EmptyView() }
-            )
-            .hidden()
-        )
+        .navigationDestination(isPresented: $showHomeView) {
+            HomeView(viewModel: HomeViewModel())
+        }
     }
 }
 

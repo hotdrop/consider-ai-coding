@@ -1,16 +1,21 @@
 import SwiftUI
 
+// ルートを表す値オブジェクト
+private enum MainRoute: Hashable {
+    case start
+    case home
+}
+
 struct MainView: View {
     @StateObject private var viewModel: MainViewModel
-    @State private var showStartView: Bool = false
-    @State private var showHomeView: Bool = false
+    @State private var path = NavigationPath()
     
     init(viewModel: MainViewModel = MainViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack(path: $path) {
             VStack {
                 Image("start")
                     .resizable()
@@ -22,39 +27,30 @@ struct MainView: View {
                 case .loading:
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
+
                 case .loaded(let userId):
                     LoadedView(userId: userId)
-                        .task(id: userId) {
-                            // onAppearはViewが再描画されるたびに実行されるため、idが変化した時だけ遷移処理を実行する
-                            showHomeView = true
-                        }
+                        .task(id: userId) { path.append(MainRoute.home) }
+                
                 case .firstTime:
                     FirstTimeView {
-                        showStartView = true
+                        path.append(MainRoute.start)
                     }
+                    
                 case .error(let message):
-                    Text("\(message)")
-                        .foregroundColor(.red)
+                    Text("\(message)").foregroundColor(.red)
                 }
             }
             .navigationTitle("splash_title")
             .navigationBarTitleDisplayMode(.inline)
-            .background(
-                NavigationLink(
-                    destination: StartView(),
-                    isActive: $showStartView,
-                    label: { EmptyView() }
-                )
-                .hidden()
-            )
-            .background(
-                NavigationLink(
-                    destination: HomeView(viewModel: HomeViewModel()),
-                    isActive: $showHomeView,
-                    label: { EmptyView() }
-                )
-                .hidden()
-            )
+            .navigationDestination(for: MainRoute.self) { route in
+                switch route {
+                case .start:
+                    StartView()
+                case .home:
+                    HomeView(viewModel: HomeViewModel())
+                }
+            }
         }
         .task {
             await viewModel.load()
