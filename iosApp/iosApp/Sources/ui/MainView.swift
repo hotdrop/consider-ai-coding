@@ -46,7 +46,9 @@ struct MainView: View {
             .navigationDestination(for: MainRoute.self) { route in
                 switch route {
                 case .start:
-                    StartView()
+                    StartView() {
+                        path.append(MainRoute.home)
+                    }
                 case .home:
                     HomeView(viewModel: HomeViewModel())
                 }

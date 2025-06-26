@@ -2,14 +2,16 @@ import SwiftUI
 import shared
 
 struct StartView: View {
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: StartViewModel
     @State private var inputNickName: String = ""
     @State private var inputEmail: String = ""
-    @State private var showHomeView: Bool = false
+    
+    private let onRegisterSuccess: () -> Void
 
-    init(viewModel: StartViewModel = StartViewModel()) {
+    init(viewModel: StartViewModel = StartViewModel(), onRegisterSuccess: @escaping () -> Void) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.onRegisterSuccess = onRegisterSuccess
     }
 
     var body: some View {
@@ -45,7 +47,7 @@ struct StartView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                Button(action: { dismiss() }) {
                     Image(systemName: "arrow.backward")
                         .foregroundColor(Color("white"))
                 }
@@ -56,11 +58,8 @@ struct StartView: View {
         }
         .onChange(of: viewModel.viewState) { newState in
             if case .success = newState {
-                showHomeView = true
+                onRegisterSuccess()
             }
-        }
-        .navigationDestination(isPresented: $showHomeView) {
-            HomeView(viewModel: HomeViewModel())
         }
     }
 }
@@ -115,16 +114,16 @@ private struct RegisterButton: View {
 struct StartView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            StartView(viewModel: StartViewModel.mock(.idle))
+            StartView(viewModel: StartViewModel.mock(.idle), onRegisterSuccess: {})
                 .previewDisplayName("画面初期表示")
 
-            StartView(viewModel: StartViewModel.mock(.loading))
+            StartView(viewModel: StartViewModel.mock(.loading), onRegisterSuccess: {})
                 .previewDisplayName("実行中")
 
-            StartView(viewModel: StartViewModel.mock(.success))
+            StartView(viewModel: StartViewModel.mock(.success), onRegisterSuccess: {})
                 .previewDisplayName("成功")
 
-            StartView(viewModel: StartViewModel.mock(.idle, error: ErrorAlertItem(message: "プレビューエラーメッセージ")))
+            StartView(viewModel: StartViewModel.mock(.idle, error: ErrorAlertItem(message: "プレビューエラーメッセージ")), onRegisterSuccess: {})
                 .previewDisplayName("エラー")
         }
     }
