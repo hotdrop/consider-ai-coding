@@ -1,7 +1,5 @@
 package jp.hotdrop.considercline.repository.remote.models
 
-import jp.hotdrop.considercline.repository.remote.models.Request
-
 class GetPointRequest(
     private val userId: String
 ) : Request {

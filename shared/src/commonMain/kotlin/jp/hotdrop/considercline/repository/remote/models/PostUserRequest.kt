@@ -1,7 +1,5 @@
 package jp.hotdrop.considercline.repository.remote.models
 
-import jp.hotdrop.considercline.repository.remote.models.Request
-
 class PostUserRequest(
     private val nickname: String?,
     private val email: String?

@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.android.ui.BaseViewModel
-import jp.hotdrop.considercline.di.KmpUseCaseFactory
+import jp.hotdrop.considercline.di.KmpFactory
 import jp.hotdrop.considercline.model.AppSetting
 import jp.hotdrop.considercline.model.PointHistory
 import jp.hotdrop.considercline.model.Point
@@ -17,9 +17,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor() : BaseViewModel() {
-    private val appSettingUseCase: AppSettingUseCase by lazy { KmpUseCaseFactory.appSettingUseCase }
-    private val pointUseCase: PointUseCase by lazy { KmpUseCaseFactory.pointUseCase }
-    private val historyUseCase: HistoryUseCase by lazy { KmpUseCaseFactory.historyUseCase }
+    private val appSettingUseCase: AppSettingUseCase by lazy { KmpFactory.useCaseFactory.appSettingUseCase }
+    private val pointUseCase: PointUseCase by lazy { KmpFactory.useCaseFactory.pointUseCase }
+    private val historyUseCase: HistoryUseCase by lazy { KmpFactory.useCaseFactory.historyUseCase }
 
     private val mutableUiState = MutableLiveData<HomeUiState>()
     val uiStateLiveData: LiveData<HomeUiState> = mutableUiState

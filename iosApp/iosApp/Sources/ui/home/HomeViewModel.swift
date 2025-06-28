@@ -24,9 +24,9 @@ class HomeViewModel: ObservableObject {
     private let loadAction: (() async -> Void)?
 
     init(
-        appSettingUseCase: AppSettingUseCaseProtocol = KmpUseCaseFactory.shared.appSettingUseCase,
-        pointUseCase: PointUseCaseProtocol = KmpUseCaseFactory.shared.pointUseCase,
-        historyUseCase: HistoryUseCaseProtocol = KmpUseCaseFactory.shared.historyUseCase,
+        appSettingUseCase: AppSettingUseCaseProtocol = KmpFactory.shared.useCaseFactory.appSettingUseCase,
+        pointUseCase: PointUseCaseProtocol = KmpFactory.shared.useCaseFactory.pointUseCase,
+        historyUseCase: HistoryUseCaseProtocol = KmpFactory.shared.useCaseFactory.historyUseCase,
         loadAction: (() async -> Void)? = nil
     ) {
         self.appSettingUseCase = appSettingUseCase

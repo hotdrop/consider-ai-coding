@@ -16,7 +16,6 @@ abstract class BaseViewModel : ViewModel(), CoroutineScope, DefaultLifecycleObse
 
     override fun onCleared() {
         super.onCleared()
-        // TODO iOSはキャンセルが効かないらしいので何か別の手段が必要
         coroutineContext.cancel()
     }
 }
