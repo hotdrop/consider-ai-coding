@@ -2,7 +2,7 @@ package jp.hotdrop.considercline.android.ui.pointget
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.android.ui.BaseViewModel
-import jp.hotdrop.considercline.di.KmpUseCaseFactory
+import jp.hotdrop.considercline.di.KmpFactory
 import jp.hotdrop.considercline.model.Point
 import jp.hotdrop.considercline.usecase.PointUseCase
 import kotlinx.coroutines.channels.Channel
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PointGetViewModel @Inject constructor() : BaseViewModel() {
-    private val pointUseCase: PointUseCase by lazy { KmpUseCaseFactory.pointUseCase }
+    private val pointUseCase: PointUseCase by lazy { KmpFactory.useCaseFactory.pointUseCase }
 
     // TODO 以下はuiStateにした方が良い
     private val _currentPoint = MutableStateFlow(Point(0))

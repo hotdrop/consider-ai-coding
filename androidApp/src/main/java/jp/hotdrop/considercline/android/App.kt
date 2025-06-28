@@ -2,12 +2,12 @@ package jp.hotdrop.considercline.android
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
-import jp.hotdrop.considercline.di.KmpUseCaseFactory
+import jp.hotdrop.considercline.di.KmpFactory
 
 @HiltAndroidApp
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        KmpUseCaseFactory.init(AndroidPlatformDependencies(this))
+        KmpFactory.init(AndroidPlatformDependencies(this))
     }
 }
