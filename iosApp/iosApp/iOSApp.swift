@@ -5,7 +5,7 @@ import shared
 @main
 struct iOSApp: App {
     init() {
-        KmpUseCaseFactory.shared.doInit(pd: IosPlatformDependencies())
+        KmpFactory.shared.doInit(pd: IosPlatformDependencies())
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()

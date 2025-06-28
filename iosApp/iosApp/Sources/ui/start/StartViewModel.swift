@@ -19,7 +19,7 @@ class StartViewModel: ObservableObject {
 
     private let appSettingUseCase: AppSettingUseCaseProtocol
 
-    init(appSettingUseCase: AppSettingUseCaseProtocol = KmpUseCaseFactory().appSettingUseCase) {
+    init(appSettingUseCase: AppSettingUseCaseProtocol = KmpFactory.shared.useCaseFactory.appSettingUseCase) {
         self.appSettingUseCase = appSettingUseCase
     }
 
