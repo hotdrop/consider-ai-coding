@@ -1,6 +1,8 @@
 package jp.hotdrop.considercline.repository.remote
 
+import jp.hotdrop.considercline.repository.remote.models.Request
+
 interface HttpClient {
-    suspend fun <reified T> get(endpoint: String, params: Map<String, Any?> = emptyMap()): T
-    suspend fun <reified T, reified R> post(endpoint: String, body: T): R
+    suspend fun get(endpoint: String, request: Request?): Map<String, Any?>
+    suspend fun post(endpoint: String, request: Request): Map<String, Any?>
 }
