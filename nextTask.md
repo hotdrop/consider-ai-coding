@@ -2,13 +2,13 @@
 このファイルは次の実行タスクで追加してほしい機能や修正内容を詳細に記載するドキュメントです。ユーザーに更新権限があり、あなたは更新しないでください。
 
 # やりたいこと
-`HomeView.swift`のUIがAndroidのUIと多々乖離しているので以下の修正を行ってほしい。
+sharedの共通ロジックをリファクタリングしたい。特に以下について議論し、必要に応じてリファクタしたい
 
-- `homeCardView()`の左上は現在時刻を表示する
-- `homeCardView()`の中央上部分に保有ポイント数(home_point_value)を表示する
-- `homeCardView()`の左下にnickNameとemailを表示する。nickNameとemailがnilになることはない。
-- ポイント獲得ボタンのアイコンは`account_balance_wallet`を使い、ボタンの枠は表示しない。TextButtonと同様とする。
-- ポイント利用ボタンのアイコンは`shopping_cart`を使い、ボタンの枠は表示しない。TextButtonと同様とする。
-- `historySectionView()`の挙動において、履歴データが空の場合は何も表示しない。
-- `historySectionView()`の挙動において、履歴データが1件以上ある場合は`HistoryRow`というstructのViewを別途定義して、データ件数分だけ`HistoryRow`を縦方向にaddしていく。
-- `HistoryRow`は左上にdateTime、その下にdetail、右に上下中央寄せでpointを「ポイント」というラベルをつけて表示する。緑や赤色はつけない
+## HttpClientの実装場所と方式の検討
+- HttpClientは`di/KmpUseCaseFactory.kt`で定義し、`KtorHttpClient`でメソッドを実装しています。しかし私はFactoryを使えば`KmpUseCaseFactory.kt`にHttpClientの実装を入れず責務を分担できると思いました。`sampleCode/`ディレクトリに私の考案コードを入れるのでどうするのが最も堅牢で可読性が高いか検討したいです。
+
+## KmpUseCaseFactory.ktの肥大化
+`KmpUseCaseFactory.kt`にUseCase、Repository、APIクライアント、データベースといった多数のコンポーネントの生成責務を担っており、単一責任の原則に違反しています。これにより、クラスが肥大化し、可読性やメンテナンス性が低下する可能性があります。
+
+## 不要なクラスのカプセル化
+Kmpで作成したsharedのパッケージからAndroid/iOSネイティブアプリに使わせたいのはUseCase(KmpUseCaseFactoryから参照)とModelクラスのみです。しかしRepositoryもコンストラクタ引数を無理やり作ればインスタンス化できてしまうと思います。例えばJavaのprotected修飾子など物理的に参照不可能にした方が実装者にも良いと思います。
