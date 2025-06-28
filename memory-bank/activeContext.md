@@ -1,22 +1,19 @@
-# Active Context
+# HomeView.swift UI改善タスク
 
-## 必ず守ること(編集禁止)
-現在のタスクに書かれた内容は必ず1つずつ「Plan/Act」を経てユーザーに確認しながら実装すること。Planで実装計画を立てた後、Actで実装に入った場合「現在のタスク」に列挙されたタスクを一度に全部こなしてはいけません。必ず1つずつPlan→Actを行い、1つ完了したらユーザーに確認し、Planで再び実装計画から行ってください。
+## 必ず守ること
+現在の作業フェーズのタスク完了後、必ずユーザーの確認を待ちます。ユーザーの明示的な指示がない限り、次の親タスク（例: ポイント獲得・利用ボタンのスタイル修正）には絶対に移行しません。
 
-## 現在のタスク
-`androidApp` の `HomeActivity` にある `viewHistories` 関数を実装する。
+- 現在の作業フェーズ: ポイント獲得・利用ボタンのスタイル修正
 
-### やりたいこと
-- `HomeActivity` の `viewHistories` 関数を実装する。
-- この関数は引数で受け取った履歴リストを `RecyclerView` に表示する処理を担当する。
-- 履歴1つ1つのRowレイアウトは `history_row.xml` を使用する。
-- RecyclerView: `binding.historyRecyclerView`
-
-### 実装計画
-1.  **`history_row.xml` の確認**: `history_row.xml` のレイアウト構造を把握し、履歴データをどのように表示するかを確認する。**[完了]**
-2.  **`RecyclerView.Adapter` の作成**: 履歴リストを表示するための `RecyclerView.Adapter` を作成する。このアダプターは `history_row.xml` を使用して各履歴アイテムのビューを生成し、データをバインドする。**[完了]**
-3.  **`HomeActivity` の `viewHistories` 関数の実装**:
-    *   作成した `RecyclerView.Adapter` のインスタンスを生成する。
-    *   `HomeActivity` 内の `RecyclerView` (`binding.historyRecyclerView`) にアダプターとレイアウトマネージャーを設定する。
-    *   引数で受け取った履歴リストをアダプターにセットし、表示を更新する。**[完了]**
-4.  **`activeContext.md` の更新**: 実装完了後、`activeContext.md` に作業内容を反映する。**[進行中]**
+## タスク
+- [x] `homeCardView()`のレイアウト修正
+    - [x] 左上に現在時刻を表示する
+    - [x] 中央上に保有ポイント数を表示する
+    - [x] 左下にnickNameとemailを表示する
+- [x] ポイント獲得・利用ボタンのスタイル修正
+    - [x] ポイント獲得ボタンのアイコンを`account_balance_wallet`にし、TextButtonスタイルにする
+    - [x] ポイント利用ボタンのアイコンを`shopping_cart`にし、TextButtonスタイルにする
+- [x] `historySectionView()`のロジック修正と`HistoryRow` Viewの新規作成および適用
+    - [x] 履歴が空の場合は何も表示しない
+    - [x] `HistoryRow` structを定義する (dateTime, detail, point)
+    - [x] `historySectionView()`で履歴がある場合に`HistoryRow`をリスト表示する

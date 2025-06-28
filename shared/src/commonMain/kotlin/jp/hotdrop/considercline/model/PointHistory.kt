@@ -1,7 +1,7 @@
 package jp.hotdrop.considercline.model
 
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.Serializable
 
 /**
  * ポイント履歴を保持するデータクラス
@@ -9,7 +9,7 @@ import kotlinx.datetime.toLocalDateTime
  * @property point ポイント
  * @property detail 詳細
  */
-data class History(
+data class PointHistory(
     val dateTime: LocalDateTime,
     val point: Int,
     val detail: String

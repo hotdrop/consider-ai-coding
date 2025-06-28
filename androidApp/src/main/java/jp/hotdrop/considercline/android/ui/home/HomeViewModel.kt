@@ -7,7 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.android.ui.BaseViewModel
 import jp.hotdrop.considercline.di.KmpUseCaseFactory
 import jp.hotdrop.considercline.model.AppSetting
-import jp.hotdrop.considercline.model.History
+import jp.hotdrop.considercline.model.PointHistory
 import jp.hotdrop.considercline.model.Point
 import jp.hotdrop.considercline.usecase.AppSettingUseCase
 import jp.hotdrop.considercline.usecase.HistoryUseCase
@@ -60,12 +60,12 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
 data class HomeUiState(
     val currentPoint: Point? = null,
     val appSetting: AppSetting,
-    val histories: List<History>? = null
+    val histories: List<PointHistory>? = null
 ) {
     fun copyWith(
         currentPoint: Point? = null,
         appSetting: AppSetting? = null,
-        histories: List<History>? = null
+        histories: List<PointHistory>? = null
     ): HomeUiState {
         return HomeUiState(
             currentPoint = currentPoint ?: this.currentPoint,
