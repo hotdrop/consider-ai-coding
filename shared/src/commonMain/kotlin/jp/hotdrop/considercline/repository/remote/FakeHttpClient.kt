@@ -6,6 +6,8 @@ import jp.hotdrop.considercline.repository.remote.models.PointResponse
 import jp.hotdrop.considercline.repository.remote.models.PostUserRequest
 import jp.hotdrop.considercline.repository.remote.models.UserResponse
 import kotlinx.coroutines.delay
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class FakeHttpClient(
     val sharedPrefs: KmpSharedPreferences
@@ -39,13 +41,15 @@ class FakeHttpClient(
         // 通信しているような雰囲気を出すため遅延を入れる
         delay(2000)
 
+        @OptIn(ExperimentalUuidApi::class)
         return when (endpoint) {
             "/user" -> {
-                // TODO JWTのダミー値を入れる
+                val dummyJwt = Uuid.random().toString()
+                val dummyRefreshToken = Uuid.random().toString()
                 UserResponse(
                     userId = FAKE_COFFEE_USER_ID,
-                    jwt = "",
-                    refreshToken = ""
+                    jwt = dummyJwt,
+                    refreshToken = dummyRefreshToken
                 ) as T
             }
             "/point" -> {
@@ -59,6 +63,9 @@ class FakeHttpClient(
                 val currentPoint = sharedPrefs.getPoint()
                 sharedPrefs.savePoint(currentPoint - point)
                 point as T
+            }
+            "/auth/refresh" -> {
+                TODO("リフレッシュトークンが未実装です")
             }
             else -> throw HttpError("未実装のエンドポイントです: $endpoint")
         }
