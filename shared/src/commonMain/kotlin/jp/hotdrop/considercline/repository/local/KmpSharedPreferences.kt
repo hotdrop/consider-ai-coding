@@ -13,5 +13,4 @@ interface KmpSharedPreferences {
     suspend fun saveJwt(newVal: String)
     suspend fun getRefreshToken(): String?
     suspend fun saveRefreshToken(newVal: String)
-    suspend fun clear()
 }

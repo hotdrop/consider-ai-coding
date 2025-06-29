@@ -17,6 +17,8 @@ class LocalDataStore(private val context: Context) : KmpSharedPreferences {
     private val NICK_NAME_KEY = stringPreferencesKey("key002")
     private val EMAIL_KEY = stringPreferencesKey("key003")
     private val FAKE_LOCAL_STORE_POINT_KEY = intPreferencesKey("key004")
+    private val JWT_KEY = stringPreferencesKey("key005")
+    private val REFRESH_TOKEN_KEY = stringPreferencesKey("key006")
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -65,6 +67,30 @@ class LocalDataStore(private val context: Context) : KmpSharedPreferences {
     override suspend fun savePoint(newVal: Int) {
         context.dataStore.edit { settings ->
             settings[FAKE_LOCAL_STORE_POINT_KEY] = newVal
+        }
+    }
+
+    override suspend fun getJwt(): String? {
+        return context.dataStore.data.map { pref ->
+            pref[JWT_KEY]
+        }.first()
+    }
+
+    override suspend fun saveJwt(newVal: String) {
+        context.dataStore.edit { settings ->
+            settings[JWT_KEY] = newVal
+        }
+    }
+
+    override suspend fun getRefreshToken(): String? {
+        return context.dataStore.data.map { pref ->
+            pref[REFRESH_TOKEN_KEY]
+        }.first()
+    }
+
+    override suspend fun saveRefreshToken(newVal: String) {
+        context.dataStore.edit { settings ->
+            settings[REFRESH_TOKEN_KEY] = newVal
         }
     }
 }
