@@ -73,8 +73,8 @@ object HttpClientFactory {
                     refreshTokens {
                         val refreshToken = oldTokens?.refreshToken
                         if (refreshToken != null) {
-                            // TODO ここ再起になっているので別の方法が望ましい
-                            val authApi = AuthApi(KtorHttpClient(createNativeClient(apiEntryPoint, isDebug, sharedPrefs)))
+                            val refreshTokenClient = KtorHttpClient(createRefreshTokenClient(apiEntryPoint, isDebug))
+                            val authApi = AuthApi(refreshTokenClient)
                             val response = authApi.refreshToken(refreshToken)
                             sharedPrefs.saveJwt(response.jwt)
                             sharedPrefs.saveRefreshToken(response.refreshToken)
@@ -101,6 +101,35 @@ object HttpClientFactory {
             //     connectTimeoutMillis = 15000L
             //     socketTimeoutMillis = 15000L
             // }
+        }
+    }
+
+    /**
+     * トークンリフレッシュ専用のKtorNativeClientを生成する。
+     * Authプラグインを含まないため、リフレッシュ処理が再帰的にAuthプラグインをトリガーすることはない。
+     */
+    private fun createRefreshTokenClient(
+        apiEntryPoint: String,
+        isDebug: Boolean
+    ): KtorNativeClient {
+        return KtorNativeClient(CIO) {
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                    prettyPrint = true
+                })
+            }
+
+            install(Logging) {
+                logger = Logger.DEFAULT
+                level = if (isDebug) LogLevel.ALL else LogLevel.NONE
+            }
+
+            defaultRequest {
+                url(apiEntryPoint)
+                contentType(ContentType.Application.Json)
+            }
         }
     }
 }
