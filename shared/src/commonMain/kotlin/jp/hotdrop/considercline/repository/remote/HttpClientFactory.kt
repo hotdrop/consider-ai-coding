@@ -2,6 +2,9 @@ package jp.hotdrop.considercline.repository.remote
 
 import io.ktor.client.HttpClient as KtorNativeClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.DEFAULT
@@ -13,6 +16,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import jp.hotdrop.considercline.model.HttpClientState
 import jp.hotdrop.considercline.repository.local.KmpSharedPreferences
+import jp.hotdrop.considercline.repository.remote.api.AuthApi
 import kotlinx.serialization.json.Json
 
 object HttpClientFactory {
@@ -23,12 +27,12 @@ object HttpClientFactory {
     fun create(state: HttpClientState, sharedPrefs: KmpSharedPreferences) : HttpClient {
         return when (state) {
             HttpClientState.useFakeHttp -> FakeHttpClient(sharedPrefs)
-            is HttpClientState.useHttpNoneLog -> KtorHttpClient(createNativeClient(apiEntryPoint = state.endpoint, isDebug = false))
-            is HttpClientState.useHttpWithDebugLog -> KtorHttpClient(createNativeClient(apiEntryPoint = state.endpoint, isDebug = true))
+            is HttpClientState.useHttpNoneLog -> KtorHttpClient(createNativeClient(apiEntryPoint = state.endpoint, isDebug = false, sharedPrefs = sharedPrefs))
+            is HttpClientState.useHttpWithDebugLog -> KtorHttpClient(createNativeClient(apiEntryPoint = state.endpoint, isDebug = true, sharedPrefs = sharedPrefs))
         }
     }
 
-    private fun createNativeClient(apiEntryPoint: String, isDebug: Boolean): KtorNativeClient {
+    private fun createNativeClient(apiEntryPoint: String, isDebug: Boolean, sharedPrefs: KmpSharedPreferences): KtorNativeClient {
         return KtorNativeClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
@@ -43,6 +47,37 @@ object HttpClientFactory {
                 level = if (isDebug) LogLevel.ALL else LogLevel.NONE
             }
 
+            install(Auth) {
+                bearer {
+                    loadTokens {
+                        val jwt = sharedPrefs.getJwt()
+                        val refreshToken = sharedPrefs.getRefreshToken()
+                        if (jwt != null && refreshToken != null) {
+                            BearerTokens(jwt, refreshToken)
+                        } else {
+                            null
+                        }
+                    }
+                    refreshTokens {
+                        val refreshToken = oldTokens?.refreshToken
+                        if (refreshToken != null) {
+                            // TODO ここ再起になっているので
+                            val authApi = AuthApi(KtorHttpClient(createNativeClient(apiEntryPoint, isDebug, sharedPrefs)))
+                            val response = authApi.refreshToken(refreshToken)
+                            sharedPrefs.saveJwt(response.jwt)
+                            sharedPrefs.saveRefreshToken(response.refreshToken)
+                            BearerTokens(response.jwt, response.refreshToken)
+                        } else {
+                            null
+                        }
+                    }
+                    sendWithoutRequest { request ->
+                        // UserApi.createは認証不要なので除外
+                        request.url.encodedPath.contains("/user")
+                    }
+                }
+            }
+
             // デフォルトリクエスト設定
             defaultRequest {
                 url(apiEntryPoint)
@@ -54,8 +89,6 @@ object HttpClientFactory {
             //     connectTimeoutMillis = 15000L
             //     socketTimeoutMillis = 15000L
             // }
-
-            // TODO Interceptor(Plugin)を設定する
         }
     }
 }

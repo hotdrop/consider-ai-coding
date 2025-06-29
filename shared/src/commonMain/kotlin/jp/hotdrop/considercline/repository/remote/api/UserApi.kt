@@ -10,11 +10,10 @@ class UserApi(
     /**
      * ユーザー作成
      */
-    suspend fun create(nickname: String?, email: String?): String {
-        val response = httpClient.post(
+    suspend fun create(nickname: String?, email: String?): UserResponse {
+        return httpClient.post(
             endpoint = "/user",
             request = PostUserRequest(nickname, email)
         )
-        return UserResponse.mapper(response).userId
     }
 }

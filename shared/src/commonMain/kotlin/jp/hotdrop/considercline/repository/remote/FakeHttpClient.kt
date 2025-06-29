@@ -52,13 +52,13 @@ class FakeHttpClient(
                 )
             }
             "/point" -> {
-                val point = request.body()?.get("inputPoint") as? Int
+                val point = request.body()?.get("point") as? Int
                     ?: throw HttpError("ポイントの値が不正です")
                 acquirePoint(point)
                 emptyMap()
             }
             "/point/use" -> {
-                val point = request.body()?.get("inputPoint") as? Int
+                val point = request.body()?.get("point") as? Int
                     ?: throw HttpError("ポイントの値が不正です")
                 usePoint(point)
                 emptyMap()
