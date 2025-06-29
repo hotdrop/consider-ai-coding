@@ -1,32 +1,31 @@
 package jp.hotdrop.considercline.repository.remote.api
 
 import jp.hotdrop.considercline.model.Point
-import jp.hotdrop.considercline.repository.remote.HttpClient
-import jp.hotdrop.considercline.repository.remote.models.GetPointRequest
+import jp.hotdrop.considercline.repository.remote.KtorHttpClient
 import jp.hotdrop.considercline.repository.remote.models.PointResponse
 import jp.hotdrop.considercline.repository.remote.models.PostPointRequest
 
 class PointApi(
-    private val httpClient: HttpClient
+    private val httpClient: KtorHttpClient
 ) {
     /**
      * ユーザーの保有ポイント取得
      */
     suspend fun find(userId: String): Point {
-        val response = httpClient.get(
+        val response = httpClient.get<PointResponse>(
             endpoint = "/point",
-            request = GetPointRequest(userId)
+            queryParams = mapOf("userId" to userId),
         )
-        return PointResponse.mapper(response).toPoint()
+        return Point(balance = response.point)
     }
 
     /**
      * ポイント獲得
      */
     suspend fun acquired(userId: String, inputPoint: Int) {
-        httpClient.post(
+        httpClient.post<Any>(
             endpoint = "/point",
-            request = PostPointRequest(userId, inputPoint)
+            body = PostPointRequest(userId, inputPoint)
         )
     }
 
@@ -34,9 +33,9 @@ class PointApi(
      * ポイント利用
      */
     suspend fun use(userId: String, inputPoint: Int) {
-        httpClient.post(
+        httpClient.post<Any>(
             endpoint = "/point/use",
-            request = PostPointRequest(userId, inputPoint)
+            body = PostPointRequest(userId, inputPoint)
         )
     }
 }

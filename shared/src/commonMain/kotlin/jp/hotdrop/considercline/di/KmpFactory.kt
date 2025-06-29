@@ -17,7 +17,7 @@ object KmpFactory {
     fun init(pd: PlatformDependencies) {
         val databaseFactory: DatabaseFactory = DatabaseFactoryImpl(pd.driverFactory, pd.sharedPrefs)
         val apiFactory: ApiFactory = ApiFactoryImpl(pd.httpClientState, pd.sharedPrefs)
-        val repositoryFactory: RepositoryFactory = RepositoryFactoryImpl(databaseFactory, apiFactory)
+        val repositoryFactory: RepositoryFactory = RepositoryFactoryImpl(databaseFactory, apiFactory, pd.sharedPrefs)
         useCaseFactory = UseCaseFactoryImpl(repositoryFactory)
     }
 }
