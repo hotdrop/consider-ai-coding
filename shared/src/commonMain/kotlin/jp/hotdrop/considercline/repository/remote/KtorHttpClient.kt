@@ -5,22 +5,31 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import jp.hotdrop.considercline.repository.remote.models.Request
 import io.ktor.client.HttpClient as KtorNativeClient
 
 class KtorHttpClient(
-    private val client: KtorNativeClient
-) : HttpClient {
-    override suspend fun get(endpoint: String, request: Request?): Map<String, Any?> {
+    val client: KtorNativeClient,
+    val fakeHttpClient: FakeHttpClient? = null
+)  {
+    suspend inline fun <reified T> get(endpoint: String, queryParams: Map<String, String>? = null): T {
+        if (fakeHttpClient != null) {
+            return fakeHttpClient.get(endpoint, queryParams) as T
+        }
         return client.get(endpoint) {
-            request?.urlParam()?.forEach { (key, value) ->
-                if (value != null) parameter(key, value)
+            queryParams?.forEach { (key, value) ->
+                parameter(key, value)
             }
         }.body()
     }
 
-    override suspend fun post(endpoint: String, request: Request): Map<String, Any?> {
+    suspend inline fun <reified T> post(endpoint: String, queryParams: Map<String, String>? = null, body: Any): T {
+        if (fakeHttpClient != null) {
+            return fakeHttpClient.post(endpoint, body) as T
+        }
         return client.post(endpoint) {
+            queryParams?.forEach { (key, value) ->
+                parameter(key, value)
+            }
             setBody(body)
         }.body()
     }

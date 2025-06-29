@@ -13,6 +13,7 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import jp.hotdrop.considercline.model.HttpClientState
 import jp.hotdrop.considercline.repository.local.KmpSharedPreferences
@@ -24,15 +25,26 @@ object HttpClientFactory {
      * KtorのHttpClientEngineはCIOを使用。よりプラットフォームに適したエンジン (Android: OkHttp, iOS: Darwin) を
      * expect/actual やネイティブからの注入で設定することも可能
      */
-    fun create(state: HttpClientState, sharedPrefs: KmpSharedPreferences) : HttpClient {
+    fun create(state: HttpClientState, sharedPrefs: KmpSharedPreferences) : KtorHttpClient {
         return when (state) {
-            HttpClientState.useFakeHttp -> FakeHttpClient(sharedPrefs)
-            is HttpClientState.useHttpNoneLog -> KtorHttpClient(createNativeClient(apiEntryPoint = state.endpoint, isDebug = false, sharedPrefs = sharedPrefs))
-            is HttpClientState.useHttpWithDebugLog -> KtorHttpClient(createNativeClient(apiEntryPoint = state.endpoint, isDebug = true, sharedPrefs = sharedPrefs))
+            HttpClientState.useFakeHttp -> KtorHttpClient(
+                createNativeClient(apiEntryPoint = "", isDebug = true, sharedPrefs = sharedPrefs),
+                FakeHttpClient(sharedPrefs = sharedPrefs)
+            )
+            is HttpClientState.useHttpNoneLog -> KtorHttpClient(
+                createNativeClient(apiEntryPoint = state.endpoint, isDebug = false, sharedPrefs = sharedPrefs)
+            )
+            is HttpClientState.useHttpWithDebugLog -> KtorHttpClient(
+                createNativeClient(apiEntryPoint = state.endpoint, isDebug = true, sharedPrefs = sharedPrefs)
+            )
         }
     }
 
-    private fun createNativeClient(apiEntryPoint: String, isDebug: Boolean, sharedPrefs: KmpSharedPreferences): KtorNativeClient {
+    private fun createNativeClient(
+        apiEntryPoint: String,
+        isDebug: Boolean,
+        sharedPrefs: KmpSharedPreferences
+    ): KtorNativeClient {
         return KtorNativeClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
@@ -61,7 +73,7 @@ object HttpClientFactory {
                     refreshTokens {
                         val refreshToken = oldTokens?.refreshToken
                         if (refreshToken != null) {
-                            // TODO ここ再起になっているので
+                            // TODO ここ再起になっているので別の方法が望ましい
                             val authApi = AuthApi(KtorHttpClient(createNativeClient(apiEntryPoint, isDebug, sharedPrefs)))
                             val response = authApi.refreshToken(refreshToken)
                             sharedPrefs.saveJwt(response.jwt)
