@@ -40,7 +40,7 @@ graph TD
 ## 4. サブタスク
 Orchestratorは、以下の単位でサブタスクを作成し、Codeモードに実装を依頼してください。
 ### 1. PointUseViewModelの作成
-1. ステータス: 未実装
+1. ステータス: 実装済み
 2. 内容
    1. `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointuse/` パッケージを作成します。
    2. `originalFlutterSrc/point_use_view_model.dart`を参考に、`PointUseViewModel.kt`を作成します。

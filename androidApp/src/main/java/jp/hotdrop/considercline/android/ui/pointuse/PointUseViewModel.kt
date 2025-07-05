@@ -1,0 +1,85 @@
+package jp.hotdrop.considercline.android.ui.pointuse
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.hotdrop.considercline.usecase.PointUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+import jp.hotdrop.considercline.di.KmpFactory
+
+@HiltViewModel
+import jp.hotdrop.considercline.android.ui.BaseViewModel
+
+class PointUseViewModel @Inject constructor() : BaseViewModel() {
+
+    private val pointUseCase: PointUseCase by lazy {
+        KmpFactory.useCaseFactory.pointUseCase
+    }
+
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    init {
+        loadCurrentPoint()
+    }
+
+    private fun loadCurrentPoint() {
+        launch {
+            val currentPoint = pointUseCase.find()
+            _uiState.update {
+                it.copy(currentPoint = currentPoint.balance)
+            }
+        }
+    }
+
+    fun inputPoint(input: String) {
+        _uiState.update {
+            val inputPoint = input.toIntOrNull() ?: 0
+            it.copy(
+                inputPoint = inputPoint,
+                errorMessage = validateInput(inputPoint, it.currentPoint)
+            )
+        }
+    }
+
+    fun usePoint() {
+        launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                val inputPoint = _uiState.value.inputPoint
+                if (validateInput(inputPoint, _uiState.value.currentPoint) == null) {
+                    pointUseCase.use(inputPoint)
+                    _uiState.update { it.copy(isSuccess = true) }
+                } else {
+                    _uiState.update { it.copy(errorMessage = "入力されたポイントが不正です。") }
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = "ポイント利用に失敗しました。", isSuccess = false) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    private fun validateInput(input: Int, current: Int): String? {
+        return when {
+            input <= 0 -> "0より大きい値を入力してください。"
+            input > current -> "保有ポイントを超えています。"
+            else -> null
+        }
+    }
+}
+
+data class UiState(
+    val inputPoint: Int = 0,
+    val currentPoint: Int = 0,
+    val errorMessage: String? = null,
+    val isLoading: Boolean = false,
+    val isSuccess: Boolean = false
+)
