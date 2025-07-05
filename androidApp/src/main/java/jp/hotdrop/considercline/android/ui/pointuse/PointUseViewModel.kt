@@ -1,21 +1,17 @@
 package jp.hotdrop.considercline.android.ui.pointuse
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.hotdrop.considercline.usecase.PointUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-
 import jp.hotdrop.considercline.di.KmpFactory
-
-@HiltViewModel
+import jp.hotdrop.considercline.usecase.PointUseCase
 import jp.hotdrop.considercline.android.ui.BaseViewModel
 
+@HiltViewModel
 class PointUseViewModel @Inject constructor() : BaseViewModel() {
 
     private val pointUseCase: PointUseCase by lazy {
