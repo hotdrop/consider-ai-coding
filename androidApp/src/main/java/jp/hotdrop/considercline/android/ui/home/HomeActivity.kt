@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.databinding.ActivityHomeBinding
 import jp.hotdrop.considercline.android.ui.pointget.PointGetActivity
+import jp.hotdrop.considercline.android.ui.pointuse.PointUseActivity
 import jp.hotdrop.considercline.model.AppSetting
 import jp.hotdrop.considercline.model.PointHistory
 import androidx.recyclerview.widget.RecyclerView
@@ -55,7 +56,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         binding.pointUseButton.setOnClickListener {
-            // TODO Jetpack Compose を使ってPointUseScreenを実装する
+            PointUseActivity.startForResult(this, pointRefreshLauncher)
         }
     }
 

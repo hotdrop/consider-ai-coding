@@ -47,29 +47,29 @@ Orchestratorは、以下の単位でサブタスクを作成し、Codeモード�
    3. `PointUseCase`のfind関数を使ってポイント残高の取得をします。入力値の保持とバリデーション、ポイント利用処理の実行ロジックをViewModelに実装します。
    4. 状態は個々に`StateFlow`を作るのではなく`data class`や`sealed class`でStateUIの状態（`UiState`）を定義します。
 ### 2. PointUseActivityの作成
-1. ステータス: 未実装
+1. ステータス: 実装済み
 2. 内容
    1. `PointUseActivity.kt`を作成し、`PointUseNavigationHost`を呼び出す基本的な枠組みを実装します。
 ### 3. PointUseInputScreenの作成
-1. ステータス: 未実装
+1. ステータス: 実装済み
 2. 内容
    1. `originalFlutterSrc/point_use_input_page.dart`を参考に、`PointUseInputScreen.kt`を作成します。
    2. ポイント残高の表示、利用ポイントの入力フィールド、確認画面への遷移ボタンを持つComposableを実装します。
    3. `ViewModel`と連携し、UIの状態を監視して表示を更新し、ユーザーのアクションを`ViewModel`に通知します。
 ### 4. PointUseConfirmScreenの作成
-1. ステータス: 未実装
+1. ステータス: 実装済み
 2. 内容
    1. `originalFlutterSrc/point_use_confirm_page.dart`を参考に、`PointUseConfirmScreen.kt`を作成します。
    2. 利用ポイントの確認表示、確定ボタン、入力画面へ戻るボタンを持つComposableを実装します。
    3. 確定ボタン押下で`ViewModel`のポイント利用処理を呼び出し、結果に応じてダイアログ表示や画面遷移を行います。
 ### 5. PointUseNavigationHostの作成とActivityへの統合
-1. ステータス: 未実装
+1. ステータス: 実装済み
 2. 内容
    1. `PointUseNavigationHost.kt` を作成します。
    2. `PointUseInputScreen`と`PointUseConfirmScreen`間のナビゲーションを定義します。
    3.  `PointUseActivity`に`PointUseNavigationHost`を組み込み、`ViewModel`のインスタンスを渡します。
 ### 6. HomeActivityへの導線追加
-1. ステータス: 未実装
+1. ステータス: 実装済み
 2. 内容
    1. `HomeActivity.kt` を変更します。
    2. ポイント利用画面 (`PointUseActivity`) を起動するためのボタンをUIに追加し、`ActivityResultLauncher` を使って画面遷移と結果の受け取りを実装します。

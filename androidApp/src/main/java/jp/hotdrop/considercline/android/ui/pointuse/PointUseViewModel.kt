@@ -25,6 +25,16 @@ class PointUseViewModel @Inject constructor() : BaseViewModel() {
         loadCurrentPoint()
     }
 
+    /**
+     * UiStateを更新するためのヘルパー関数。
+     * この関数は、UiStateの特定のプロパティのみを更新するために使用されます。
+     *
+     * @param block 現在のUiStateを受け取り、更新されたUiStateを返すラムダ関数。
+     */
+    fun updateUiState(block: UiState.() -> UiState) {
+        _uiState.update { it.block() }
+    }
+
     private fun loadCurrentPoint() {
         launch {
             val currentPoint = pointUseCase.find()
@@ -78,4 +88,12 @@ data class UiState(
     val errorMessage: String? = null,
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false
-)
+) {
+    /**
+     * UiStateを更新するためのヘルパー関数。
+     * この関数は、UiStateの特定のプロパティのみを更新するために使用されます。
+     *
+     * @param block 現在のUiStateを受け取り、更新されたUiStateを返すラムダ関数。
+     */
+    fun update(block: UiState.() -> UiState): UiState = block()
+}

@@ -20,5 +20,6 @@
         <activity android:name=".ui.start.StartActivity" />
         <activity android:name=".ui.home.HomeActivity" />
         <activity android:name=".ui.pointget.PointGetActivity" />
+        <activity android:name=".ui.pointuse.PointUseActivity" />
     </application>
 </manifest>
