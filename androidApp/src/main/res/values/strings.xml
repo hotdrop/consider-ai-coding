@@ -49,4 +49,7 @@
     <string name="point_history_point_label">%1$d ポイント</string>
     <string name="dialog_cancel">キャンセル</string>
     <string name="dialog_ok">OK</string>
+    <string name="dialog_title_error">エラー</string>
+    <string name="dialog_title_success">成功</string>
+    <string name="point_use_success_message">ポイント利用に成功しました！</string>
 </resources>
