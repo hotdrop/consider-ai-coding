@@ -186,9 +186,15 @@ private fun PointTextField(
         value = if (inputPoint > 0) inputPoint.toString() else "",
         singleLine = true,
         onValueChange = { newValue ->
-            if (newValue.all { it.isDigit() } && newValue.toInt() <= holdPoint ) {
-                val newValWithInt = newValue.toIntOrNull() ?: 0
-                onValueChange(newValWithInt)
+            if (newValue.isEmpty()) {
+                onValueChange(0)
+            } else if (newValue.all { it.isDigit() }) {
+                // toLongOrNullで安全にパースし、保有ポイントと比較
+                newValue.toLongOrNull()?.let {
+                    if (it <= holdPoint) {
+                        onValueChange(it.toInt())
+                    }
+                }
             }
         },
         label = { Text(stringResource(id = R.string.point_use_input_text_field_label)) },
