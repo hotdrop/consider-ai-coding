@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -19,6 +19,7 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,26 +33,23 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
 
+/**
+ * ポイント獲得数を入力するためのUIコンポーネント。
+ */
 @Composable
 fun PointGetInputScreen(
     viewModel: PointGetViewModel,
     onNavigateToConfirm: () -> Unit,
     onBack: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val inputPoint by viewModel.inputPoint.collectAsState()
-    val showError by viewModel.showError.collectAsState()
-    val isButtonEnabled by viewModel.isButtonEnabled.collectAsState()
-    val currentPoint by viewModel.currentPoint.collectAsState()
-
     val maxPoint = context.resources.getInteger(R.integer.max_point)
-    val maxAvailablePoint = currentPoint.getMaxAvailablePoint(maxPoint)
 
     Scaffold(
         topBar = { PointGetTopBar(onBack) },
@@ -63,27 +61,15 @@ fun PointGetInputScreen(
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-            ) {
-                PointGetOverview(
-                    balance = currentPoint.balance,
-                    maxAvailable = maxAvailablePoint
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                PointGetInputField(
-                    inputPoint = inputPoint,
-                    showError = showError,
-                    maxLength = maxPoint.toString().length,
-                    onValueChange = { newValue ->
+            when {
+                uiState.isStartScreenLoading -> LoadingView()
+                uiState.loadingErrorMessage != null -> ErrorView(errorMessage = uiState.loadingErrorMessage ?: "")
+                else -> PointGetInputContent(
+                    uiState = uiState,
+                    onInputChanged = { newValue ->
+                        val maxAvailablePoint = uiState.currentPoint.getMaxAvailablePoint(maxPoint)
                         viewModel.inputPoint(newValue, maxAvailablePoint)
-                    }
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-                PointGetConfirmButton(
-                    isEnabled = isButtonEnabled,
+                    },
                     onNavigateToConfirm = onNavigateToConfirm
                 )
             }
@@ -117,6 +103,71 @@ fun PointGetTopBar(onBack: () -> Unit) {
     )
 }
 
+/**
+ * 読み込み中の表示
+ */
+@Composable
+private fun LoadingView() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+/**
+ * エラー発生時の表示
+ */
+@Composable
+private fun ErrorView(errorMessage: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = errorMessage,
+            color = MaterialTheme.colors.error,
+            fontSize = 16.sp
+        )
+    }
+}
+
+/**
+ * ポイント獲得入力画面のコンテンツ
+ */
+@Composable
+private fun PointGetInputContent(
+    uiState: PointGetUiState,
+    onInputChanged: (Int) -> Unit,
+    onNavigateToConfirm: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        PointGetOverview(
+            balance = uiState.currentPoint.balance,
+            maxAvailable = uiState.currentPoint.getMaxAvailablePoint(
+                LocalContext.current.resources.getInteger(R.integer.max_point)
+            )
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        PointGetInputField(
+            inputPoint = uiState.inputPoint,
+            errorMessage = uiState.inputPointErrorMessage,
+            onValueChange = onInputChanged
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        PointGetConfirmButton(
+            isEnabled = uiState.isEnableInputPoint,
+            onNavigateToConfirm = onNavigateToConfirm
+        )
+    }
+}
+
 @Composable
 fun PointGetOverview(balance: Int, maxAvailable: Int) {
     Column(
@@ -133,7 +184,7 @@ fun PointGetOverview(balance: Int, maxAvailable: Int) {
             color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold)
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(R.string.point_get_input_attention, maxAvailable),
             color = Color.Black,
@@ -145,28 +196,31 @@ fun PointGetOverview(balance: Int, maxAvailable: Int) {
 @Composable
 fun PointGetInputField(
     inputPoint: Int,
-    showError: Boolean,
-    maxLength: Int,
+    errorMessage: String?,
     onValueChange: (Int) -> Unit
 ) {
     OutlinedTextField(
         value = if (inputPoint > 0) inputPoint.toString() else "",
         singleLine = true,
         onValueChange = { newValue ->
-            if (newValue.length <= maxLength && newValue.all { it.isDigit() }) {
-                val newValWithInt = newValue.toIntOrNull() ?: 0
-                onValueChange(newValWithInt)
+            if (newValue.isEmpty()) {
+                onValueChange(0)
+            } else if (newValue.all { it.isDigit() }) {
+                // toLongOrNullで安全にパースし、保有ポイントと比較
+                newValue.toLongOrNull()?.let {
+                    onValueChange(it.toInt())
+                }
             }
         },
         label = { Text(stringResource(id = R.string.point_get_input_text_field_label)) },
         textStyle = TextStyle(color = Color.Black, fontSize = 20.sp),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        isError = showError,
+        isError = errorMessage != null,
         modifier = Modifier.fillMaxWidth()
     )
-    if (showError) {
+    if (errorMessage != null) {
         Text(
-            text = stringResource(R.string.point_get_input_max_over_error),
+            text = errorMessage,
             color = Color.Red,
             style = MaterialTheme.typography.body2,
             modifier = Modifier.padding(start = 4.dp, top = 4.dp)
@@ -180,7 +234,7 @@ fun PointGetConfirmButton(
     onNavigateToConfirm: () -> Unit
 ) {
     Button(
-        onClick = { onNavigateToConfirm() },
+        onClick = onNavigateToConfirm,
         enabled = isEnabled,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -191,14 +245,36 @@ fun PointGetConfirmButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(name = "PointGetInput - Loaded", showBackground = true)
 @Composable
 fun PreviewPointGetInputScreen() {
     ConsiderClineTheme {
-        PointGetInputScreen(
-            viewModel = PointGetViewModel(),
-            onNavigateToConfirm = {},
-            onBack = {}
+        PointGetInputContent(
+            uiState = PointGetUiState(
+                currentPoint = jp.hotdrop.considercline.model.Point(100),
+                inputPoint = 50,
+                inputPointErrorMessage = null,
+                isEnableInputPoint = true,
+                isStartScreenLoading = false
+            ),
+            onInputChanged = {},
+            onNavigateToConfirm = {}
         )
+    }
+}
+
+@Preview(name = "PointGetInput - Loading", showBackground = true)
+@Composable
+fun PreviewPointGetInputScreen_Loading() {
+    ConsiderClineTheme {
+        LoadingView()
+    }
+}
+
+@Preview(name = "PointGetInput - Error", showBackground = true)
+@Composable
+fun PreviewPointGetInputScreen_Error() {
+    ConsiderClineTheme {
+        ErrorView(errorMessage = "エラーが発生しました。")
     }
 }

@@ -43,25 +43,16 @@ shared/        # 共通ロジック（KMP共通）
 本プロジェクトでは、Kotlin MultiPlatform (KMP) を最大限に活用し、プラットフォーム間で可能な限りコードを共通化することを目指します。主要なアーキテクチャパターンは以下の通りです。
 
 - ネイティブViewレイヤー:
-  - Android (`androidApp/`): Jetpack Compose を使用してUIを実装します。既存でAndroidViewを使用していますが、そこには手を加えません。
-  - iOS (`iosApp/`): SwiftUI を使用してUIを実装します。
-  - 各プラットフォームで MVVM (Model-View-ViewModel) アーキテクチャを採用します。ViewModel は各プラットフォームで実装しますが、ビジネスロジックの実行は `shared` モジュールの UseCase を利用します。
+  - 各プラットフォームで MVVM (Model-View-ViewModel) アーキテクチャを採用します。ViewModel は各プラットフォームで実装し、ビジネスロジックの実行は `shared` モジュールの UseCase を利用します。
 - UseCase レイヤー (KMP共通 - `shared/src/commonMain/`):
   - アプリケーション固有のビジネスロジックを実装します。
-  - 1つ以上のRepositoryを組み合わせて特定の機能を提供します。
-  - ネイティブのViewModelは、`KmpUseCaseFactory` を経由してUseCaseのインスタンスを取得し、ビジネスロジックやデータ取得を実行します。Repository層はUseCaseによってカプセル化されます。
+  - 1つ以上のRepositoryを組み合わせて特定の機能を提供します。Repository層はUseCaseによってカプセル化されます。
 - データレイヤー (KMP共通 - `shared/src/commonMain/`):
   - Repositoryパターンを採用します。
   - Repositoryは、データソース（Remote/Local）を抽象化し、UseCase に一貫したインターフェースを提供します。
 
-## UI実装方針
-- Android: Jetpack Compose を全面的に採用します。AndroidViewベースのUI実装は行いません。
-- iOS: SwiftUI を全面的に採用します。UIKitの利用やSwiftのinterop層の実装は行いません。
-
 ## Dependency Injection (DI) 方針
-- `shared/` (KMP共通ロジック): DIライブラリは使用しません。
-  - モデルクラスを除くすべてのクラスは、可能な限りコンストラクタインジェクションを使用して疎結合を保ちます。
-  - UseCaseのインスタンスは、必ず`KmpUseCaseFactory`クラスを経由して取得します。これにより、UseCase以下のRepository層などの依存関係はカプセル化されます。
+- `shared/` (KMP共通ロジック): DIライブラリは使用しません。モデルクラスを除くすべてのクラスは、可能な限りコンストラクタインジェクションを使用して疎結合を保ちます。
 - `androidApp/` (Androidネイティブ実装): `Dagger Hilt`を使用して依存性注入を行います。
 
 ## 非同期処理

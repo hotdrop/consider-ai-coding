@@ -96,8 +96,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun onRefreshData() {
-        viewModel.onLoadCurrentPoint()
-        viewModel.onLoadHistory()
+        viewModel.onLoadAllData()
     }
 
     /**
