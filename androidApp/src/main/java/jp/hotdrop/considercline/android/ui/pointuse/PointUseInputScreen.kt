@@ -3,7 +3,6 @@ package jp.hotdrop.considercline.android.ui.pointuse
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +18,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -37,9 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jp.hotdrop.considercline.android.R
-import jp.hotdrop.considercline.android.ui.pointget.PointGetConfirmButton
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
-import jp.hotdrop.considercline.android.ui.pointuse.UiState
+import jp.hotdrop.considercline.model.Point
 
 /**
  * ポイント利用数を入力するためのUIコンポーネント。
@@ -64,12 +61,12 @@ fun PointUseInputScreen(
                 .padding(paddingValues)
         ) {
             when {
-                uiState.isLoading -> LoadingView()
-                uiState.errorMessage != null -> ErrorView(errorMessage = uiState.errorMessage ?: "")
+                uiState.isStartScreenLoading -> LoadingView()
+                uiState.inputPointErrorMessage != null -> ErrorView(errorMessage = uiState.inputPointErrorMessage ?: "")
                 else -> PointUseInputContent(
                     uiState = uiState,
                     onInputChanged = { viewModel.inputPoint(it) },
-                    onNavigateToConfirm = { onNavigateToConfirm() }
+                    onNavigateToConfirm = onNavigateToConfirm
                 )
             }
         }
@@ -153,15 +150,15 @@ private fun PointUseInputContent(
             style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
         )
         Text(
-            text = uiState.currentPoint.toString(),
+            text = uiState.currentPoint.balance.toString(),
             color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold)
         )
         Spacer(modifier = Modifier.height(16.dp))
         PointTextField(
             inputPoint = uiState.inputPoint,
-            holdPoint = uiState.currentPoint,
-            errorMessage = uiState.errorMessage,
+            holdPoint = uiState.currentPoint.balance,
+            errorMessage = uiState.inputPointErrorMessage,
             onValueChange = onInputChanged
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -214,10 +211,7 @@ private fun PointTextField(
 }
 
 /**
- * 次へ進むボタン。
- *
- * @param enableButton ボタンが有効かどうか。
- * @param onConfirmClick ボタンがクリックされた際のコールバック。
+ * 次へ進むボタン
  */
 @Composable
 private fun PointUseConfirmButton(
@@ -242,10 +236,10 @@ fun PreviewPointUseInputScreen() {
     ConsiderClineTheme {
         PointUseInputContent(
             uiState = UiState(
-                currentPoint = 100,
+                currentPoint = Point(100),
                 inputPoint = 50,
-                errorMessage = null,
-                isLoading = false
+                inputPointErrorMessage = null,
+                isStartScreenLoading = false
             ),
             onInputChanged = {},
             onNavigateToConfirm = {},

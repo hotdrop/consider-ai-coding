@@ -21,37 +21,41 @@ class PointGetViewModel @Inject constructor() : BaseViewModel() {
 
     init {
         launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isStartScreenLoading = true) }
             runCatching {
                 pointUseCase.find()
             }.onSuccess { currentPoint ->
-                _uiState.update { it.copy(currentPoint = currentPoint, isLoading = false) }
+                _uiState.update { it.copy(currentPoint = currentPoint, isStartScreenLoading = false) }
             }.onFailure { throwable ->
-                _uiState.update { it.copy(errorMessage = throwable.message, isLoading = false) }
+                _uiState.update { it.copy(loadingErrorMessage = throwable.message, isStartScreenLoading = false) }
             }
         }
     }
 
     fun inputPoint(newInputPoint: Int, maxAvailablePoint: Int) {
+        val errorMessage = validateInput(
+            input = newInputPoint,
+            current = _uiState.value.currentPoint.balance,
+            maxAvailablePoint = maxAvailablePoint
+        )
         _uiState.update {
-            val showError = (newInputPoint <= 0 || newInputPoint > maxAvailablePoint)
             it.copy(
                 inputPoint = newInputPoint,
-                showError = showError,
-                isButtonEnabled = newInputPoint > 0 && !showError
+                inputPointErrorMessage = errorMessage,
+                isEnableInputPoint = errorMessage == null && newInputPoint > 0
             )
         }
     }
 
     fun acquirePoint(inputPoint: Int) {
         launch {
-            _uiState.update { it.copy(isAcquiring = true) }
+            _uiState.update { it.copy(runAcquiringProcess = true) }
             runCatching {
                 pointUseCase.acquire(inputPoint)
             }.onSuccess {
-                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowSuccessDialog, isAcquiring = false) }
+                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowSuccessDialog, runAcquiringProcess = false) }
             }.onFailure { throwable ->
-                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowErrorDialog(throwable), isAcquiring = false) }
+                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowErrorDialog(throwable), runAcquiringProcess = false) }
             }
         }
     }
@@ -59,17 +63,25 @@ class PointGetViewModel @Inject constructor() : BaseViewModel() {
     fun resetAcquireEvent() {
         _uiState.update { it.copy(acquireEvent = null) }
     }
+
+    private fun validateInput(input: Int, current: Int, maxAvailablePoint: Int): String? {
+        return when {
+            input <= 0 -> "0より大きい値を入力してください。"
+            input + current > maxAvailablePoint -> "最大ポイントを超えています。"
+            else -> null
+        }
+    }
 }
 
 data class PointGetUiState(
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null,
     val currentPoint: Point = Point(0),
     val inputPoint: Int = 0,
-    val showError: Boolean = false,
-    val isButtonEnabled: Boolean = false,
+    val isStartScreenLoading: Boolean = false,
+    val loadingErrorMessage: String? = null,
+    val inputPointErrorMessage: String? = null,
+    val isEnableInputPoint: Boolean = false,
     val acquireEvent: PointAcquireEvent? = null,
-    val isAcquiring: Boolean = false
+    val runAcquiringProcess: Boolean = false
 )
 
 sealed class PointAcquireEvent {

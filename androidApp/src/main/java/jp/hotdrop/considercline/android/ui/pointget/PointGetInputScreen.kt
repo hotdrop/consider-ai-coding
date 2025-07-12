@@ -3,7 +3,6 @@ package jp.hotdrop.considercline.android.ui.pointget
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,8 +62,8 @@ fun PointGetInputScreen(
                 .padding(paddingValues)
         ) {
             when {
-                uiState.isLoading -> LoadingView()
-                uiState.errorMessage != null -> ErrorView(errorMessage = uiState.errorMessage ?: "")
+                uiState.isStartScreenLoading -> LoadingView()
+                uiState.inputPointErrorMessage != null -> ErrorView(errorMessage = uiState.inputPointErrorMessage ?: "")
                 else -> PointGetInputContent(
                     uiState = uiState,
                     onInputChanged = { newValue ->
@@ -158,13 +157,14 @@ private fun PointGetInputContent(
         Spacer(modifier = Modifier.height(24.dp))
         PointGetInputField(
             inputPoint = uiState.inputPoint,
-            showError = uiState.showError,
+            holdPoint = uiState.currentPoint.balance,
             maxLength = LocalContext.current.resources.getInteger(R.integer.max_point).toString().length,
+            errorMessage = uiState.inputPointErrorMessage,
             onValueChange = onInputChanged
         )
         Spacer(modifier = Modifier.height(32.dp))
         PointGetConfirmButton(
-            isEnabled = uiState.isButtonEnabled,
+            isEnabled = uiState.isEnableInputPoint,
             onNavigateToConfirm = onNavigateToConfirm
         )
     }
@@ -198,28 +198,35 @@ fun PointGetOverview(balance: Int, maxAvailable: Int) {
 @Composable
 fun PointGetInputField(
     inputPoint: Int,
-    showError: Boolean,
+    holdPoint: Int,
     maxLength: Int,
+    errorMessage: String?,
     onValueChange: (Int) -> Unit
 ) {
     OutlinedTextField(
         value = if (inputPoint > 0) inputPoint.toString() else "",
         singleLine = true,
         onValueChange = { newValue ->
-            if (newValue.length <= maxLength && newValue.all { it.isDigit() }) {
-                val newValWithInt = newValue.toIntOrNull() ?: 0
-                onValueChange(newValWithInt)
+            if (newValue.isEmpty()) {
+                onValueChange(0)
+            } else if (newValue.all { it.isDigit() }) {
+                // toLongOrNullで安全にパースし、保有ポイントと比較
+                newValue.toLongOrNull()?.let {
+                    if (it <= holdPoint) {
+                        onValueChange(it.toInt())
+                    }
+                }
             }
         },
         label = { Text(stringResource(id = R.string.point_get_input_text_field_label)) },
         textStyle = TextStyle(color = Color.Black, fontSize = 20.sp),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        isError = showError,
+        isError = errorMessage != null,
         modifier = Modifier.fillMaxWidth()
     )
-    if (showError) {
+    if (errorMessage != null) {
         Text(
-            text = stringResource(R.string.point_get_input_max_over_error),
+            text = errorMessage,
             color = Color.Red,
             style = MaterialTheme.typography.body2,
             modifier = Modifier.padding(start = 4.dp, top = 4.dp)
@@ -252,10 +259,9 @@ fun PreviewPointGetInputScreen() {
             uiState = PointGetUiState(
                 currentPoint = jp.hotdrop.considercline.model.Point(100),
                 inputPoint = 50,
-                showError = false,
-                isButtonEnabled = true,
-                isLoading = false,
-                errorMessage = null
+                inputPointErrorMessage = null,
+                isEnableInputPoint = true,
+                isStartScreenLoading = false
             ),
             onInputChanged = {},
             onNavigateToConfirm = {}

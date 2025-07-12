@@ -33,15 +33,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jp.hotdrop.considercline.android.R
+import jp.hotdrop.considercline.android.ui.pointget.PointAcquireEvent
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
 
-/**
- * ポイント利用の確認画面。
- * 利用するポイント数を確認し、処理を確定するためのUIコンポーネント。
- *
- * @param viewModel PointUseViewModelのインスタンス。
- * @param onNavigateBack 入力画面に戻るためのコールバック。
- */
 @Composable
 fun PointUseConfirmScreen(
     viewModel: PointUseViewModel,
@@ -60,27 +54,15 @@ fun PointUseConfirmScreen(
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            when {
-                uiState.isLoading -> LoadingView()
-                uiState.errorMessage != null -> {
-                    ErrorDialog(
-                        errorMessage = uiState.errorMessage ?: "",
-                        onDismiss = { viewModel.updateUiState { copy(errorMessage = null) } }
-                    )
+            PointUseConfirmContent(
+                uiState = uiState,
+                onConfirmUsePoint = { viewModel.usePoint() },
+                errorDialogDismiss = { viewModel.resetGetEvent() },
+                onComplete = {
+                    viewModel.resetGetEvent()
+                    onComplete()
                 }
-                uiState.isSuccess -> {
-                    SuccessDialog(
-                        onDismiss = {
-                            viewModel.updateUiState { copy(isSuccess = false) }
-                            onComplete()
-                        }
-                    )
-                }
-                else -> PointUseConfirmContent(
-                    uiState = uiState,
-                    onConfirmUsePoint = { viewModel.usePoint() }
-                )
-            }
+            )
         }
     }
 }
@@ -113,16 +95,12 @@ fun PointConfirmTopBar(onBack: () -> Unit) {
    )
 }
 
-/**
-* ポイント利用確認画面のコンテンツ。
-*
-* @param uiState PointUseViewModelから受け取ったUiState。
-* @param onConfirmUsePoint ポイント利用を確定する際のコールバック。
-*/
 @Composable
 private fun PointUseConfirmContent(
    uiState: UiState,
-   onConfirmUsePoint: () -> Unit
+   onConfirmUsePoint: () -> Unit,
+   errorDialogDismiss: () -> Unit,
+   onComplete: () -> Unit
 ) {
    Column(
        modifier = Modifier
@@ -157,17 +135,32 @@ private fun PointUseConfirmContent(
        Spacer(modifier = Modifier.height(32.dp))
        Button(
            onClick = onConfirmUsePoint,
-           enabled = !uiState.isLoading,
+           enabled = !uiState.runPointUseProcess,
            modifier = Modifier.fillMaxWidth()
        ) {
-           if (uiState.isLoading) {
-               CircularProgressIndicator()
+           if (uiState.runPointUseProcess) {
+               CircularProgressIndicator(color = MaterialTheme.colors.onPrimary)
            } else {
                Text(
                    text = stringResource(id = R.string.point_use_confirm_execute_button),
                    modifier = Modifier.padding(vertical = 8.dp)
                )
            }
+       }
+
+       when (val event = uiState.pointUseEvent) {
+           is PointUseEvent.ShowErrorDialog -> {
+               ErrorDialog(
+                   errorMessage = event.throwable.message!!,
+                   onDismiss = errorDialogDismiss
+               )
+           }
+           PointUseEvent.ShowSuccessDialog -> {
+               SuccessDialog(
+                   onDismiss = onComplete
+               )
+           }
+           null -> { /** 何もしない */ }
        }
    }
 }
@@ -230,7 +223,9 @@ fun PreviewPointUseConfirmContent() {
    ConsiderClineTheme {
        PointUseConfirmContent(
            uiState = UiState(inputPoint = 100),
-           onConfirmUsePoint = {}
+           onConfirmUsePoint = {},
+           errorDialogDismiss = {},
+           onComplete = {}
        )
    }
 }
@@ -247,7 +242,15 @@ fun PreviewPointUseConfirmContentLoading() {
 @Composable
 fun PreviewPointUseConfirmContentError() {
    ConsiderClineTheme {
-       ErrorDialog(errorMessage = "エラーが発生しました。", onDismiss = {})
+       PointUseConfirmContent(
+           uiState = UiState(
+               inputPoint = 100,
+               pointUseEvent = PointUseEvent.ShowErrorDialog(Throwable("エラーが発生しました"))
+           ),
+           onConfirmUsePoint = {},
+           errorDialogDismiss = {},
+           onComplete = {}
+       )
    }
 }
 
@@ -255,6 +258,14 @@ fun PreviewPointUseConfirmContentError() {
 @Composable
 fun PreviewPointUseConfirmContentSuccess() {
    ConsiderClineTheme {
-       SuccessDialog(onDismiss = {})
+       PointUseConfirmContent(
+           uiState = UiState(
+               inputPoint = 100,
+               pointUseEvent = PointUseEvent.ShowSuccessDialog
+           ),
+           onConfirmUsePoint = {},
+           errorDialogDismiss = {},
+           onComplete = {}
+       )
    }
 }

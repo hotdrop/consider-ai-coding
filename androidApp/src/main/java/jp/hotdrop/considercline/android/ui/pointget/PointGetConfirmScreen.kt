@@ -134,10 +134,10 @@ private fun PointGetConfirmContent(
         Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = onAcquirePoint,
-            enabled = !uiState.isAcquiring,
+            enabled = !uiState.runAcquiringProcess,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (uiState.isAcquiring) {
+            if (uiState.runAcquiringProcess) {
                 CircularProgressIndicator(color = MaterialTheme.colors.onPrimary)
             } else {
                 Text(
