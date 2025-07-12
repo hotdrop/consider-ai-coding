@@ -39,35 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun PointConfirmTopBar(onBack: () -> Unit) {
-    TopAppBar(
-        title = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 48.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.point_get_title),
-                )
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.point_get_confirm_back_button_content_description),
-
-                )
-            }
-        },
-        backgroundColor = MaterialTheme.colors.primary,
-        modifier = Modifier.statusBarsPadding()
-    )
-}
-
-@Composable
 fun PointGetConfirmScreen(
     viewModel: PointGetViewModel,
     onBack: () -> Unit,
@@ -130,6 +101,35 @@ fun PointGetConfirmScreen(
             showErrorDialog = null
         }
     }
+}
+
+@Composable
+fun PointConfirmTopBar(onBack: () -> Unit) {
+    TopAppBar(
+        title = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 48.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.point_get_title),
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.point_get_confirm_back_button_content_description),
+
+                    )
+            }
+        },
+        backgroundColor = MaterialTheme.colors.primary,
+        modifier = Modifier.statusBarsPadding()
+    )
 }
 
 @Composable

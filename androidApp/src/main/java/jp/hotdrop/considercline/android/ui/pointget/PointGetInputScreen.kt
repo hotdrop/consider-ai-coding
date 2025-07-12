@@ -196,6 +196,7 @@ fun PointGetConfirmButton(
 fun PreviewPointGetInputScreen() {
     ConsiderClineTheme {
         PointGetInputScreen(
+            // ここでViewModelを扱うのは非常に良くない・・たまたま動作するがinitがAPI実行するものだとエラーになる
             viewModel = PointGetViewModel(),
             onNavigateToConfirm = {},
             onBack = {}
