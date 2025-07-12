@@ -53,27 +53,15 @@ fun PointGetConfirmScreen(
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            when (val event = uiState.acquireEvent) {
-                PointAcquireEvent.NowLoading -> LoadingView()
-                is PointAcquireEvent.ShowErrorDialog -> {
-                    ErrorDialog(
-                        errorMessage = event.throwable.message!!,
-                        onDismiss = { viewModel.resetAcquireEvent() }
-                    )
+            PointGetConfirmContent(
+                uiState = uiState,
+                onAcquirePoint = { viewModel.acquirePoint(uiState.inputPoint) },
+                errorDialogDismiss = { viewModel.resetAcquireEvent() },
+                onComplete = {
+                    viewModel.resetAcquireEvent()
+                    onComplete()
                 }
-                PointAcquireEvent.ShowSuccessDialog -> {
-                    SuccessDialog(
-                        onDismiss = {
-                            viewModel.resetAcquireEvent()
-                            onComplete()
-                        }
-                    )
-                }
-                PointAcquireEvent.Standby -> PointGetConfirmContent(
-                    uiState = uiState,
-                    onAcquirePoint = { viewModel.acquirePoint(uiState.inputPoint) }
-                )
-            }
+            )
         }
     }
 }
@@ -109,7 +97,9 @@ fun PointConfirmTopBar(onBack: () -> Unit) {
 @Composable
 private fun PointGetConfirmContent(
     uiState: PointGetUiState,
-    onAcquirePoint: () -> Unit
+    onAcquirePoint: () -> Unit,
+    errorDialogDismiss: () -> Unit,
+    onComplete: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -144,17 +134,32 @@ private fun PointGetConfirmContent(
         Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = onAcquirePoint,
-            enabled = !uiState.isLoading,
+            enabled = !uiState.isAcquiring,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator()
+            if (uiState.isAcquiring) {
+                CircularProgressIndicator(color = MaterialTheme.colors.onPrimary)
             } else {
                 Text(
                     text = stringResource(id = R.string.point_get_confirm_execute_button),
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
+        }
+
+        when (val event = uiState.acquireEvent) {
+            is PointAcquireEvent.ShowErrorDialog -> {
+                ErrorDialog(
+                    errorMessage = event.throwable.message!!,
+                    onDismiss = errorDialogDismiss
+                )
+            }
+            PointAcquireEvent.ShowSuccessDialog -> {
+                SuccessDialog(
+                    onDismiss = onComplete
+                )
+            }
+            null -> { /** 何もしない */ }
         }
     }
 }
@@ -204,7 +209,9 @@ fun PreviewPointGetConfirmContent() {
     ConsiderClineTheme {
         PointGetConfirmContent(
             uiState = PointGetUiState(inputPoint = 100),
-            onAcquirePoint = {}
+            onAcquirePoint = {},
+            errorDialogDismiss = {},
+            onComplete = {}
         )
     }
 }
@@ -220,8 +227,17 @@ fun PreviewPointGetConfirmContentLoading() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewPointGetConfirmContentError() {
+    val throwable = Throwable("エラーが発生しました")
     ConsiderClineTheme {
-        ErrorDialog(errorMessage = "エラーが発生しました。", onDismiss = {})
+        PointGetConfirmContent(
+            uiState = PointGetUiState(
+                inputPoint = 100,
+                acquireEvent = PointAcquireEvent.ShowErrorDialog(throwable)
+            ),
+            onAcquirePoint = {},
+            errorDialogDismiss = {},
+            onComplete = {}
+        )
     }
 }
 
@@ -230,5 +246,14 @@ fun PreviewPointGetConfirmContentError() {
 fun PreviewPointGetConfirmContentSuccess() {
     ConsiderClineTheme {
         SuccessDialog(onDismiss = {})
+        PointGetConfirmContent(
+            uiState = PointGetUiState(
+                inputPoint = 100,
+                acquireEvent = PointAcquireEvent.ShowSuccessDialog
+            ),
+            onAcquirePoint = {},
+            errorDialogDismiss = {},
+            onComplete = {}
+        )
     }
 }

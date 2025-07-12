@@ -69,3 +69,10 @@ pointuse機能と同様に、`PointGetInputScreen`が取りうる各UI状態に�
   - isSuccessがtrueになったらSuccessDialogを表示します。ダイアログが閉じられた際、ViewModelのUiStateをリセットすると同時に、onCompleteコールバックを呼び出して、ポイント獲得フローが完了したことを呼び出し元（Activity）に通知します。これにより、画面遷移などの後続処理が可能になります。
 - UIデザインの統一:
   - `PointUseConfirmContent`内のComposable（TextやButtonなど）のスタイル（フォントサイズ、色、パディング、ボタン幅など）を、`PointGetConfirmContent`のスタイルと一致させます。これにより、アプリ全体で一貫性のあるデザインを提供します
+
+## 4. ポイント獲得ボタンのローディング表示の改善 (完了)
+ポイント獲得画面の「ポイントを獲得する」ボタンを押したときに画面全体がLoading状態になるのをやめて、ボタンレイアウトの部分だけLoadingするように修正しました。
+- `PointGetUiState`に`isAcquiring: Boolean`プロパティを追加し、ポイント獲得処理中の状態を管理するようにしました。
+- `PointGetViewModel`の`acquirePoint`メソッドを修正し、`isAcquiring`を適切に更新するように変更しました。
+- `PointGetConfirmScreen`から画面全体の`LoadingView()`呼び出しを削除しました。
+- `PointGetConfirmContent`のボタンのローディング表示を`isAcquiring`で制御するように修正しました。

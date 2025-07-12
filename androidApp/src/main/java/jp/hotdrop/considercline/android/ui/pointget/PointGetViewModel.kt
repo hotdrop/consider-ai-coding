@@ -45,19 +45,19 @@ class PointGetViewModel @Inject constructor() : BaseViewModel() {
 
     fun acquirePoint(inputPoint: Int) {
         launch {
-            _uiState.update { it.copy(acquireEvent = PointAcquireEvent.NowLoading) }
+            _uiState.update { it.copy(isAcquiring = true) }
             runCatching {
                 pointUseCase.acquire(inputPoint)
             }.onSuccess {
-                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowSuccessDialog) }
+                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowSuccessDialog, isAcquiring = false) }
             }.onFailure { throwable ->
-                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowErrorDialog(throwable)) }
+                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowErrorDialog(throwable), isAcquiring = false) }
             }
         }
     }
 
     fun resetAcquireEvent() {
-        _uiState.update { it.copy(acquireEvent = PointAcquireEvent.Standby) }
+        _uiState.update { it.copy(acquireEvent = null) }
     }
 }
 
@@ -68,12 +68,11 @@ data class PointGetUiState(
     val inputPoint: Int = 0,
     val showError: Boolean = false,
     val isButtonEnabled: Boolean = false,
-    val acquireEvent: PointAcquireEvent = PointAcquireEvent.Standby
+    val acquireEvent: PointAcquireEvent? = null,
+    val isAcquiring: Boolean = false
 )
 
 sealed class PointAcquireEvent {
-    object Standby: PointAcquireEvent()
-    object NowLoading: PointAcquireEvent()
     object ShowSuccessDialog: PointAcquireEvent()
     data class ShowErrorDialog(val throwable: Throwable): PointAcquireEvent()
 }
