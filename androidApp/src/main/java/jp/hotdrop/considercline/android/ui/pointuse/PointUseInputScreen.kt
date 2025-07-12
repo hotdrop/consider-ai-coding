@@ -62,7 +62,7 @@ fun PointUseInputScreen(
         ) {
             when {
                 uiState.isStartScreenLoading -> LoadingView()
-                uiState.inputPointErrorMessage != null -> ErrorView(errorMessage = uiState.inputPointErrorMessage ?: "")
+                uiState.loadingErrorMessage != null -> ErrorView(errorMessage = uiState.loadingErrorMessage ?: "")
                 else -> PointUseInputContent(
                     uiState = uiState,
                     onInputChanged = { viewModel.inputPoint(it) },
@@ -157,7 +157,6 @@ private fun PointUseInputContent(
         Spacer(modifier = Modifier.height(16.dp))
         PointTextField(
             inputPoint = uiState.inputPoint,
-            holdPoint = uiState.currentPoint.balance,
             errorMessage = uiState.inputPointErrorMessage,
             onValueChange = onInputChanged
         )
@@ -175,7 +174,6 @@ private fun PointUseInputContent(
 @Composable
 private fun PointTextField(
     inputPoint: Int,
-    holdPoint: Int,
     errorMessage: String?,
     onValueChange: (Int) -> Unit
 ) {
@@ -188,9 +186,7 @@ private fun PointTextField(
             } else if (newValue.all { it.isDigit() }) {
                 // toLongOrNullで安全にパースし、保有ポイントと比較
                 newValue.toLongOrNull()?.let {
-                    if (it <= holdPoint) {
-                        onValueChange(it.toInt())
-                    }
+                    onValueChange(it.toInt())
                 }
             }
         },

@@ -63,7 +63,7 @@ fun PointGetInputScreen(
         ) {
             when {
                 uiState.isStartScreenLoading -> LoadingView()
-                uiState.inputPointErrorMessage != null -> ErrorView(errorMessage = uiState.inputPointErrorMessage ?: "")
+                uiState.loadingErrorMessage != null -> ErrorView(errorMessage = uiState.loadingErrorMessage ?: "")
                 else -> PointGetInputContent(
                     uiState = uiState,
                     onInputChanged = { newValue ->
@@ -157,8 +157,6 @@ private fun PointGetInputContent(
         Spacer(modifier = Modifier.height(24.dp))
         PointGetInputField(
             inputPoint = uiState.inputPoint,
-            holdPoint = uiState.currentPoint.balance,
-            maxLength = LocalContext.current.resources.getInteger(R.integer.max_point).toString().length,
             errorMessage = uiState.inputPointErrorMessage,
             onValueChange = onInputChanged
         )
@@ -198,8 +196,6 @@ fun PointGetOverview(balance: Int, maxAvailable: Int) {
 @Composable
 fun PointGetInputField(
     inputPoint: Int,
-    holdPoint: Int,
-    maxLength: Int,
     errorMessage: String?,
     onValueChange: (Int) -> Unit
 ) {
@@ -212,9 +208,7 @@ fun PointGetInputField(
             } else if (newValue.all { it.isDigit() }) {
                 // toLongOrNullで安全にパースし、保有ポイントと比較
                 newValue.toLongOrNull()?.let {
-                    if (it <= holdPoint) {
-                        onValueChange(it.toInt())
-                    }
+                    onValueChange(it.toInt())
                 }
             }
         },

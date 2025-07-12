@@ -36,23 +36,14 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
         }
     }
 
-    fun onLoadCurrentPoint() {
+    fun onLoadAllData() {
         launch {
-            val uiState = mutableUiState.value ?: return@launch
-            val newUiState = uiState.copyWith(
-                currentPoint = pointUseCase.find()
-            )
-            mutableUiState.postValue(newUiState)
-        }
-    }
-
-    fun onLoadHistory() {
-        launch {
-            val uiState = mutableUiState.value ?: return@launch
-            val newUiState = uiState.copyWith(
+            val uiState = HomeUiState(
+                appSetting = appSettingUseCase.find(),
+                currentPoint = pointUseCase.find(),
                 histories = historyUseCase.findAll()
             )
-            mutableUiState.postValue(newUiState)
+            mutableUiState.postValue(uiState)
         }
     }
 }
