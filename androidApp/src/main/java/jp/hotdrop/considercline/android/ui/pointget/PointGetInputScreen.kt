@@ -49,6 +49,8 @@ fun PointGetInputScreen(
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val maxPoint = context.resources.getInteger(R.integer.max_point)
 
     Scaffold(
         topBar = { PointGetTopBar(onBack) },
@@ -66,8 +68,6 @@ fun PointGetInputScreen(
                 else -> PointGetInputContent(
                     uiState = uiState,
                     onInputChanged = { newValue ->
-                        val context = LocalContext.current
-                        val maxPoint = context.resources.getInteger(R.integer.max_point)
                         val maxAvailablePoint = uiState.currentPoint.getMaxAvailablePoint(maxPoint)
                         viewModel.inputPoint(newValue, maxAvailablePoint)
                     },
