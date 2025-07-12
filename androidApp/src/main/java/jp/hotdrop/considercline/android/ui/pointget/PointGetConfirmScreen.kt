@@ -57,7 +57,7 @@ fun PointGetConfirmScreen(
                 PointAcquireEvent.NowLoading -> LoadingView()
                 is PointAcquireEvent.ShowErrorDialog -> {
                     ErrorDialog(
-                        errorMessage = event.throwable.message ?: stringResource(id = R.string.home_loading_error_label),
+                        errorMessage = event.throwable.message!!,
                         onDismiss = { viewModel.resetAcquireEvent() }
                     )
                 }
@@ -173,7 +173,7 @@ private fun LoadingView() {
 private fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(id = R.string.splash_error_label)) },
+        title = { Text(stringResource(id = R.string.point_get_confirm_error)) },
         text = { Text(errorMessage) },
         confirmButton = {
             TextButton(onClick = onDismiss) {

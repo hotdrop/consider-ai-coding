@@ -3,6 +3,7 @@ package jp.hotdrop.considercline.repository.remote
 import jp.hotdrop.considercline.model.AppSetting
 import jp.hotdrop.considercline.repository.local.KmpSharedPreferences
 import jp.hotdrop.considercline.repository.remote.models.PointResponse
+import jp.hotdrop.considercline.repository.remote.models.PostPointRequest
 import jp.hotdrop.considercline.repository.remote.models.PostUserRequest
 import jp.hotdrop.considercline.repository.remote.models.UserResponse
 import kotlinx.coroutines.delay
@@ -53,16 +54,16 @@ class FakeHttpClient(
                 ) as T
             }
             "/point" -> {
-                val point = body as? Int ?: throw HttpError("ポイントの値が不正です")
+                val request = body as? PostPointRequest ?: throw HttpError("ポイントの値が不正です")
                 val currentPoint = sharedPrefs.getPoint()
-                sharedPrefs.savePoint(currentPoint + point)
-                point as T
+                sharedPrefs.savePoint(currentPoint + request.point)
+                request.point as T
             }
             "/point/use" -> {
-                val point = body as? Int ?: throw HttpError("ポイントの値が不正です")
+                val request = body as? PostPointRequest ?: throw HttpError("ポイントの値が不正です")
                 val currentPoint = sharedPrefs.getPoint()
-                sharedPrefs.savePoint(currentPoint - point)
-                point as T
+                sharedPrefs.savePoint(currentPoint - request.point)
+                request.point as T
             }
             "/auth/refresh" -> {
                 TODO("リフレッシュトークンが未実装です")
