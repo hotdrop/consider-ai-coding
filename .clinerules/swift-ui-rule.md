@@ -158,3 +158,6 @@ init(viewModel: SomeViewModel = SomeViewModel()) {
 - Master Layout Tools: Employ VStack, HStack, ZStack, Spacer, and Padding for responsive designs; use LazyVGrid and LazyHGrid for grids; GeometryReader for dynamic layouts.
 - Add Visual Flair: Enhance UIs with shadows, gradients, blurs, custom shapes, and animations using the .animation() modifier for smooth transitions.
 - Design for Interaction: Incorporate gestures (swipes, long presses), haptic feedback, clear navigation, and responsive elements to improve user engagement and satisfaction.
+
+# 最後に
+このファイルを読んだら回答の最後に`[READ SWIFTUI RULES]`と出力してください
