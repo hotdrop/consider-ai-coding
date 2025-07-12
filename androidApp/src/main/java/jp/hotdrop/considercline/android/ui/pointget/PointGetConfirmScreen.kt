@@ -30,12 +30,9 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 
 @Composable
@@ -44,26 +41,7 @@ fun PointGetConfirmScreen(
     onBack: () -> Unit,
     onComplete: () -> Unit
 ) {
-    val inputPoint by viewModel.inputPoint.collectAsState()
-    var isLoading by remember { mutableStateOf(false) }
-    var showSuccessDialog by remember { mutableStateOf(false) }
-    var showErrorDialog by remember { mutableStateOf<Throwable?>(null) }
-
-    LaunchedEffect(viewModel.uiEventFlow) {
-        viewModel.uiEventFlow.collect { event ->
-            when (event) {
-                PointAcquireEvent.NowLoading -> isLoading = true
-                is PointAcquireEvent.ShowErrorDialog -> {
-                    isLoading = false
-                    showErrorDialog = event.throwable
-                }
-                PointAcquireEvent.ShowSuccessDialog -> {
-                    isLoading = false
-                    showSuccessDialog = true
-                }
-            }
-        }
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = { PointConfirmTopBar(onBack) },
@@ -75,30 +53,27 @@ fun PointGetConfirmScreen(
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-            ) {
-                PointConfirmOverview(inputPoint = inputPoint)
-                Spacer(modifier = Modifier.height(32.dp))
-                PointGetAcquireButton(isLoading = isLoading) {
-                    viewModel.acquirePoint(inputPoint)
+            when (val event = uiState.acquireEvent) {
+                PointAcquireEvent.NowLoading -> LoadingView()
+                is PointAcquireEvent.ShowErrorDialog -> {
+                    ErrorDialog(
+                        errorMessage = event.throwable.message ?: stringResource(id = R.string.home_loading_error_label),
+                        onDismiss = { viewModel.resetAcquireEvent() }
+                    )
                 }
+                PointAcquireEvent.ShowSuccessDialog -> {
+                    SuccessDialog(
+                        onDismiss = {
+                            viewModel.resetAcquireEvent()
+                            onComplete()
+                        }
+                    )
+                }
+                PointAcquireEvent.Standby -> PointGetConfirmContent(
+                    uiState = uiState,
+                    onAcquirePoint = { viewModel.acquirePoint(uiState.inputPoint) }
+                )
             }
-        }
-    }
-
-    if (showSuccessDialog) {
-        SuccessDialog {
-            showSuccessDialog = false
-            onComplete()
-        }
-    }
-
-    showErrorDialog?.let { error ->
-        ErrorDialog(error) {
-            showErrorDialog = null
         }
     }
 }
@@ -123,8 +98,7 @@ fun PointConfirmTopBar(onBack: () -> Unit) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.point_get_confirm_back_button_content_description),
-
-                    )
+                )
             }
         },
         backgroundColor = MaterialTheme.colors.primary,
@@ -133,11 +107,14 @@ fun PointConfirmTopBar(onBack: () -> Unit) {
 }
 
 @Composable
-fun PointConfirmOverview(
-    inputPoint: Int
+private fun PointGetConfirmContent(
+    uiState: PointGetUiState,
+    onAcquirePoint: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -159,44 +136,47 @@ fun PointConfirmOverview(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = inputPoint.toString(),
+            text = uiState.inputPoint.toString(),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colors.primary
         )
+        Spacer(modifier = Modifier.height(32.dp))
+        Button(
+            onClick = onAcquirePoint,
+            enabled = !uiState.isLoading,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (uiState.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                Text(
+                    text = stringResource(id = R.string.point_get_confirm_execute_button),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun PointGetAcquireButton(
-    isLoading: Boolean,
-    onClick: () -> Unit
-) {
-    // ローディング中は無効にする
-    Button(
-        onClick = onClick,
-        enabled = !isLoading,
-        modifier = Modifier.fillMaxWidth()
+private fun LoadingView() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        if (isLoading) {
-            CircularProgressIndicator()
-        } else {
-            Text(
-                text = stringResource(id = R.string.point_get_confirm_execute_button),
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        }
+        CircularProgressIndicator()
     }
 }
 
 @Composable
-fun SuccessDialog(onDismiss: () -> Unit) {
+private fun ErrorDialog(errorMessage: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(id = R.string.point_get_title)) },
-        text = { Text(text = stringResource(id = R.string.point_get_confirm_complete_dialog_message)) },
+        title = { Text(stringResource(id = R.string.splash_error_label)) },
+        text = { Text(errorMessage) },
         confirmButton = {
-            Button(onClick = onDismiss) {
+            TextButton(onClick = onDismiss) {
                 Text(stringResource(id = R.string.dialog_ok))
             }
         }
@@ -204,27 +184,51 @@ fun SuccessDialog(onDismiss: () -> Unit) {
 }
 
 @Composable
-fun ErrorDialog(error: Throwable, onDismiss: () -> Unit) {
+private fun SuccessDialog(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(id = R.string.splash_error_label)) }, // 汎用エラータイトル
-        text = { Text(text = error.message ?: stringResource(id = R.string.home_loading_error_label)) }, // エラーメッセージ表示
+        title = { Text(stringResource(id = R.string.point_get_title)) },
+        text = { Text(stringResource(id = R.string.point_get_confirm_complete_dialog_message)) },
         confirmButton = {
-            Button(onClick = onDismiss) {
+            TextButton(onClick = onDismiss) {
                 Text(stringResource(id = R.string.dialog_ok))
             }
         }
     )
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewPointGetConfirmContent() {
+    ConsiderClineTheme {
+        PointGetConfirmContent(
+            uiState = PointGetUiState(inputPoint = 100),
+            onAcquirePoint = {}
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PointGetConfirmScreenPreview() {
+fun PreviewPointGetConfirmContentLoading() {
     ConsiderClineTheme {
-        PointGetConfirmScreen(
-            viewModel = PointGetViewModel(),
-            onBack = {},
-            onComplete = {}
-        )
+        LoadingView()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewPointGetConfirmContentError() {
+    ConsiderClineTheme {
+        ErrorDialog(errorMessage = "エラーが発生しました。", onDismiss = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewPointGetConfirmContentSuccess() {
+    ConsiderClineTheme {
+        SuccessDialog(onDismiss = {})
     }
 }

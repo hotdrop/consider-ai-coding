@@ -5,14 +5,10 @@ import jp.hotdrop.considercline.android.ui.BaseViewModel
 import jp.hotdrop.considercline.di.KmpFactory
 import jp.hotdrop.considercline.model.Point
 import jp.hotdrop.considercline.usecase.PointUseCase
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,59 +16,63 @@ import javax.inject.Inject
 class PointGetViewModel @Inject constructor() : BaseViewModel() {
     private val pointUseCase: PointUseCase by lazy { KmpFactory.useCaseFactory.pointUseCase }
 
-    // TODO 以下はuiStateにした方が良い
-    private val _currentPoint = MutableStateFlow(Point(0))
-    val currentPoint: StateFlow<Point> = _currentPoint.asStateFlow()
-
-    private val _inputPoint = MutableStateFlow(0)
-    val inputPoint: StateFlow<Int> = _inputPoint.asStateFlow()
-
-    private val _showError = MutableStateFlow(false)
-    val showError: StateFlow<Boolean> = _showError.asStateFlow()
-
-    val isButtonEnabled: StateFlow<Boolean> = combine(_inputPoint, _showError) { input, error ->
-        input > 0 && !error
-    }.stateIn(
-        scope = this,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = false
-    )
-
-    // ポイント獲得処理のUIイベント
-    private val _uiEvent = Channel<PointAcquireEvent>(Channel.BUFFERED)
-    val uiEventFlow = _uiEvent.receiveAsFlow()
+    private val _uiState = MutableStateFlow(PointGetUiState())
+    val uiState: StateFlow<PointGetUiState> = _uiState.asStateFlow()
 
     init {
         launch {
-            val currentPoint = pointUseCase.find()
-            _currentPoint.value = currentPoint
+            _uiState.update { it.copy(isLoading = true) }
+            runCatching {
+                pointUseCase.find()
+            }.onSuccess { currentPoint ->
+                _uiState.update { it.copy(currentPoint = currentPoint, isLoading = false) }
+            }.onFailure { throwable ->
+                _uiState.update { it.copy(errorMessage = throwable.message, isLoading = false) }
+            }
         }
     }
 
     fun inputPoint(newInputPoint: Int, maxAvailablePoint: Int) {
-        _inputPoint.value = newInputPoint
-        validateInput(newInputPoint, maxAvailablePoint)
-    }
-
-    private fun validateInput(inputPoint: Int, maxAvailablePoint: Int) {
-        _showError.value = (inputPoint <= 0 || inputPoint > maxAvailablePoint)
+        _uiState.update {
+            val showError = (newInputPoint <= 0 || newInputPoint > maxAvailablePoint)
+            it.copy(
+                inputPoint = newInputPoint,
+                showError = showError,
+                isButtonEnabled = newInputPoint > 0 && !showError
+            )
+        }
     }
 
     fun acquirePoint(inputPoint: Int) {
         launch {
-            _uiEvent.send(PointAcquireEvent.NowLoading)
+            _uiState.update { it.copy(acquireEvent = PointAcquireEvent.NowLoading) }
             runCatching {
                 pointUseCase.acquire(inputPoint)
             }.onSuccess {
-                _uiEvent.send(PointAcquireEvent.ShowSuccessDialog)
+                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowSuccessDialog) }
             }.onFailure { throwable ->
-                _uiEvent.send(PointAcquireEvent.ShowErrorDialog(throwable))
+                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowErrorDialog(throwable)) }
             }
         }
     }
+
+    fun resetAcquireEvent() {
+        _uiState.update { it.copy(acquireEvent = PointAcquireEvent.Standby) }
+    }
 }
 
+data class PointGetUiState(
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val currentPoint: Point = Point(0),
+    val inputPoint: Int = 0,
+    val showError: Boolean = false,
+    val isButtonEnabled: Boolean = false,
+    val acquireEvent: PointAcquireEvent = PointAcquireEvent.Standby
+)
+
 sealed class PointAcquireEvent {
+    object Standby: PointAcquireEvent()
     object NowLoading: PointAcquireEvent()
     object ShowSuccessDialog: PointAcquireEvent()
     data class ShowErrorDialog(val throwable: Throwable): PointAcquireEvent()

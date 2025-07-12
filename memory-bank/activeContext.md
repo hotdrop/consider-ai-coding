@@ -21,16 +21,15 @@
   - 代わりに、MutableStateFlow<PointGetUiState>を一つだけ保持するように変更します。
   - init、inputPoint、acquirePointなどの関数は、このUiStateを更新するロジ-ックに書き換えます。
 
-### 3.2. pointget/PointGetInputScreen.kt のリファクタリング
-- `PointGetInputScreen`の責務分離: 
-  - 現在の`PointGetInputScreen`はUIの定義と状態の監視が混在しています。これを`Screen`と`Content`に分離します。
-  - リファクタリング後の`PointGetInputScreen`は、ViewModelからUiStateを監視し、その状態（例：isLoading, errorMessageの有無）に応じて、LoadingView、ErrorView、または後述のPointGetInputContentといった適切なComposableを呼び出す役割に限定します。
-- `PointGetInputContent`の作成: 
-  - `PointUseInputContent`を参考に、UIの具体的なレイアウトを担当す
-  - `PointGetInputContent`という新しいComposable関数を作成します。
-  - この関数は、UiStateを引数として受け取り、ポイント残高の表示、入力フィールド、確認ボタンなどの既存のUI要素を配置します。
-  - レイアウトはすでに完成されています。コンポーネントを移動するだけで絶対にコンポーネントの並び順、スタイル、Modifier等は修正しません。
-  - ユーザーからの入力イベント（テキストフィールドの変更、ボタンクリックなど）は、コールバック関数を通じてPointGetInputScreenに通知され、ViewModelに渡されます。この処理もすでに実装済みですので挙動を勝手に変えません。
+### 3.2. pointget/PointGetInputScreen.kt のリファクタリング (完了)
+- `PointGetInputScreen`の責務分離:
+  - 現在の`PointGetInputScreen`はUIの定義と状態の監視が混在しています。これを`Screen`と`Content`に分離しました。
+  - リファクタリング後の`PointGetInputScreen`は、ViewModelからUiStateを監視し、その状態（例：isLoading, errorMessageの有無）に応じて、LoadingView、ErrorView、または後述のPointGetInputContentといった適切なComposableを呼び出す役割に限定しました。
+- `PointGetInputContent`の作成:
+  - `PointUseInputContent`を参考に、UIの具体的なレイアウトを担当する`PointGetInputContent`という新しいComposable関数を作成しました。
+  - この関数は、UiStateを引数として受け取り、ポイント残高の表示、入力フィールド、確認ボタンなどの既存のUI要素を配置しました。
+  - レイアウトはすでに完成されています。コンポーネントを移動するだけで絶対にコンポーネントの並び順、スタイル、Modifier等は修正しませんでした。
+  - ユーザーからの入力イベント（テキストフィールドの変更、ボタンクリックなど）は、コールバック関数を通じてPointGetInputScreenに通知され、ViewModelに渡されます。この処理もすでに実装済みですので挙動を勝手に変えませんでした。
 
 ### 3.3. PointGetInputScreenのPreview拡充
 pointuse機能と同様に、`PointGetInputScreen`が取りうる各UI状態に対応したPreviewを作成します。これにより、UIの確認が容易になり、開発効率が向上します。
