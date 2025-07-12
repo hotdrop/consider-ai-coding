@@ -44,12 +44,13 @@ class PointUseViewModel @Inject constructor() : BaseViewModel() {
         }
     }
 
-    fun inputPoint(input: String) {
+    fun inputPoint(newInputPoint: Int) {
+        val errorMessage = validateInput(newInputPoint, _uiState.value.currentPoint)
         _uiState.update {
-            val inputPoint = input.toIntOrNull() ?: 0
             it.copy(
-                inputPoint = inputPoint,
-                errorMessage = validateInput(inputPoint, it.currentPoint)
+                inputPoint = newInputPoint,
+                errorMessage = errorMessage,
+                isEnableInputPoint = errorMessage == null && newInputPoint > 0
             )
         }
     }
@@ -86,14 +87,7 @@ data class UiState(
     val inputPoint: Int = 0,
     val currentPoint: Int = 0,
     val errorMessage: String? = null,
+    val isEnableInputPoint: Boolean = false,
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false
-) {
-    /**
-     * UiStateを更新するためのヘルパー関数。
-     * この関数は、UiStateの特定のプロパティのみを更新するために使用されます。
-     *
-     * @param block 現在のUiStateを受け取り、更新されたUiStateを返すラムダ関数。
-     */
-    fun update(block: UiState.() -> UiState): UiState = block()
-}
+)

@@ -133,7 +133,7 @@ fun PointGetOverview(balance: Int, maxAvailable: Int) {
             color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold)
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(R.string.point_get_input_attention, maxAvailable),
             color = Color.Black,
@@ -180,7 +180,7 @@ fun PointGetConfirmButton(
     onNavigateToConfirm: () -> Unit
 ) {
     Button(
-        onClick = { onNavigateToConfirm() },
+        onClick = onNavigateToConfirm,
         enabled = isEnabled,
         modifier = Modifier.fillMaxWidth()
     ) {

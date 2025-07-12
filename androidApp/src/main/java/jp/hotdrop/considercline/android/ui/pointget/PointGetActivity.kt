@@ -30,8 +30,6 @@ class PointGetActivity : ComponentActivity() {
         fun startForResult(
             activity: Activity,
             launcher: ActivityResultLauncher<Intent>
-        ) = launcher.launch(
-            Intent(activity, PointGetActivity::class.java)
-        )
+        ) = launcher.launch(Intent(activity, PointGetActivity::class.java))
     }
 }

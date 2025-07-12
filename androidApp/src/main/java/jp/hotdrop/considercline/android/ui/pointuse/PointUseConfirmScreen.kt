@@ -43,7 +43,8 @@ import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
 @Composable
 fun PointUseConfirmScreen(
     viewModel: PointUseViewModel,
-    onNavigateBack: () -> Unit
+    onBack: () -> Unit,
+    onComplete: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -52,7 +53,7 @@ fun PointUseConfirmScreen(
             TopAppBar(
                 title = { Text(stringResource(id = R.string.point_use_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = onBack) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }

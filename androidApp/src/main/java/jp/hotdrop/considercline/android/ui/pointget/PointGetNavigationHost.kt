@@ -1,7 +1,6 @@
 package jp.hotdrop.considercline.android.ui.pointget
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -15,22 +14,19 @@ fun PointGetNavigationHost(
     onClose: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {
-    val inputDestination = "pointGetInput"
-    val confirmDestination = "pointGetConfirm"
-
     NavHost(
         navController = navController,
-        startDestination = inputDestination
+        startDestination = PointGetScreen.Input.route
     ) {
-        composable(inputDestination) {
+        composable(PointGetScreen.Input.route) {
             PointGetInputScreen(
                 viewModel = viewModel,
-                onNavigateToConfirm = { navController.navigate(confirmDestination) },
+                onNavigateToConfirm = { navController.navigate(PointGetScreen.Confirm.route) },
                 onBack = onClose
             )
         }
 
-        composable(confirmDestination) {
+        composable(PointGetScreen.Confirm.route) {
             PointGetConfirmScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
@@ -38,4 +34,12 @@ fun PointGetNavigationHost(
             )
         }
     }
+}
+
+/**
+ * ポイント獲得機能の画面ルートを定義するsealed class。
+ */
+sealed class PointGetScreen(val route: String) {
+    object Input : PointGetScreen("pointGetInput")
+    object Confirm : PointGetScreen("pointGetConfirm")
 }
