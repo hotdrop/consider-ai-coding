@@ -1,4 +1,4 @@
-# Gemini Rules for E2E Test Server Project
+# Gemini Rules
 This file defines the rules Gemini must follow when developing on this project.
 
 ## 1. Overall Rules
