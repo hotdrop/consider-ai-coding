@@ -27,13 +27,6 @@ This file defines the rules Gemini must follow when developing on this project.
 - iOS native `iosApp` is a Swift implementation. Implement it in a Swift-like style while following iOS conventions.
 - Do not arbitrarily add unnecessary comments to existing code as it will make it difficult to see the differences.
 
-## 5. Using Memory Bank
-- When the user asks a question, be sure to read all Markdown files in the `memory-bank/` directory to fully understand the current task status and context.
-- When you have finished planning your implementation and are moving to the implementation phase, or when an implementation task is completed, be sure to update `activeContext.md` to reflect the current work status without omission.
-- **Strict adherence to step-by-step implementation**: Strictly adhere to the "must-follow" instructions in `activeContext.md` and implement the task one step at a time. After completing each step, get the user's confirmation before proceeding to the next step.
-- **Reporting compilation errors**: Since Gemini cannot automatically detect iOS compilation errors, if an error occurs, the user should share the specific error message.
-- **Update `activeContext.md`**: After completing each step, get the user's explicit approval before updating `activeContext.md`. Mark a step as complete only after the user's approval.
-
-## 6. Handling confidential files and .Geminiignore
+## 5. Handling confidential files and .Geminiignore
 - Sensitive information: `.env` files, `.keystore` files, and files containing API keys, tokens, secrets, and passwords are never read or modified.
 - `.Geminiignore`: No access is given to files and directories listed in the `.Geminiignore` file in the project root (build artifacts, sensitive files, OS-specific files, etc.). Files marked with 🔒 in `list_files` are forbidden.
