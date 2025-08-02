@@ -22,8 +22,8 @@
 ## 4. expect/actual の利用方針
 - プラットフォーム固有APIへのアクセスが必要な場合に限定して使用します。
 - 可能な限り`commonMain` でインターフェースを定義し、各ネイティブレイヤーでそのインターフェースを実装する方法を優先的に検討します。
-  - 例: Key-Valueストア (SharedPreferences/UserDefaults)
-  - `expect`/`actual` は、PlatformFileReaderやSecureStorageのように、システムAPIを直接ラップするような場合に適しています。
+  - 例: Key-Valueストア (`SharedPreferences`/`UserDefaults`)
+  - `expect`/`actual` は、`PlatformFileReader`や`SecureStorage`のように、システムAPIを直接ラップするような場合に適しています。
 
 # 5. 最後に
 このファイルを読んだら回答の最後に`[READ KMP RULES]`と出力してください
