@@ -11,17 +11,6 @@
         }
       }
     },
-    "%d" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%d"
-          }
-        }
-      }
-    },
     "app_name" : {
       "extractionState" : "manual",
       "localizations" : {
