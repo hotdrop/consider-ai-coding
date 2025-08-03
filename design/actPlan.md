@@ -39,36 +39,16 @@ graph TD
 | `HomeView.swift`    | 「ポイント獲得」ボタンのタップイベントに、`PointGetHostingController`をモーダルで表示する処理を実装する。 |
 
 ## 5. Localizable文字列の追加依頼
-実装に着手する前に、**Androidの`strings.xml`と既存の`Localizable.xcstrings`を基に**、以下の文字列を`Localizable.strings`に追加していただく必要があります。
-
-| Key                                       | Japanese (ja)                                          |
-| ----------------------------------------- | ------------------------------------------------------ |
-| `point_get_title`                         | ポイント獲得                                           |
-| `point_get_input_overview`                | 現在保持しているポイント数                             |
-| `point_get_input_attention %d`            | (※最大で保持できるポイントは%dです)                   |
-| `point_get_input_text_field_label`        | ポイントを入力                                         |
-| `point_get_input_confirm_button`          | 確認画面へ進む                                         |
-| `point_get_confirm_overview`              | ポイントを獲得します！                                 |
-| `point_get_confirm_detail`                | よろしければ「ポイントを獲得する」ボタンをタップしてください。 |
-| `point_get_confirm_point_label`           | 獲得ポイント                                           |
-| `point_get_confirm_execute_button`        | ポイントを獲得する                                     |
-| `point_get_confirm_complete_dialog_message` | ポイントを獲得しました！                               |
-| `point_get_confirm_error_dialog_title`    | エラー                                                 |
-| `point_get_input_error_over_zero`         | 0より大きい値を入力してください。                      |
-| `point_get_input_error_over_max`          | 最大で保持できるポイントを超えています。               |
-| `common_dialog_ok`                        | OK                                                     |
-| `common_dialog_title_success`             | 成功                                                   |
-| `common_back_button_content_description`  | 戻る                                                   |
+必要な文字列はすべてLocalizableに定義済みです。文字列はすべて必ずLocalizableから取得しましょう。
 
 ## 6. 実装タスクリスト
 以下の順序で実装を進めます。
 
-1.  **【ユーザー依頼】** `Localizable.strings`に上記リストの文字列を追加する。
-2.  **【Roo】** `PointGetViewModel.swift`を実装する。
-3.  **【Roo】** `PointGetInputView.swift`を実装する。
-4.  **【Roo】** `PointGetConfirmView.swift`を実装する。
-5.  **【Roo】** `PointGetHostingController.swift`を実装し、モーダル遷移を構成する。
-6.  **【Roo】** `HomeView.swift`を修正し、ポイント獲得画面への遷移を実装する。
+1. [ ] `PointGetViewModel.swift`を実装する。
+2. [ ] `PointGetInputView.swift`を実装する。
+3. [ ] `PointGetConfirmView.swift`を実装する。
+4. [ ] `PointGetHostingController.swift`を実装し、モーダル遷移を構成する。
+5. [ ] `HomeView.swift`を修正し、ポイント獲得画面への遷移を実装する。
 
 ## 7. レイアウト参照仕様
 SwiftUIでのレイアウト実装にあたっては、以下のAndroid側Compose実装ファイルを**唯一の正**とし、これと**全く同じレイアウト**になるように実装すること。Padding, Margin, Color, Font Size, Font Weightなど、すべてのスタイルは下記ファイルから読み取り、忠実に再現すること。

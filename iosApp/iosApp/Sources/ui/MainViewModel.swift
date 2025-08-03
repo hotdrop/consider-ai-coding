@@ -2,13 +2,6 @@ import Foundation
 import Combine
 import shared
 
-enum MainViewState {
-    case loading
-    case loaded(String) // userId
-    case firstTime
-    case error(String)
-}
-
 class MainViewModel: ObservableObject {
     @Published var viewState: MainViewState = .loading
 
@@ -55,4 +48,11 @@ extension MainViewModel {
         vm.viewState = state
         return vm
     }
+}
+
+enum MainViewState {
+    case loading
+    case loaded(String) // userId
+    case firstTime
+    case error(String)
 }

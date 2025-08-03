@@ -2,19 +2,8 @@ import Foundation
 import Combine
 import shared
 
-struct ErrorAlertItem: Identifiable, Equatable {
-    let id = UUID()
-    let message: String
-}
-
-enum ViewState: Equatable {
-    case idle
-    case loading
-    case success
-}
-
 class StartViewModel: ObservableObject {
-    @Published var viewState: ViewState = .idle
+    @Published var viewState: StartViewState = .idle
     @Published var errorAlertItem: ErrorAlertItem?
 
     private let appSettingUseCase: AppSettingUseCaseProtocol
@@ -39,10 +28,21 @@ class StartViewModel: ObservableObject {
 
 // Mock
 extension StartViewModel {
-    static func mock(_ state: ViewState, error: ErrorAlertItem? = nil) -> StartViewModel {
+    static func mock(_ state: StartViewState, error: ErrorAlertItem? = nil) -> StartViewModel {
         let vm = StartViewModel(appSettingUseCase: DummyAppSettingUseCase())
         vm.viewState = state
         vm.errorAlertItem = error
         return vm
     }
+}
+
+struct ErrorAlertItem: Identifiable, Equatable {
+    let id = UUID()
+    let message: String
+}
+
+enum StartViewState: Equatable {
+    case idle
+    case loading
+    case success
 }

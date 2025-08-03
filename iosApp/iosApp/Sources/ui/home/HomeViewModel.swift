@@ -2,18 +2,6 @@ import Foundation
 import Combine
 import shared
 
-enum HomeViewState: Equatable {
-    case initialLoading
-    case loaded(nickname: String, email: String, point: Int)
-    case error(String)
-}
-
-enum HistoryState: Equatable {
-    case loading
-    case loaded([PointHistory])
-    case error(String)
-}
-
 class HomeViewModel: ObservableObject {
     @Published var viewState: HomeViewState = .initialLoading
     @Published var historyState: HistoryState = .loading
@@ -83,4 +71,16 @@ extension HomeViewModel {
         vm.historyState = historyState
         return vm
     }
+}
+
+enum HomeViewState: Equatable {
+    case initialLoading
+    case loaded(nickname: String, email: String, point: Int)
+    case error(String)
+}
+
+enum HistoryState: Equatable {
+    case loading
+    case loaded([PointHistory])
+    case error(String)
 }
