@@ -50,8 +50,17 @@ class HomeViewModel: ObservableObject {
 
         do {
             self.historyState = .loading
-            let histories = try await historyUseCase.findAll()
-            self.historyState = .loaded(histories)
+            let result = try await historyUseCase.findAll()
+            switch result {
+            case let success as AppResultSuccess<NSArray>:
+                let histories = success.data as! [PointHistory]
+                self.historyState = .loaded(histories)
+            case let errorObj as AnyObject:
+                if let error = errorObj as? AppResultError {
+                    fatalError("\(error)")
+                }
+            default: break
+            }
         } catch {
             self.historyState = .error(error.localizedDescription)
         }

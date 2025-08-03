@@ -1,13 +1,17 @@
 import shared
 
 protocol HistoryUseCaseProtocol {
-    func findAll() async throws -> Array<PointHistory>
+    func findAll() async throws -> AppResult<NSArray>
 }
 
-extension HistoryUseCase: HistoryUseCaseProtocol {}
+extension HistoryUseCase: HistoryUseCaseProtocol {
+    func findAll() async throws -> AppResult<NSArray> {
+        return try await self.findAllForSwift()
+    }
+}
 
 class DummyHistoryUseCase: HistoryUseCaseProtocol {
-    func findAll() async throws -> Array<PointHistory> {
-        return []
+    func findAll() async -> AppResult<NSArray> {
+        return AppResultSuccess(data: [] as NSArray)
     }
 }
