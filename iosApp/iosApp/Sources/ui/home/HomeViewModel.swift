@@ -8,13 +8,13 @@ class HomeViewModel: ObservableObject {
 
     private let appSettingUseCase: AppSettingUseCaseProtocol
     private let pointUseCase: PointUseCaseProtocol
-    private let historyUseCase: HistoryUseCaseProtocol
+    private let historyUseCase: HistoryUseCase
     private let loadAction: (() async -> Void)?
 
     init(
         appSettingUseCase: AppSettingUseCaseProtocol = KmpFactory.shared.useCaseFactory.appSettingUseCase,
         pointUseCase: PointUseCaseProtocol = KmpFactory.shared.useCaseFactory.pointUseCase,
-        historyUseCase: HistoryUseCaseProtocol = KmpFactory.shared.useCaseFactory.historyUseCase,
+        historyUseCase: HistoryUseCase = KmpFactory.shared.useCaseFactory.historyUseCase,
         loadAction: (() async -> Void)? = nil
     ) {
         self.appSettingUseCase = appSettingUseCase
@@ -50,35 +50,16 @@ class HomeViewModel: ObservableObject {
 
         do {
             self.historyState = .loading
-            let result = try await historyUseCase.findAll()
+            let result = try await historyUseCase.findAll() as! Result<[PointHistory], any Error>
             switch result {
-            case let success as AppResultSuccess<NSArray>:
-                let histories = success.data as! [PointHistory]
+            case .success(let histories):
                 self.historyState = .loaded(histories)
-            case let errorObj as AnyObject:
-                if let error = errorObj as? AppResultError {
-                    fatalError("\(error)")
-                }
-            default: break
+            case .failure(let err):
+                fatalError("\(err)")
             }
         } catch {
             self.historyState = .error(error.localizedDescription)
         }
-    }
-}
-
-// Mock
-extension HomeViewModel {
-    static func mock(viewState: HomeViewState, historyState: HistoryState) -> HomeViewModel {
-        let vm = HomeViewModel(
-            appSettingUseCase: DummyAppSettingUseCase(),
-            pointUseCase: DummyPointUseCase(),
-            historyUseCase: DummyHistoryUseCase(),
-            loadAction: {}
-        )
-        vm.viewState = viewState
-        vm.historyState = historyState
-        return vm
     }
 }
 

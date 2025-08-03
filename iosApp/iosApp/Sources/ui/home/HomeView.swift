@@ -4,41 +4,12 @@ import shared
 struct HomeView: View {
     @StateObject var viewModel: HomeViewModel
     
-    private static let dateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy/MM/dd HH:mm:ss"
-        return f
-    }()
-    
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 20) {
-                HomeCardView(
-                    viewState: viewModel.viewState,
-                    dateFormatter: Self.dateFormatter
-                )
-                
-                HStack(spacing: 20) {
-                    PointActionButton(
-                        titleKey: "home_menu_get_point",
-                        icon: "account_balance_wallet"
-                    ) {
-                        // TODO: ポイント獲得画面への遷移
-                    }
-                    PointActionButton(
-                        titleKey: "home_menu_use_point",
-                        icon: "shopping_cart"
-                    ) {
-                        // TODO: ポイント利用画面への遷移
-                    }
-                }
-                .padding(.horizontal)
-                
-                HistorySectionView(
-                    historyState: viewModel.historyState
-                )
-            }
-            .padding(.vertical)
+            HomeContents(
+                viewState: viewModel.viewState,
+                historyState: viewModel.historyState
+            )
         }
         .navigationTitle("home_title")
         .navigationBarTitleDisplayMode(.inline)
@@ -46,6 +17,48 @@ struct HomeView: View {
         .task {
             await viewModel.load()
         }
+    }
+}
+
+// MARK: - HomeContents
+private struct HomeContents: View {
+    let viewState: HomeViewState
+    let historyState: HistoryState
+    
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy/MM/dd HH:mm:ss"
+        return f
+    }()
+    
+    var body: some View {
+        LazyVStack(spacing: 20) {
+            HomeCardView(
+                viewState: viewState,
+                dateFormatter: Self.dateFormatter
+            )
+            
+            HStack(spacing: 20) {
+                PointActionButton(
+                    titleKey: "home_menu_get_point",
+                    icon: "account_balance_wallet"
+                ) {
+                    // TODO: ポイント獲得画面への遷移
+                }
+                PointActionButton(
+                    titleKey: "home_menu_use_point",
+                    icon: "shopping_cart"
+                ) {
+                    // TODO: ポイント利用画面への遷移
+                }
+            }
+            .padding(.horizontal)
+            
+            HistorySectionView(
+                historyState: historyState
+            )
+        }
+        .padding(.vertical)
     }
 }
 
@@ -195,28 +208,27 @@ struct HomeView_Previews: PreviewProvider {
         Group {
             // データ読み込み中
             // 初回ロード中
-            HomeView(viewModel: HomeViewModel.mock(
+            HomeContents(
                 viewState: .initialLoading,
                 historyState: .loading
-            ))
-            .previewDisplayName("初回ロード中")
+            ).previewDisplayName("初回ロード中")
 
             // 履歴ロード中
-            HomeView(viewModel: HomeViewModel.mock(
+            HomeContents(
                 viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
                 historyState: .loading
-            ))
+            )
             .previewDisplayName("履歴ロード中")
             
             // 正常表示(履歴なし)
-            HomeView(viewModel: HomeViewModel.mock(
+            HomeContents(
                 viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
                 historyState: .loaded([])
-            ))
+            )
             .previewDisplayName("履歴なし")
 
             // 正常表示(履歴あり)
-            HomeView(viewModel: HomeViewModel.mock(
+            HomeContents(
                 viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
                 historyState: .loaded([
                     PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
@@ -247,14 +259,14 @@ struct HomeView_Previews: PreviewProvider {
                         nanosecond: 0
                     ), point: 200, detail: "利用")
                 ])
-            ))
+            )
             .previewDisplayName("履歴あり")
 
             // エラー表示
-            HomeView(viewModel: HomeViewModel.mock(
+            HomeContents(
                 viewState: .error("不明なエラーが発生しました。"),
                 historyState: .error("履歴の読み込みに失敗しました。")
-            ))
+            )
             .previewDisplayName("エラー")
         }
     }

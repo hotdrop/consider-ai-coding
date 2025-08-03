@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.android.ui.BaseViewModel
 import jp.hotdrop.considercline.di.KmpFactory
-import jp.hotdrop.considercline.model.AppResult
 import jp.hotdrop.considercline.model.AppSetting
 import jp.hotdrop.considercline.model.PointHistory
 import jp.hotdrop.considercline.model.Point
@@ -32,17 +31,18 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
 
     fun onLoadAllData() {
         launch {
-            when (val result = historyUseCase.findAll()) {
-                is AppResult.Success -> {
+            historyUseCase.findAll()
+                .onSuccess {
                     val uiState = HomeUiState(
                         appSetting = appSettingUseCase.find(),
                         currentPoint = pointUseCase.find(),
-                        histories = result.data
+                        histories = it
                     )
                     mutableUiState.postValue(uiState)
                 }
-                is AppResult.Error -> { /** TODO エラー処理 */ }
-            }
+                .onFailure {
+                    // TODO エラー処理
+                }
         }
     }
 }
