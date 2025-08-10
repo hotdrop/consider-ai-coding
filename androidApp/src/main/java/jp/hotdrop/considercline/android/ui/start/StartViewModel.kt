@@ -40,7 +40,7 @@ class StartViewModel @Inject constructor() : BaseViewModel() {
         launch {
             val nickName = _uiState.inputNickName
             val email = _uiState.inputEmail
-            when (val result = userUseCase.registerUser(nickName, email)) {
+            when (val result = dispatcherIO { userUseCase.registerUser(nickName, email) }) {
                 AppComplete.Complete -> {
                     _uiState = _uiState.copyWith(isComplete = true)
                 }

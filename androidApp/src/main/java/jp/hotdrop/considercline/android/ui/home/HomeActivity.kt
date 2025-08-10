@@ -39,6 +39,8 @@ class HomeActivity : AppCompatActivity() {
 
         initView()
         observe()
+
+        viewModel.onLoadAllData()
     }
 
     private fun initView() {

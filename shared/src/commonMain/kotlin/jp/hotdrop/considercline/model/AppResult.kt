@@ -1,6 +1,5 @@
 package jp.hotdrop.considercline.model
 
-
 /**
  * Android用のResultクラス
  */

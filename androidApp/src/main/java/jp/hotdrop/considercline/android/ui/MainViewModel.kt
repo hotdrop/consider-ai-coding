@@ -1,12 +1,10 @@
 package jp.hotdrop.considercline.android.ui
 
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.di.KmpFactory
 import jp.hotdrop.considercline.model.AppResult
-import kotlinx.coroutines.launch
 import jp.hotdrop.considercline.model.User
 import jp.hotdrop.considercline.usecase.UserUseCase
 import javax.inject.Inject
@@ -21,10 +19,9 @@ class MainViewModel @Inject constructor() : BaseViewModel() {
     private val mutableError = MutableLiveData<String>()
     val errorLiveData: LiveData<String> = mutableError
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
+    init {
         launch {
-            when(val result = userUseCase.find()) {
+            when(val result = dispatcherIO { userUseCase.find() }) {
                 is AppResult.Success -> mutableUser.postValue(result.data)
                 is AppResult.Error -> mutableError.postValue(result.error.message)
             }

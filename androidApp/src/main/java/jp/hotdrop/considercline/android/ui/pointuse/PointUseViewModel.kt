@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import jp.hotdrop.considercline.di.KmpFactory
@@ -17,7 +16,6 @@ import jp.hotdrop.considercline.model.Point
 
 @HiltViewModel
 class PointUseViewModel @Inject constructor() : BaseViewModel() {
-
     private val pointUseCase: PointUseCase by lazy {
         KmpFactory.useCaseFactory.pointUseCase
     }
@@ -28,9 +26,13 @@ class PointUseViewModel @Inject constructor() : BaseViewModel() {
     init {
         launch {
             _uiState.update { it.copy(isStartScreenLoading = true) }
-            when (val result = pointUseCase.find()) {
-                is AppResult.Success -> _uiState.update { it.copy(currentPoint = result.data, isStartScreenLoading = false) }
-                is AppResult.Error -> _uiState.update { it.copy(loadingError = result.error, isStartScreenLoading = false) }
+            when (val result = dispatcherIO { pointUseCase.find() }) {
+                is AppResult.Success -> _uiState.update {
+                    it.copy(currentPoint = result.data, isStartScreenLoading = false)
+                }
+                is AppResult.Error -> _uiState.update {
+                    it.copy(loadingError = result.error, isStartScreenLoading = false)
+                }
             }
         }
     }
@@ -53,7 +55,7 @@ class PointUseViewModel @Inject constructor() : BaseViewModel() {
         launch {
             _uiState.update { it.copy(runPointUseProcess = true) }
             val inputPoint = _uiState.value.inputPoint
-            when (val result = pointUseCase.use(inputPoint)) {
+            when (val result = dispatcherIO { pointUseCase.use(inputPoint) }) {
                 AppComplete.Complete -> _uiState.update {
                     it.copy(pointUseEvent = PointUseEvent.ShowSuccessDialog, isStartScreenLoading = false)
                 }

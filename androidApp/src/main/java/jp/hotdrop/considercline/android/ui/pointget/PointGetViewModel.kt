@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,12 +24,18 @@ class PointGetViewModel @Inject constructor() : BaseViewModel() {
     init {
         launch {
             _uiState.update { it.copy(isStartScreenLoading = true) }
-            when(val result = pointUseCase.find()) {
+            when(val result = dispatcherIO { pointUseCase.find() }) {
                 is AppResult.Success -> _uiState.update {
-                    it.copy(currentPoint = result.data, isStartScreenLoading = false)
+                    it.copy(
+                        currentPoint = result.data,
+                        isStartScreenLoading = false
+                    )
                 }
                 is AppResult.Error -> _uiState.update {
-                    it.copy(loadingErrorMessage = result.error.message, isStartScreenLoading = false)
+                    it.copy(
+                        loadingErrorMessage = result.error.message,
+                        isStartScreenLoading = false
+                    )
                 }
             }
         }
@@ -54,7 +59,7 @@ class PointGetViewModel @Inject constructor() : BaseViewModel() {
     fun acquirePoint(inputPoint: Int) {
         launch {
             _uiState.update { it.copy(runAcquiringProcess = true) }
-            when (val result = pointUseCase.acquire(inputPoint)) {
+            when (val result = dispatcherIO { pointUseCase.acquire(inputPoint) }) {
                 AppComplete.Complete -> _uiState.update {
                     it.copy(acquireEvent = PointAcquireEvent.ShowSuccessDialog, runAcquiringProcess = false)
                 }

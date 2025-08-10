@@ -1,6 +1,5 @@
 package jp.hotdrop.considercline.android.ui.home
 
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +15,7 @@ import jp.hotdrop.considercline.model.map
 import jp.hotdrop.considercline.usecase.UserUseCase
 import jp.hotdrop.considercline.usecase.HistoryUseCase
 import jp.hotdrop.considercline.usecase.PointUseCase
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.ensureActive
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,25 +30,23 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
     private val mutableError = MutableLiveData<AppError>()
     val errorLiveData: LiveData<AppError> = mutableError
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-        onLoadAllData()
-    }
-
     fun onLoadAllData() {
         launch {
-            historyUseCase.findAll()
-                .flatMap { histories ->
-                    pointUseCase.find().map { point -> histories to point }
+            dispatcherIO { userUseCase.find() }
+                .flatMap { user ->
+                    dispatcherIO { pointUseCase.find() }.map { point -> user to point }
                 }
-                .flatMap { (histories, point) ->
-                    userUseCase.find().map { user ->
+                .flatMap { (user, point) ->
+                    dispatcherIO { historyUseCase.findAll() }.map {  histories ->
                         HomeUiState(
                             user = user,
                             currentPoint = point,
                             histories = histories
                         )
                     }
+                }.also {
+                    // ここでキャンセルなら以降は一切実行されない
+                    ensureActive()
                 }.fold(
                     onSuccess = { mutableUiState.postValue(it) },
                     onFailure = { mutableError.postValue(it) }
@@ -62,16 +59,4 @@ data class HomeUiState(
     val currentPoint: Point? = null,
     val user: User,
     val histories: List<PointHistory>? = null,
-) {
-    fun copyWith(
-        currentPoint: Point? = null,
-        user: User? = null,
-        histories: List<PointHistory>? = null
-    ): HomeUiState {
-        return HomeUiState(
-            currentPoint = currentPoint ?: this.currentPoint,
-            user = user ?: this.user,
-            histories = histories ?: this.histories
-        )
-    }
-}
+)
