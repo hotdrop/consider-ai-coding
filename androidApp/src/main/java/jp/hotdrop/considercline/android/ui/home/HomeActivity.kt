@@ -14,7 +14,7 @@ import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.databinding.ActivityHomeBinding
 import jp.hotdrop.considercline.android.ui.pointget.PointGetActivity
 import jp.hotdrop.considercline.android.ui.pointuse.PointUseActivity
-import jp.hotdrop.considercline.model.AppSetting
+import jp.hotdrop.considercline.model.User
 import jp.hotdrop.considercline.model.PointHistory
 import androidx.recyclerview.widget.RecyclerView
 import jp.hotdrop.considercline.android.databinding.HistoryRowBinding
@@ -62,19 +62,22 @@ class HomeActivity : AppCompatActivity() {
 
     private fun observe() {
         viewModel.uiStateLiveData.observe(this) { uiState ->
-            viewUserInfo(uiState.appSetting)
+            viewUserInfo(uiState.user)
             uiState.currentPoint?.let { viewCurrentPoint(it) }
             uiState.histories?.let { viewHistories(it) }
+        }
+        viewModel.errorLiveData.observe(this) { error ->
+            // TODO エラーダイアログ表示
         }
         lifecycle.addObserver(viewModel)
     }
 
-    private fun viewUserInfo(appSetting: AppSetting) {
-        if (!appSetting.nickName.isNullOrEmpty()) {
-            binding.nickname.text = appSetting.nickName
+    private fun viewUserInfo(user: User) {
+        if (!user.nickName.isNullOrEmpty()) {
+            binding.nickname.text = user.nickName
         }
-        if (!appSetting.email.isNullOrEmpty()) {
-            binding.email.text = appSetting.email
+        if (!user.email.isNullOrEmpty()) {
+            binding.email.text = user.email
         }
         binding.homeCardProgressBar.isVisible = false
         binding.homeContentsGroup.isVisible = true

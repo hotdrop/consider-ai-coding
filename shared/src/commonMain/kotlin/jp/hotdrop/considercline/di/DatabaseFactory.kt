@@ -4,11 +4,11 @@ import jp.hotdrop.considercline.db.ConsiderClineDatabase
 import jp.hotdrop.considercline.db.DriverFactory
 import jp.hotdrop.considercline.repository.local.HistoryDao
 import jp.hotdrop.considercline.repository.local.KmpSharedPreferences
-import jp.hotdrop.considercline.repository.local.SettingDao
+import jp.hotdrop.considercline.repository.local.UserDao
 
 internal interface DatabaseFactory {
     val historyDao: HistoryDao
-    val settingDao: SettingDao
+    val userDao: UserDao
 }
 
 internal class DatabaseFactoryImpl(
@@ -22,5 +22,5 @@ internal class DatabaseFactoryImpl(
     }
 
     override val historyDao: HistoryDao by lazy { HistoryDao(database) }
-    override val settingDao: SettingDao by lazy { SettingDao(sharedPreferences) }
+    override val userDao: UserDao by lazy { UserDao(sharedPreferences) }
 }

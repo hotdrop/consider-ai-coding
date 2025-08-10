@@ -22,13 +22,12 @@ class PointGetViewModel @Inject constructor() : BaseViewModel() {
     init {
         launch {
             _uiState.update { it.copy(isStartScreenLoading = true) }
-            runCatching {
-                pointUseCase.find()
-            }.onSuccess { currentPoint ->
-                _uiState.update { it.copy(currentPoint = currentPoint, isStartScreenLoading = false) }
-            }.onFailure { throwable ->
-                _uiState.update { it.copy(loadingErrorMessage = throwable.message, isStartScreenLoading = false) }
-            }
+            pointUseCase.find()
+                .onSuccess { point ->
+                    _uiState.update { it.copy(currentPoint = point, isStartScreenLoading = false) }
+                }.onFailure { error ->
+                    _uiState.update { it.copy(loadingErrorMessage = error.message.toString(), isStartScreenLoading = false) }
+                }
         }
     }
 

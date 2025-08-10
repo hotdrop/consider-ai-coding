@@ -1,10 +1,9 @@
 package jp.hotdrop.considercline.repository.remote
 
-import jp.hotdrop.considercline.model.AppSetting
+import jp.hotdrop.considercline.model.User
 import jp.hotdrop.considercline.repository.local.KmpSharedPreferences
 import jp.hotdrop.considercline.repository.remote.models.PointResponse
 import jp.hotdrop.considercline.repository.remote.models.PostPointRequest
-import jp.hotdrop.considercline.repository.remote.models.PostUserRequest
 import jp.hotdrop.considercline.repository.remote.models.UserResponse
 import kotlinx.coroutines.delay
 import kotlin.uuid.ExperimentalUuidApi
@@ -23,7 +22,7 @@ class FakeHttpClient(
 
         return when (endpoint) {
             "/user/$FAKE_COFFEE_USER_ID" -> {
-                AppSetting(
+                User(
                     userId = FAKE_COFFEE_USER_ID,
                     nickName = "テストユーザー",
                     email = "test@example.com"

@@ -6,10 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.android.ui.BaseViewModel
 import jp.hotdrop.considercline.di.KmpFactory
-import jp.hotdrop.considercline.model.AppSetting
+import jp.hotdrop.considercline.model.User
 import jp.hotdrop.considercline.model.PointHistory
 import jp.hotdrop.considercline.model.Point
-import jp.hotdrop.considercline.usecase.AppSettingUseCase
+import jp.hotdrop.considercline.usecase.UserUseCase
 import jp.hotdrop.considercline.usecase.HistoryUseCase
 import jp.hotdrop.considercline.usecase.PointUseCase
 import kotlinx.coroutines.launch
@@ -17,12 +17,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor() : BaseViewModel() {
-    private val appSettingUseCase: AppSettingUseCase by lazy { KmpFactory.useCaseFactory.appSettingUseCase }
+    private val userUseCase: UserUseCase by lazy { KmpFactory.useCaseFactory.userUseCase }
     private val pointUseCase: PointUseCase by lazy { KmpFactory.useCaseFactory.pointUseCase }
     private val historyUseCase: HistoryUseCase by lazy { KmpFactory.useCaseFactory.historyUseCase }
 
     private val mutableUiState = MutableLiveData<HomeUiState>()
     val uiStateLiveData: LiveData<HomeUiState> = mutableUiState
+
+    private val mutableError = MutableLiveData<Throwable>()
+    val errorLiveData: LiveData<Throwable> = mutableError
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -32,16 +35,20 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
     fun onLoadAllData() {
         launch {
             historyUseCase.findAll()
-                .onSuccess {
-                    val uiState = HomeUiState(
-                        appSetting = appSettingUseCase.find(),
-                        currentPoint = pointUseCase.find(),
-                        histories = it
-                    )
-                    mutableUiState.postValue(uiState)
+                .onSuccess { histories ->
+                    pointUseCase.find()
+                        .onSuccess { point ->
+                            val uiState = HomeUiState(
+                                user = userUseCase.find(),
+                                currentPoint = point,
+                                histories = histories
+                            )
+                            mutableUiState.postValue(uiState)
+                        }
+
                 }
-                .onFailure {
-                    // TODO エラー処理
+                .onFailure { throwable ->
+                    mutableError.postValue(throwable)
                 }
         }
     }
@@ -49,17 +56,17 @@ class HomeViewModel @Inject constructor() : BaseViewModel() {
 
 data class HomeUiState(
     val currentPoint: Point? = null,
-    val appSetting: AppSetting,
-    val histories: List<PointHistory>? = null
+    val user: User,
+    val histories: List<PointHistory>? = null,
 ) {
     fun copyWith(
         currentPoint: Point? = null,
-        appSetting: AppSetting? = null,
+        user: User? = null,
         histories: List<PointHistory>? = null
     ): HomeUiState {
         return HomeUiState(
             currentPoint = currentPoint ?: this.currentPoint,
-            appSetting = appSetting ?: this.appSetting,
+            user = user ?: this.user,
             histories = histories ?: this.histories
         )
     }

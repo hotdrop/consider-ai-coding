@@ -25,13 +25,12 @@ class PointUseViewModel @Inject constructor() : BaseViewModel() {
     init {
         launch {
             _uiState.update { it.copy(isStartScreenLoading = true) }
-            runCatching {
-                pointUseCase.find()
-            }.onSuccess { currentPoint ->
-                _uiState.update { it.copy(currentPoint = currentPoint, isStartScreenLoading = false) }
-            }.onFailure { throwable ->
-                _uiState.update { it.copy(loadingErrorMessage = throwable.message, isStartScreenLoading = false) }
-            }
+            pointUseCase.find()
+                .onSuccess { point ->
+                    _uiState.update { it.copy(currentPoint = point, isStartScreenLoading = false) }
+                }.onFailure { throwable ->
+                    _uiState.update { it.copy(loadingErrorMessage = throwable.message, isStartScreenLoading = false) }
+                }
         }
     }
 
@@ -52,14 +51,13 @@ class PointUseViewModel @Inject constructor() : BaseViewModel() {
     fun usePoint() {
         launch {
             _uiState.update { it.copy(runPointUseProcess = true) }
-            runCatching {
-                val inputPoint = _uiState.value.inputPoint
-                pointUseCase.use(inputPoint)
-            }.onSuccess {
-                _uiState.update { it.copy(pointUseEvent = PointUseEvent.ShowSuccessDialog, isStartScreenLoading = false) }
-            }.onFailure { throwable ->
-                _uiState.update { it.copy(pointUseEvent = PointUseEvent.ShowErrorDialog(throwable), isStartScreenLoading = false) }
-            }
+            val inputPoint = _uiState.value.inputPoint
+            pointUseCase.use(inputPoint)
+                .onSuccess {
+                    _uiState.update { it.copy(pointUseEvent = PointUseEvent.ShowSuccessDialog, isStartScreenLoading = false) }
+                }.onFailure { throwable ->
+                    _uiState.update { it.copy(pointUseEvent = PointUseEvent.ShowErrorDialog(throwable), isStartScreenLoading = false) }
+                }
         }
     }
 
