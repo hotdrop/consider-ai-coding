@@ -6,17 +6,18 @@ class PointGetViewModel: ObservableObject {
     @Published var viewState: PointGetViewState = .loading
     @Published var acquireEvent: PointAcquireEvent?
 
-    private let pointUseCase: PointUseCaseProtocol
-    private let maxPoint = 20000 // TODO　本来は共通のconfigファイルから取得する
+    private let pointUseCase: PointUseCase
+    // TODO　本来は共通のconfigファイルから取得する
+    private let maxPoint = 20000
 
-    init(pointUseCase: PointUseCaseProtocol = KmpFactory.shared.useCaseFactory.pointUseCase) {
+    init(pointUseCase: PointUseCase = KmpFactory.shared.useCaseFactory.pointUseCase) {
         self.pointUseCase = pointUseCase
     }
 
     @MainActor
     func load() async {
         do {
-            let point = try await pointUseCase.find()
+            let point = try await pointUseCase.findForIos()
             viewState = .success(currentPoint: point, inputPoint: 0, errorMessage: nil, isEnableConfirm: false)
         } catch {
             viewState = .error("ポイント残高の取得に失敗しました。")
@@ -61,16 +62,6 @@ class PointGetViewModel: ObservableObject {
             return "最大ポイントを超えています。"
         }
         return nil
-    }
-}
-
-// Mock
-extension PointGetViewModel {
-    static func mock(_ state: PointGetViewState, acquireEvent: PointAcquireEvent? = nil) -> PointGetViewModel {
-        let vm = PointGetViewModel(pointUseCase: DummyPointUseCase())
-        vm.viewState = state
-        vm.acquireEvent = acquireEvent
-        return vm
     }
 }
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.di.KmpFactory
+import jp.hotdrop.considercline.model.AppResult
 import kotlinx.coroutines.launch
 import jp.hotdrop.considercline.model.User
 import jp.hotdrop.considercline.usecase.UserUseCase
@@ -23,11 +24,9 @@ class MainViewModel @Inject constructor() : BaseViewModel() {
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         launch {
-            try {
-                val appSetting = userUseCase.find()
-                mutableUser.postValue(appSetting)
-            } catch (e: Exception) {
-                mutableError.postValue(e.message ?: "Unknown error")
+            when(val result = userUseCase.find()) {
+                is AppResult.Success -> mutableUser.postValue(result.data)
+                is AppResult.Error -> mutableError.postValue(result.error.message)
             }
         }
     }

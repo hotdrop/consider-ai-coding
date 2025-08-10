@@ -87,7 +87,7 @@ private struct HomeCardView: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: Color("white")))
                             .padding(.top, 64)
-                    case .loaded(_, _, let point):
+                    case .loaded(_, let point):
                         Text("home_point_value \(point)")
                             .font(.title)
                             .fontWeight(.bold)
@@ -104,11 +104,15 @@ private struct HomeCardView: View {
                 switch viewState {
                 case .initialLoading:
                     EmptyView()
-                case .loaded(let nickname, let email, _):
-                    Text(nickname.isEmpty ? NSLocalizedString("home_un_setting_nickname", comment: "") : nickname)
+                case .loaded(let user, _):
+                    let nickName = user.nickName ?? ""
+                    let nickNameLabel = nickName.isEmpty ? NSLocalizedString("home_un_setting_nickname", comment: "") : nickName
+                    Text(nickNameLabel)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
-                    Text(email.isEmpty ? NSLocalizedString("home_un_setting_email", comment: "") : email)
+                    let email = user.email ?? ""
+                    let emailLabel = email.isEmpty ? NSLocalizedString("home_un_setting_email", comment: "") : email
+                    Text(emailLabel)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
                 case .error(_):
@@ -205,6 +209,7 @@ private struct HistoryRow: View {
  
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
+        let previewUser = User(userId: "123", nickName: "テスト太郎", email: "preview@example.com")
         Group {
             // データ読み込み中
             // 初回ロード中
@@ -215,21 +220,21 @@ struct HomeView_Previews: PreviewProvider {
 
             // 履歴ロード中
             HomeContents(
-                viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
+                viewState: .loaded(user: previewUser, point: 1000),
                 historyState: .loading
             )
             .previewDisplayName("履歴ロード中")
             
             // 正常表示(履歴なし)
             HomeContents(
-                viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
+                viewState: .loaded(user: previewUser, point: 1000),
                 historyState: .loaded([])
             )
             .previewDisplayName("履歴なし")
 
             // 正常表示(履歴あり)
             HomeContents(
-                viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
+                viewState: .loaded(user: previewUser, point: 1000),
                 historyState: .loaded([
                     PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
                         year: 2025,

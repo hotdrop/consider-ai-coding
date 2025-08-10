@@ -3,6 +3,9 @@ package jp.hotdrop.considercline.android.ui.pointget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.android.ui.BaseViewModel
 import jp.hotdrop.considercline.di.KmpFactory
+import jp.hotdrop.considercline.model.AppComplete
+import jp.hotdrop.considercline.model.AppError
+import jp.hotdrop.considercline.model.AppResult
 import jp.hotdrop.considercline.model.Point
 import jp.hotdrop.considercline.usecase.PointUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,12 +25,14 @@ class PointGetViewModel @Inject constructor() : BaseViewModel() {
     init {
         launch {
             _uiState.update { it.copy(isStartScreenLoading = true) }
-            pointUseCase.find()
-                .onSuccess { point ->
-                    _uiState.update { it.copy(currentPoint = point, isStartScreenLoading = false) }
-                }.onFailure { error ->
-                    _uiState.update { it.copy(loadingErrorMessage = error.message.toString(), isStartScreenLoading = false) }
+            when(val result = pointUseCase.find()) {
+                is AppResult.Success -> _uiState.update {
+                    it.copy(currentPoint = result.data, isStartScreenLoading = false)
                 }
+                is AppResult.Error -> _uiState.update {
+                    it.copy(loadingErrorMessage = result.error.message, isStartScreenLoading = false)
+                }
+            }
         }
     }
 
@@ -49,12 +54,13 @@ class PointGetViewModel @Inject constructor() : BaseViewModel() {
     fun acquirePoint(inputPoint: Int) {
         launch {
             _uiState.update { it.copy(runAcquiringProcess = true) }
-            runCatching {
-                pointUseCase.acquire(inputPoint)
-            }.onSuccess {
-                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowSuccessDialog, runAcquiringProcess = false) }
-            }.onFailure { throwable ->
-                _uiState.update { it.copy(acquireEvent = PointAcquireEvent.ShowErrorDialog(throwable), runAcquiringProcess = false) }
+            when (val result = pointUseCase.acquire(inputPoint)) {
+                AppComplete.Complete -> _uiState.update {
+                    it.copy(acquireEvent = PointAcquireEvent.ShowSuccessDialog, runAcquiringProcess = false)
+                }
+                is AppComplete.Error -> _uiState.update {
+                    it.copy(acquireEvent = PointAcquireEvent.ShowErrorDialog(result.error), runAcquiringProcess = false)
+                }
             }
         }
     }
@@ -85,5 +91,5 @@ data class PointGetUiState(
 
 sealed class PointAcquireEvent {
     object ShowSuccessDialog: PointAcquireEvent()
-    data class ShowErrorDialog(val throwable: Throwable): PointAcquireEvent()
+    data class ShowErrorDialog(val error: AppError): PointAcquireEvent()
 }

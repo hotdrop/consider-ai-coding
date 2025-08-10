@@ -10,6 +10,9 @@ import javax.inject.Inject
 import jp.hotdrop.considercline.di.KmpFactory
 import jp.hotdrop.considercline.usecase.PointUseCase
 import jp.hotdrop.considercline.android.ui.BaseViewModel
+import jp.hotdrop.considercline.model.AppComplete
+import jp.hotdrop.considercline.model.AppError
+import jp.hotdrop.considercline.model.AppResult
 import jp.hotdrop.considercline.model.Point
 
 @HiltViewModel
@@ -25,12 +28,10 @@ class PointUseViewModel @Inject constructor() : BaseViewModel() {
     init {
         launch {
             _uiState.update { it.copy(isStartScreenLoading = true) }
-            pointUseCase.find()
-                .onSuccess { point ->
-                    _uiState.update { it.copy(currentPoint = point, isStartScreenLoading = false) }
-                }.onFailure { throwable ->
-                    _uiState.update { it.copy(loadingErrorMessage = throwable.message, isStartScreenLoading = false) }
-                }
+            when (val result = pointUseCase.find()) {
+                is AppResult.Success -> _uiState.update { it.copy(currentPoint = result.data, isStartScreenLoading = false) }
+                is AppResult.Error -> _uiState.update { it.copy(loadingError = result.error, isStartScreenLoading = false) }
+            }
         }
     }
 
@@ -52,12 +53,14 @@ class PointUseViewModel @Inject constructor() : BaseViewModel() {
         launch {
             _uiState.update { it.copy(runPointUseProcess = true) }
             val inputPoint = _uiState.value.inputPoint
-            pointUseCase.use(inputPoint)
-                .onSuccess {
-                    _uiState.update { it.copy(pointUseEvent = PointUseEvent.ShowSuccessDialog, isStartScreenLoading = false) }
-                }.onFailure { throwable ->
-                    _uiState.update { it.copy(pointUseEvent = PointUseEvent.ShowErrorDialog(throwable), isStartScreenLoading = false) }
+            when (val result = pointUseCase.use(inputPoint)) {
+                AppComplete.Complete -> _uiState.update {
+                    it.copy(pointUseEvent = PointUseEvent.ShowSuccessDialog, isStartScreenLoading = false)
                 }
+                is AppComplete.Error -> _uiState.update {
+                    it.copy(pointUseEvent = PointUseEvent.ShowErrorDialog(result.error), isStartScreenLoading = false)
+                }
+            }
         }
     }
 
@@ -78,7 +81,7 @@ data class UiState(
     val currentPoint: Point = Point(0),
     val inputPoint: Int = 0,
     val isStartScreenLoading: Boolean = false,
-    val loadingErrorMessage: String? = null,
+    val loadingError: AppError? = null,
     val inputPointErrorMessage: String? = null,
     val isEnableInputPoint: Boolean = false,
     val pointUseEvent: PointUseEvent? = null,
@@ -87,5 +90,5 @@ data class UiState(
 
 sealed class PointUseEvent {
     object ShowSuccessDialog: PointUseEvent()
-    data class ShowErrorDialog(val throwable: Throwable): PointUseEvent()
+    data class ShowErrorDialog(val error: AppError): PointUseEvent()
 }

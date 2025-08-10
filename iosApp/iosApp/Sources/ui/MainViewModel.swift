@@ -5,48 +5,32 @@ import shared
 class MainViewModel: ObservableObject {
     @Published var viewState: MainViewState = .loading
 
-    private let useCase: AppSettingUseCaseProtocol
-    private let loadAction: (() async -> Void)?
+    private let userUseCase: UserUseCase
 
     init(
-        appSettingUseCase: AppSettingUseCaseProtocol = KmpFactory.shared.useCaseFactory.appSettingUseCase,
-        loadAction: (() async -> Void)? = nil
+        userUseCase: UserUseCase = KmpFactory.shared.useCaseFactory.userUseCase
     ) {
-        self.useCase = appSettingUseCase
-        self.loadAction = loadAction
+        self.userUseCase = userUseCase
     }
 
     @MainActor
     func load() async {
-        if Task.isCancelled { return }
-        if let customLoad = loadAction {
-            await customLoad()
-            return
-        }
-        
+        viewState = .loading
         do {
-            viewState = .loading
-            
-            let appSetting = try await useCase.find()
-            if appSetting.isInitialized(), let userId = appSetting.userId {
+            let user = try await userUseCase.findForIos()
+            if user.isInitialized(), let userId = user.userId {
                 self.viewState = .loaded(userId)
-            } else if appSetting.isInitialized() {
+            } else if user.isInitialized() {
                 self.viewState = .error("User ID is missing despite being initialized.")
             } else {
                 self.viewState = .firstTime
             }
-        } catch {
+        } catch is CancellationError {
+            // 何もしない（UIを変えない）
+            return
+        }  catch {
             self.viewState = .error(error.localizedDescription)
         }
-    }
-}
-
-// Mock
-extension MainViewModel {
-    static func mock(_ state: MainViewState) -> MainViewModel {
-        let vm = MainViewModel(appSettingUseCase: DummyAppSettingUseCase(), loadAction: {})
-        vm.viewState = state
-        return vm
     }
 }
 

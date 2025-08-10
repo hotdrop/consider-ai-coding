@@ -22,31 +22,38 @@ class HomeViewModel: ObservableObject {
 
     @MainActor
     func load() async {
-        if Task.isCancelled { return }
+        viewState = .initialLoading
         
         do {
-            self.viewState = .initialLoading
-            async let user = userUseCase.find()
-            async let point = pointUseCase.find()
+            async let userDefered = userUseCase.findForIos()
+            async let pointDefered = pointUseCase.findForIos()
+            async let historyDefered = historyUseCase.findAllForIos()
 
-            let (userResult, pointResult) = try await (user, point)
-            self.viewState = .loaded(user: user, point: Int(pointResult))
-        } catch {
-            self.viewState = .error(error.localizedDescription)
-            return
-        }
-
-        do {
-            self.historyState = .loading
-            let result = try await historyUseCase.findAll() as! Result<[PointHistory], any Error>
-            switch result {
-            case .success(let histories):
-                self.historyState = .loaded(histories)
-            case .failure(let err):
-                fatalError("\(err)")
+            let (userResult, pointResult, historiesResult) = try await (userDefered, pointDefered, historyDefered)
+            viewState = .loaded(
+                user: userResult,
+                point: Int(pointResult.balance)
+            )
+            historyState = .loaded(historiesResult)
+        } catch is CancellationError {
+            // TODO UIを変えない/戻すなどの処理を行う
+        } catch let e as AppError {
+            switch (e) {
+            case is AppError.NetworkError:
+                viewState = .error(e.message)
+                break
+            case is AppError.ProgramError:
+                viewState = .error(e.message)
+                break
+            case is AppError.UnknownError:
+                viewState = .error(e.message)
+                break
+            default:
+                viewState = .error(e.message)
+                break
             }
         } catch {
-            self.historyState = .error(error.localizedDescription)
+            viewState = .error("Unknown Error")
         }
     }
 }

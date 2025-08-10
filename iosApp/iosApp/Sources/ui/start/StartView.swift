@@ -4,8 +4,6 @@ import shared
 struct StartView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: StartViewModel
-    @State private var inputNickName: String = ""
-    @State private var inputEmail: String = ""
     
     private let onRegisterSuccess: () -> Void
 
@@ -16,30 +14,12 @@ struct StartView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("start_overview")
-                .font(.body)
-                .padding(.bottom, 16)
-
-            CustomTextField(
-                placeholder: NSLocalizedString("start_nick_name_field_label", comment: ""),
-                text: $inputNickName
-            )
-
-            CustomTextField(
-                placeholder: NSLocalizedString("start_email_field_label", comment: ""),
-                text: $inputEmail,
-                keyboardType: .emailAddress,
-                autocapitalization: .none
-            )
-
-            RegisterButton(isLoading: viewModel.viewState == .loading) {
-                Task {
-                    await viewModel.registerUser(nickname: inputNickName, email: inputEmail)
+            StartContents(
+                viewState: viewModel.viewState,
+                onRegisterUser: { email, password async in
+                    await viewModel.registerUser(nickname: email, email: email)
                 }
-            }
-            .padding(.top, 16)
-
-            Spacer()
+            )
         }
         .padding()
         .navigationTitle("start_title")
@@ -61,6 +41,42 @@ struct StartView: View {
                 onRegisterSuccess()
             }
         }
+    }
+}
+
+// MARK: - StartContents
+private struct StartContents: View {
+    let viewState: StartViewState
+    let onRegisterUser: (String, String) async -> Void
+    
+    @State private var inputNickName: String = ""
+    @State private var inputEmail: String = ""
+    
+    var body: some View {
+        Text("start_overview")
+            .font(.body)
+            .padding(.bottom, 16)
+
+        CustomTextField(
+            placeholder: NSLocalizedString("start_nick_name_field_label", comment: ""),
+            text: $inputNickName
+        )
+
+        CustomTextField(
+            placeholder: NSLocalizedString("start_email_field_label", comment: ""),
+            text: $inputEmail,
+            keyboardType: .emailAddress,
+            autocapitalization: .none
+        )
+
+        RegisterButton(isLoading: viewState == .loading) {
+            Task {
+                await onRegisterUser(inputNickName, inputEmail)
+            }
+        }
+        .padding(.top, 16)
+
+        Spacer()
     }
 }
 
@@ -114,17 +130,23 @@ private struct RegisterButton: View {
 struct StartView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            StartView(viewModel: StartViewModel.mock(.idle), onRegisterSuccess: {})
-                .previewDisplayName("画面初期表示")
+            StartContents(
+                viewState: .idle,
+                onRegisterUser: {_,_ in }
+            ).previewDisplayName("画面初期表示")
 
-            StartView(viewModel: StartViewModel.mock(.loading), onRegisterSuccess: {})
-                .previewDisplayName("実行中")
+            StartContents(
+                viewState: .loading,
+                onRegisterUser: {_,_ in }
+            ).previewDisplayName("実行中")
 
-            StartView(viewModel: StartViewModel.mock(.success), onRegisterSuccess: {})
-                .previewDisplayName("成功")
+            StartContents(
+                viewState: .success,
+                onRegisterUser: {_,_ in }
+            ).previewDisplayName("成功")
 
-            StartView(viewModel: StartViewModel.mock(.idle, error: ErrorAlertItem(message: "プレビューエラーメッセージ")), onRegisterSuccess: {})
-                .previewDisplayName("エラー")
+//            StartContents(viewState: .idle, error: ErrorAlertItem(message: "プレビューエラーメッセージ")), onRegisterSuccess: {})
+//                .previewDisplayName("エラー")
         }
     }
 }

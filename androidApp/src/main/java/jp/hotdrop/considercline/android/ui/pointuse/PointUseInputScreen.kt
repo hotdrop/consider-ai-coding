@@ -62,7 +62,7 @@ fun PointUseInputScreen(
         ) {
             when {
                 uiState.isStartScreenLoading -> LoadingView()
-                uiState.loadingErrorMessage != null -> ErrorView(errorMessage = uiState.loadingErrorMessage ?: "")
+                uiState.loadingError != null -> ErrorView(errorMessage = uiState.loadingError?.message ?: "")
                 else -> PointUseInputContent(
                     uiState = uiState,
                     onInputChanged = { viewModel.inputPoint(it) },

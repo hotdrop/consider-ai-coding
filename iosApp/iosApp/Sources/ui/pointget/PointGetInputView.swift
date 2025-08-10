@@ -21,28 +21,15 @@ struct PointGetInputView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.white.ignoresSafeArea()
-                switch viewModel.viewState {
-                case .loading:
-                    ProgressView()
-                case .success(let currentPoint, let inputPoint, let errorMessage, let isEnableConfirm):
-                    PointGetInputContentView(
-                        currentPoint: currentPoint,
-                        inputPoint: inputPoint,
-                        errorMessage: errorMessage,
-                        isEnableConfirm: isEnableConfirm,
-                        onInputChanged: { newValue in
-                            viewModel.inputPoint(newInputPoint: newValue)
-                        },
-                        onNavigateToConfirm: {
-                            onNavigateToConfirm(inputPoint)
-                        }
-                    )
-                case .error(let message):
-                    Text(message)
-                        .foregroundColor(.red)
-                        .font(.system(size: 16))
-                }
+                PointGetInputContents(
+                    viewState: viewModel.viewState,
+                    onInputPoint: { newValue in
+                        viewModel.inputPoint(newInputPoint: newValue)
+                    },
+                    onNavigateToConfirm: { newValue in
+                        onNavigateToConfirm(newValue)
+                    }
+                )
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -58,6 +45,38 @@ struct PointGetInputView: View {
         }
         .task {
             await viewModel.load()
+        }
+    }
+}
+
+// MARK: - PointGetInputContents
+private struct PointGetInputContents: View {
+    let viewState: PointGetViewState
+    let onInputPoint: (Int) -> Void
+    let onNavigateToConfirm: (Int) -> Void
+    
+    var body: some View {
+        Color.white.ignoresSafeArea()
+        switch viewState {
+        case .loading:
+            ProgressView()
+        case .success(let currentPoint, let inputPoint, let errorMessage, let isEnableConfirm):
+            PointGetInputContentView(
+                currentPoint: currentPoint,
+                inputPoint: inputPoint,
+                errorMessage: errorMessage,
+                isEnableConfirm: isEnableConfirm,
+                onInputChanged: { newValue in
+                    onInputPoint(newValue)
+                },
+                onNavigateToConfirm: {
+                    onNavigateToConfirm(inputPoint)
+                }
+            )
+        case .error(let message):
+            Text(message)
+                .foregroundColor(.red)
+                .font(.system(size: 16))
         }
     }
 }
@@ -169,16 +188,16 @@ private func PointGetConfirmButton(
 struct PointGetInputView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            PointGetInputView(
-                viewModel: PointGetViewModel.mock(.loading),
-                onNavigateToConfirm: { _ in },
-                onBack: {}
+            PointGetInputContents(
+                viewState: .loading,
+                onInputPoint: { _ in },
+                onNavigateToConfirm: { _ in }
             ).previewDisplayName("ロード中")
             
-            PointGetInputView(
-                viewModel: PointGetViewModel.mock(.success(currentPoint: Point(balance: Int32(2000)), inputPoint: 0, errorMessage: nil, isEnableConfirm: false)),
-                onNavigateToConfirm: { _ in },
-                onBack: {}
+            PointGetInputContents(
+                viewState: .success(currentPoint: Point(balance: Int32(2000)), inputPoint: 0, errorMessage: nil, isEnableConfirm: false),
+                onInputPoint: { _ in },
+                onNavigateToConfirm: { _ in }
             ).previewDisplayName("初期画面")
         }
     }
