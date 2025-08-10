@@ -1,12 +1,12 @@
 package jp.hotdrop.considercline.model
 
 /**
- * アプリケーション設定を保持するデータクラス
+ * ユーザー情報を保持するデータクラス
  * @property userId ユーザーID
  * @property nickName ニックネーム
  * @property email メールアドレス
  */
-data class AppSetting(
+data class User(
     val userId: String? = null,
     val nickName: String? = null,
     val email: String? = null

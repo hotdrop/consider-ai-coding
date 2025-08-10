@@ -1,6 +1,6 @@
 package jp.hotdrop.considercline.repository.local
 
-class SettingDao(
+class UserDao(
     private val sharedPreferences: KmpSharedPreferences
 ) {
     suspend fun getUserId(): String? = sharedPreferences.getUserId()

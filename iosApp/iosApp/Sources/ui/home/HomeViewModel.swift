@@ -2,9 +2,65 @@ import Foundation
 import Combine
 import shared
 
+class HomeViewModel: ObservableObject {
+    @Published var viewState: HomeViewState = .initialLoading
+    @Published var historyState: HistoryState = .loading
+
+    private let userUseCase: UserUseCase
+    private let pointUseCase: PointUseCase
+    private let historyUseCase: HistoryUseCase
+
+    init(
+        userUseCase: UserUseCase = KmpFactory.shared.useCaseFactory.userUseCase,
+        pointUseCase: PointUseCase = KmpFactory.shared.useCaseFactory.pointUseCase,
+        historyUseCase: HistoryUseCase = KmpFactory.shared.useCaseFactory.historyUseCase
+    ) {
+        self.userUseCase = userUseCase
+        self.pointUseCase = pointUseCase
+        self.historyUseCase = historyUseCase
+    }
+
+    @MainActor
+    func load() async {
+        viewState = .initialLoading
+        
+        do {
+            async let userDefered = userUseCase.findForIos()
+            async let pointDefered = pointUseCase.findForIos()
+            async let historyDefered = historyUseCase.findAllForIos()
+
+            let (userResult, pointResult, historiesResult) = try await (userDefered, pointDefered, historyDefered)
+            viewState = .loaded(
+                user: userResult,
+                point: Int(pointResult.balance)
+            )
+            historyState = .loaded(historiesResult)
+        } catch is CancellationError {
+            // TODO UIを変えない/戻すなどの処理を行う
+        } catch let e as AppError {
+            switch (e) {
+            case is AppError.NetworkError:
+                viewState = .error(e.message)
+                break
+            case is AppError.ProgramError:
+                viewState = .error(e.message)
+                break
+            case is AppError.UnknownError:
+                viewState = .error(e.message)
+                break
+            default:
+                viewState = .error(e.message)
+                break
+            }
+        } catch {
+            viewState = .error("Unknown Error")
+        }
+    }
+}
+
 enum HomeViewState: Equatable {
     case initialLoading
-    case loaded(nickname: String, email: String, point: Int)
+    case loaded(user: User, point: Int)
     case error(String)
 }
 
@@ -12,75 +68,4 @@ enum HistoryState: Equatable {
     case loading
     case loaded([PointHistory])
     case error(String)
-}
-
-class HomeViewModel: ObservableObject {
-    @Published var viewState: HomeViewState = .initialLoading
-    @Published var historyState: HistoryState = .loading
-
-    private let appSettingUseCase: AppSettingUseCaseProtocol
-    private let pointUseCase: PointUseCaseProtocol
-    private let historyUseCase: HistoryUseCaseProtocol
-    private let loadAction: (() async -> Void)?
-
-    init(
-        appSettingUseCase: AppSettingUseCaseProtocol = KmpFactory.shared.useCaseFactory.appSettingUseCase,
-        pointUseCase: PointUseCaseProtocol = KmpFactory.shared.useCaseFactory.pointUseCase,
-        historyUseCase: HistoryUseCaseProtocol = KmpFactory.shared.useCaseFactory.historyUseCase,
-        loadAction: (() async -> Void)? = nil
-    ) {
-        self.appSettingUseCase = appSettingUseCase
-        self.pointUseCase = pointUseCase
-        self.historyUseCase = historyUseCase
-        self.loadAction = loadAction
-    }
-
-    @MainActor
-    func load() async {
-        if Task.isCancelled { return }
-        if let customLoad = loadAction {
-            await customLoad()
-            return
-        }
-        
-        do {
-            self.viewState = .initialLoading
-            async let appSetting = appSettingUseCase.find()
-            async let point = pointUseCase.find()
-
-            let (appSettingResult, pointResult) = try await (appSetting, point)
-
-            if let nickname = appSettingResult.nickName, let email = appSettingResult.email {
-                self.viewState = .loaded(nickname: nickname, email: email, point: Int(pointResult.balance))
-            } else {
-                self.viewState = .error("NickNameとEmailが不正です")
-            }
-        } catch {
-            self.viewState = .error(error.localizedDescription)
-            return
-        }
-
-        do {
-            self.historyState = .loading
-            let histories = try await historyUseCase.findAll()
-            self.historyState = .loaded(histories)
-        } catch {
-            self.historyState = .error(error.localizedDescription)
-        }
-    }
-}
-
-// Mock
-extension HomeViewModel {
-    static func mock(viewState: HomeViewState, historyState: HistoryState) -> HomeViewModel {
-        let vm = HomeViewModel(
-            appSettingUseCase: DummyAppSettingUseCase(),
-            pointUseCase: DummyPointUseCase(),
-            historyUseCase: DummyHistoryUseCase(),
-            loadAction: {}
-        )
-        vm.viewState = viewState
-        vm.historyState = historyState
-        return vm
-    }
 }

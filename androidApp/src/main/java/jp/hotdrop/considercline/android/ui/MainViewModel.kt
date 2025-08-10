@@ -1,33 +1,29 @@
 package jp.hotdrop.considercline.android.ui
 
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.di.KmpFactory
-import kotlinx.coroutines.launch
-import jp.hotdrop.considercline.model.AppSetting
-import jp.hotdrop.considercline.usecase.AppSettingUseCase
+import jp.hotdrop.considercline.model.AppResult
+import jp.hotdrop.considercline.model.User
+import jp.hotdrop.considercline.usecase.UserUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor() : BaseViewModel() {
-    private val appSettingUseCase: AppSettingUseCase by lazy { KmpFactory.useCaseFactory.appSettingUseCase }
+    private val userUseCase: UserUseCase by lazy { KmpFactory.useCaseFactory.userUseCase }
 
-    private val mutableAppSetting = MutableLiveData<AppSetting>()
-    val appSettingLiveData: LiveData<AppSetting> = mutableAppSetting
+    private val mutableUser = MutableLiveData<User>()
+    val userLiveData: LiveData<User> = mutableUser
 
     private val mutableError = MutableLiveData<String>()
     val errorLiveData: LiveData<String> = mutableError
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
+    init {
         launch {
-            try {
-                val appSetting = appSettingUseCase.find()
-                mutableAppSetting.postValue(appSetting)
-            } catch (e: Exception) {
-                mutableError.postValue(e.message ?: "Unknown error")
+            when(val result = dispatcherIO { userUseCase.find() }) {
+                is AppResult.Success -> mutableUser.postValue(result.data)
+                is AppResult.Error -> mutableError.postValue(result.error.message)
             }
         }
     }

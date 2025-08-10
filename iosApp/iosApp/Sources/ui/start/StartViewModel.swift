@@ -2,25 +2,16 @@ import Foundation
 import Combine
 import shared
 
-struct ErrorAlertItem: Identifiable, Equatable {
-    let id = UUID()
-    let message: String
-}
-
-enum ViewState: Equatable {
-    case idle
-    case loading
-    case success
-}
-
 class StartViewModel: ObservableObject {
-    @Published var viewState: ViewState = .idle
+    @Published var viewState: StartViewState = .idle
     @Published var errorAlertItem: ErrorAlertItem?
 
-    private let appSettingUseCase: AppSettingUseCaseProtocol
+    private let userUseCase: UserUseCase
 
-    init(appSettingUseCase: AppSettingUseCaseProtocol = KmpFactory.shared.useCaseFactory.appSettingUseCase) {
-        self.appSettingUseCase = appSettingUseCase
+    init(
+        userUseCase: UserUseCase = KmpFactory.shared.useCaseFactory.userUseCase
+    ) {
+        self.userUseCase = userUseCase
     }
 
     @MainActor
@@ -28,8 +19,10 @@ class StartViewModel: ObservableObject {
         viewState = .loading
         
         do {
-            try await appSettingUseCase.registerUser(nickname: nickname, email: email)
+            try await userUseCase.registerUserForIos(nickname: nickname, email: email)
             viewState = .success
+        } catch is CancellationError {
+            // TODO UIを変えない/戻すなどの処理を行う
         } catch {
             viewState = .idle
             errorAlertItem = ErrorAlertItem(message: error.localizedDescription)
@@ -37,12 +30,13 @@ class StartViewModel: ObservableObject {
     }
 }
 
-// Mock
-extension StartViewModel {
-    static func mock(_ state: ViewState, error: ErrorAlertItem? = nil) -> StartViewModel {
-        let vm = StartViewModel(appSettingUseCase: DummyAppSettingUseCase())
-        vm.viewState = state
-        vm.errorAlertItem = error
-        return vm
-    }
+struct ErrorAlertItem: Identifiable, Equatable {
+    let id = UUID()
+    let message: String
+}
+
+enum StartViewState: Equatable {
+    case idle
+    case loading
+    case success
 }

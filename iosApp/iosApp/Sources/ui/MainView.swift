@@ -17,29 +17,15 @@ struct MainView: View {
     var body: some View {
         NavigationStack(path: $path) {
             VStack {
-                Image("start")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 264, height: 264)
-                    .padding(.vertical, 32)
-                
-                switch viewModel.viewState {
-                case .loading:
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
-
-                case .loaded(let userId):
-                    LoadedView(userId: userId)
-                        .task(id: userId) { path.append(MainRoute.home) }
-                
-                case .firstTime:
-                    FirstTimeView {
+                MainContents(
+                    viewState: viewModel.viewState,
+                    onLoadedNavigation: {
+                        path.append(MainRoute.home)
+                    },
+                    onFirstTimeView: {
                         path.append(MainRoute.start)
                     }
-                    
-                case .error(let message):
-                    Text("\(message)").foregroundColor(.red)
-                }
+                )
             }
             .navigationTitle("splash_title")
             .navigationBarTitleDisplayMode(.inline)
@@ -56,6 +42,39 @@ struct MainView: View {
         }
         .task {
             await viewModel.load()
+        }
+    }
+}
+
+// MARK: - MainContents
+private struct MainContents: View {
+    let viewState: MainViewState
+    let onLoadedNavigation: () -> Void
+    let onFirstTimeView: () -> Void
+    
+    var body: some View {
+        Image("start")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 264, height: 264)
+            .padding(.vertical, 32)
+        
+        switch viewState {
+        case .loading:
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
+
+        case .loaded(let userId):
+            LoadedView(userId: userId)
+                .task(id: userId) { onLoadedNavigation() }
+        
+        case .firstTime:
+            FirstTimeView {
+                onFirstTimeView()
+            }
+            
+        case .error(let message):
+            Text("\(message)").foregroundColor(.red)
         }
     }
 }
@@ -104,14 +123,23 @@ private struct FirstTimeView: View {
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            MainView(viewModel: MainViewModel.mock(.loading))
-                .previewDisplayName("読み込み中")
+            MainContents(
+                viewState: .loading,
+                onLoadedNavigation: {},
+                onFirstTimeView: {}
+            ).previewDisplayName("読み込み中")
 
-            MainView(viewModel: MainViewModel.mock(.firstTime))
-                .previewDisplayName("初回起動")
+            MainContents(
+                viewState: .firstTime,
+                onLoadedNavigation: {},
+                onFirstTimeView: {}
+            ).previewDisplayName("初回起動")
 
-            MainView(viewModel: MainViewModel.mock(.error("プレビュー用エラー")))
-                .previewDisplayName("エラー")
+            MainContents(
+                viewState: .error("プレビュー用エラー"),
+                onLoadedNavigation: {},
+                onFirstTimeView: {}
+            ).previewDisplayName("エラー")
         }
     }
 }
