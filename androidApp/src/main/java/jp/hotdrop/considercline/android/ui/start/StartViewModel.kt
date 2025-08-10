@@ -29,18 +29,21 @@ class StartViewModel @Inject constructor() : BaseViewModel() {
         _uiState = _uiState.copyWith(email = newValue)
     }
 
-    fun save() {
+    /**
+     * ユーザー情報を登録する
+     */
+    fun register() {
         _uiState = _uiState.copyWith(isLoading = true)
         mutableUiState.postValue(_uiState)
         launch {
-            try {
-                userUseCase.registerUser(_uiState.inputNickName, _uiState.inputEmail)
+            userUseCase.registerUser(
+                nickname = _uiState.inputNickName,
+                email = _uiState.inputEmail
+            ).onSuccess {
                 _uiState = _uiState.copyWith(isComplete = true)
-            } catch (e: Exception) {
-                mutableError.postValue(e.message)
-            } finally {
+            }.onFailure { throwable ->
                 _uiState = _uiState.copyWith(isLoading = false)
-                mutableUiState.postValue(_uiState)
+                mutableError.postValue(throwable.message)
             }
         }
     }

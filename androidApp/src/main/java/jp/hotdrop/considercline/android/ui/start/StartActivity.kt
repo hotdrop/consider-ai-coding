@@ -40,7 +40,7 @@ class StartActivity : AppCompatActivity() {
         }
 
         binding.registerButton.setOnClickListener {
-            viewModel.save()
+            viewModel.register()
         }
     }
 

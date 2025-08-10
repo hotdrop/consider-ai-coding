@@ -6,43 +6,31 @@ class HomeViewModel: ObservableObject {
     @Published var viewState: HomeViewState = .initialLoading
     @Published var historyState: HistoryState = .loading
 
-    private let appSettingUseCase: AppSettingUseCaseProtocol
-    private let pointUseCase: PointUseCaseProtocol
+    private let userUseCase: UserUseCase
+    private let pointUseCase: PointUseCase
     private let historyUseCase: HistoryUseCase
-    private let loadAction: (() async -> Void)?
 
     init(
-        appSettingUseCase: AppSettingUseCaseProtocol = KmpFactory.shared.useCaseFactory.appSettingUseCase,
-        pointUseCase: PointUseCaseProtocol = KmpFactory.shared.useCaseFactory.pointUseCase,
-        historyUseCase: HistoryUseCase = KmpFactory.shared.useCaseFactory.historyUseCase,
-        loadAction: (() async -> Void)? = nil
+        userUseCase: UserUseCase = KmpFactory.shared.useCaseFactory.userUseCase,
+        pointUseCase: PointUseCase = KmpFactory.shared.useCaseFactory.pointUseCase,
+        historyUseCase: HistoryUseCase = KmpFactory.shared.useCaseFactory.historyUseCase
     ) {
-        self.appSettingUseCase = appSettingUseCase
+        self.userUseCase = userUseCase
         self.pointUseCase = pointUseCase
         self.historyUseCase = historyUseCase
-        self.loadAction = loadAction
     }
 
     @MainActor
     func load() async {
         if Task.isCancelled { return }
-        if let customLoad = loadAction {
-            await customLoad()
-            return
-        }
         
         do {
             self.viewState = .initialLoading
-            async let appSetting = appSettingUseCase.find()
+            async let user = userUseCase.find()
             async let point = pointUseCase.find()
 
-            let (appSettingResult, pointResult) = try await (appSetting, point)
-
-            if let nickname = appSettingResult.nickName, let email = appSettingResult.email {
-                self.viewState = .loaded(nickname: nickname, email: email, point: Int(pointResult.balance))
-            } else {
-                self.viewState = .error("NickNameとEmailが不正です")
-            }
+            let (userResult, pointResult) = try await (user, point)
+            self.viewState = .loaded(user: user, point: Int(pointResult))
         } catch {
             self.viewState = .error(error.localizedDescription)
             return
@@ -65,7 +53,7 @@ class HomeViewModel: ObservableObject {
 
 enum HomeViewState: Equatable {
     case initialLoading
-    case loaded(nickname: String, email: String, point: Int)
+    case loaded(user: User, point: Int)
     case error(String)
 }
 
