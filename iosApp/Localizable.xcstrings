@@ -195,7 +195,7 @@
         }
       }
     },
-    "point_get_input_attention" : {
+    "point_get_input_attention %d" : {
       "extractionState" : "manual",
       "localizations" : {
         "ja" : {
@@ -424,21 +424,6 @@
           }
         }
       }
-    },
-    "ポイント獲得" : {
-
-    },
-    "今回獲得できるポイントの上限は%lldです。" : {
-
-    },
-    "獲得ポイント数" : {
-
-    },
-    "現在のポイント残高" : {
-
-    },
-    "確認画面へ" : {
-
     }
   },
   "version" : "1.0"

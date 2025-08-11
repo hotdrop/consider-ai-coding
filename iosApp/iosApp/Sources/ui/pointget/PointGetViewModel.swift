@@ -4,10 +4,10 @@ import shared
 
 class PointGetViewModel: ObservableObject {
     @Published var viewState: PointGetViewState = .loading
-    @Published var acquireEvent: PointAcquireEvent?
+    @Published var acquireEventState: PointAcquireEventState?
 
     private let pointUseCase: PointUseCase
-    // TODO　本来は共通のconfigファイルから取得する
+    // TODO　本来は設定ファイル（config？）から取得する
     private let maxPoint = 20000
 
     init(pointUseCase: PointUseCase = KmpFactory.shared.useCaseFactory.pointUseCase) {
@@ -18,9 +18,14 @@ class PointGetViewModel: ObservableObject {
     func load() async {
         do {
             let point = try await pointUseCase.findForIos()
-            viewState = .success(currentPoint: point, inputPoint: 0, errorMessage: nil, isEnableConfirm: false)
+            viewState = .success(
+                currentPoint: point,
+                inputPoint: 0,
+                errorMessage: nil,
+                isEnableConfirm: false
+            )
         } catch {
-            viewState = .error("ポイント残高の取得に失敗しました。")
+            viewState = .error(message: "ポイント残高の取得に失敗しました。")
         }
     }
 
@@ -48,9 +53,9 @@ class PointGetViewModel: ObservableObject {
     func acquirePoint(inputPoint: Int) async {
         do {
             try await pointUseCase.acquire(inputPoint: Int32(inputPoint))
-            acquireEvent = .success
+            acquireEventState = .success
         } catch {
-            acquireEvent = .error("ポイントの獲得に失敗しました。")
+            acquireEventState = .error(message: "ポイントの獲得に失敗しました。")
         }
     }
 
@@ -65,14 +70,14 @@ class PointGetViewModel: ObservableObject {
     }
 }
 
-enum PointGetViewState {
+enum PointGetViewState: Equatable {
     case loading
     case success(currentPoint: Point, inputPoint: Int, errorMessage: String?, isEnableConfirm: Bool)
-    case error(String)
+    case error(message: String)
 }
 
-enum PointAcquireEvent {
+enum PointAcquireEventState: Equatable {
     case success
-    case error(String)
+    case error(message: String)
 }
 
