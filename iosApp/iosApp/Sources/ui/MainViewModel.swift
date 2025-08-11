@@ -7,9 +7,7 @@ class MainViewModel: ObservableObject {
 
     private let userUseCase: UserUseCase
 
-    init(
-        userUseCase: UserUseCase = KmpFactory.shared.useCaseFactory.userUseCase
-    ) {
+    init(userUseCase: UserUseCase = KmpFactory.shared.useCaseFactory.userUseCase) {
         self.userUseCase = userUseCase
     }
 
@@ -34,7 +32,7 @@ class MainViewModel: ObservableObject {
     }
 }
 
-enum MainViewState {
+enum MainViewState: Equatable {
     case loading
     case loaded(String) // userId
     case firstTime
