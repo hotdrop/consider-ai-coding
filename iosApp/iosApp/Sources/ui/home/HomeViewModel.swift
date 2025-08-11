@@ -34,26 +34,27 @@ class HomeViewModel: ObservableObject {
                 user: userResult,
                 point: Int(pointResult.balance)
             )
-            historyState = .loaded(historiesResult)
+            historyState = .loaded(histories: historiesResult)
         } catch is CancellationError {
-            // TODO UIを変えない/戻すなどの処理を行う
+            // no operation(not change UI)
+            return
         } catch let e as AppError {
             switch (e) {
             case is AppError.NetworkError:
-                viewState = .error(e.message)
+                viewState = .error(message: e.message)
                 break
             case is AppError.ProgramError:
-                viewState = .error(e.message)
+                viewState = .error(message: e.message)
                 break
             case is AppError.UnknownError:
-                viewState = .error(e.message)
+                viewState = .error(message: e.message)
                 break
             default:
-                viewState = .error(e.message)
+                viewState = .error(message: e.message)
                 break
             }
         } catch {
-            viewState = .error("Unknown Error")
+            viewState = .error(message: "Unknown Error")
         }
     }
 }
@@ -61,11 +62,11 @@ class HomeViewModel: ObservableObject {
 enum HomeViewState: Equatable {
     case initialLoading
     case loaded(user: User, point: Int)
-    case error(String)
+    case error(message: String)
 }
 
 enum HistoryState: Equatable {
     case loading
-    case loaded([PointHistory])
-    case error(String)
+    case loaded(histories: [PointHistory])
+    case error(message: String)
 }

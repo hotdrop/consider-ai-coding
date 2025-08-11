@@ -5,15 +5,10 @@ struct HomeView: View {
     @StateObject var viewModel: HomeViewModel
     
     var body: some View {
-        ScrollView {
-            HomeContents(
-                viewState: viewModel.viewState,
-                historyState: viewModel.historyState
-            )
-        }
-        .navigationTitle("home_title")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
+        HomeContents(
+            viewState: viewModel.viewState,
+            historyState: viewModel.historyState
+        )
         .task {
             await viewModel.load()
         }
@@ -32,33 +27,38 @@ private struct HomeContents: View {
     }()
     
     var body: some View {
-        LazyVStack(spacing: 20) {
-            HomeCardView(
-                viewState: viewState,
-                dateFormatter: Self.dateFormatter
-            )
-            
-            HStack(spacing: 20) {
-                PointActionButton(
-                    titleKey: "home_menu_get_point",
-                    icon: "account_balance_wallet"
-                ) {
-                    // TODO: ポイント獲得画面への遷移
+        ScrollView {
+            LazyVStack(spacing: 20) {
+                HomeCardView(
+                    viewState: viewState,
+                    dateFormatter: Self.dateFormatter
+                )
+                
+                HStack(spacing: 20) {
+                    PointActionButton(
+                        titleKey: "home_menu_get_point",
+                        icon: "account_balance_wallet"
+                    ) {
+                        // TODO: ポイント獲得画面への遷移
+                    }
+                    PointActionButton(
+                        titleKey: "home_menu_use_point",
+                        icon: "shopping_cart"
+                    ) {
+                        // TODO: ポイント利用画面への遷移
+                    }
                 }
-                PointActionButton(
-                    titleKey: "home_menu_use_point",
-                    icon: "shopping_cart"
-                ) {
-                    // TODO: ポイント利用画面への遷移
-                }
+                .padding(.horizontal)
+                
+                HistorySectionView(
+                    historyState: historyState
+                )
             }
-            .padding(.horizontal)
-            
-            HistorySectionView(
-                historyState: historyState
-            )
+            .padding(.vertical)
         }
-        .padding(.vertical)
+        .navigationTitle("home_title")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
     }
 }
 
@@ -205,74 +205,74 @@ private struct HistoryRow: View {
     }
 }
 
-// MARK: - HomeView_Previews
+// MARK: - Previews
  
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         let previewUser = User(userId: "123", nickName: "テスト太郎", email: "preview@example.com")
         Group {
-            // データ読み込み中
-            // 初回ロード中
-            HomeContents(
-                viewState: .initialLoading,
-                historyState: .loading
-            ).previewDisplayName("初回ロード中")
+            NavigationStack {
+                HomeContents(
+                    viewState: .initialLoading,
+                    historyState: .loading
+                )
+            }.previewDisplayName("初回ロード中")
 
-            // 履歴ロード中
-            HomeContents(
-                viewState: .loaded(user: previewUser, point: 1000),
-                historyState: .loading
-            )
-            .previewDisplayName("履歴ロード中")
+            NavigationStack {
+                HomeContents(
+                    viewState: .loaded(user: previewUser, point: 1000),
+                    historyState: .loading
+                )
+            }.previewDisplayName("履歴ロード中")
             
-            // 正常表示(履歴なし)
-            HomeContents(
-                viewState: .loaded(user: previewUser, point: 1000),
-                historyState: .loaded([])
-            )
-            .previewDisplayName("履歴なし")
+            NavigationStack {
+                HomeContents(
+                    viewState: .loaded(user: previewUser, point: 1000),
+                    historyState: .loaded(histories: [])
+                )
+            }.previewDisplayName("履歴なし")
 
-            // 正常表示(履歴あり)
-            HomeContents(
-                viewState: .loaded(user: previewUser, point: 1000),
-                historyState: .loaded([
-                    PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
-                        year: 2025,
-                        monthNumber: 6,
-                        dayOfMonth: 21,
-                        hour: 10,
-                        minute: 20,
-                        second: 10,
-                        nanosecond: 0
-                    ), point: 100, detail: "獲得"),
-                    PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
-                        year: 2025,
-                        monthNumber: 6,
-                        dayOfMonth: 22,
-                        hour: 15,
-                        minute: 25,
-                        second: 20,
-                        nanosecond: 0
-                    ), point: 50, detail: "利用"),
-                    PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
-                        year: 2025,
-                        monthNumber: 6,
-                        dayOfMonth: 22,
-                        hour: 18,
-                        minute: 32,
-                        second: 56,
-                        nanosecond: 0
-                    ), point: 200, detail: "利用")
-                ])
-            )
-            .previewDisplayName("履歴あり")
+            NavigationStack {
+                HomeContents(
+                    viewState: .loaded(user: previewUser, point: 1000),
+                    historyState: .loaded(histories: [
+                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                            year: 2025,
+                            monthNumber: 6,
+                            dayOfMonth: 21,
+                            hour: 10,
+                            minute: 20,
+                            second: 10,
+                            nanosecond: 0
+                        ), point: 100, detail: "獲得"),
+                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                            year: 2025,
+                            monthNumber: 6,
+                            dayOfMonth: 22,
+                            hour: 15,
+                            minute: 25,
+                            second: 20,
+                            nanosecond: 0
+                        ), point: 50, detail: "利用"),
+                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                            year: 2025,
+                            monthNumber: 6,
+                            dayOfMonth: 22,
+                            hour: 18,
+                            minute: 32,
+                            second: 56,
+                            nanosecond: 0
+                        ), point: 200, detail: "利用")
+                    ])
+                )
+            }.previewDisplayName("履歴あり")
 
-            // エラー表示
-            HomeContents(
-                viewState: .error("不明なエラーが発生しました。"),
-                historyState: .error("履歴の読み込みに失敗しました。")
-            )
-            .previewDisplayName("エラー")
+            NavigationStack {
+                HomeContents(
+                    viewState: .error(message: "不明なエラーが発生しました。"),
+                    historyState: .error(message: "履歴の読み込みに失敗しました。")
+                )
+            }.previewDisplayName("エラー")
         }
     }
 }
