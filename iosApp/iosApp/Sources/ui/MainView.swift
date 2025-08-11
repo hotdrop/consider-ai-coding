@@ -6,6 +6,7 @@ private enum MainRoute: Hashable {
     case home
 }
 
+// MARK: - MainView
 struct MainView: View {
     @StateObject private var viewModel: MainViewModel
     
@@ -27,14 +28,21 @@ struct MainView: View {
                         path.append(MainRoute.start)
                         hasNavigatedToStart = true
                     }
-                },
-                onHomeRequested: {
-                    if !hasNavigatedToHome {
-                        path.append(MainRoute.home)
-                        hasNavigatedToHome = true
-                    }
                 }
             )
+            .navigationDestination(for: MainRoute.self) { route in
+                switch route {
+                case .start:
+                    StartView(onRegisterSuccess: {
+                        if !hasNavigatedToHome {
+                            path.append(MainRoute.home)
+                            hasNavigatedToHome = true
+                        }
+                    })
+                case .home:
+                    HomeView(viewModel: HomeViewModel())
+                }
+            }
         }
         .task {
             guard !didTriggerInitialLoad else { return }
@@ -59,7 +67,6 @@ struct MainView: View {
 private struct MainContents: View {
     let viewState: MainViewState
     let onStartRequested: () -> Void
-    let onHomeRequested: () -> Void
     
     var body: some View {
         VStack {
@@ -86,17 +93,10 @@ private struct MainContents: View {
         }
         .navigationTitle("splash_title")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: MainRoute.self) { route in
-            switch route {
-            case .start:
-                StartView(onRegisterSuccess: onHomeRequested)
-            case .home:
-                HomeView(viewModel: HomeViewModel())
-            }
-        }
     }
 }
 
+// MARK: - LoadedView
 private struct LoadedView: View {
     let userId: String
     
@@ -112,6 +112,7 @@ private struct LoadedView: View {
     }
 }
 
+// MARK: - FirstTimeView
 private struct FirstTimeView: View {
     let onStartRequested: () -> Void
     
@@ -136,38 +137,35 @@ private struct FirstTimeView: View {
     }
 }
 
+// MARK: - Previews
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NavigationStack {
                 MainContents(
                     viewState: .loading,
-                    onStartRequested: {},
-                    onHomeRequested: {}
+                    onStartRequested: {}
                 )
             }.previewDisplayName("読み込み中")
 
             NavigationStack {
                 MainContents(
                     viewState: .firstTime,
-                    onStartRequested: {},
-                    onHomeRequested: {}
+                    onStartRequested: {}
                 )
             }.previewDisplayName("初回起動")
 
             NavigationStack {
                 MainContents(
                     viewState: .error("プレビュー用エラー"),
-                    onStartRequested: {},
-                    onHomeRequested: {}
+                    onStartRequested: {}
                 )
             }.previewDisplayName("エラー")
             
             NavigationStack {
                 MainContents(
                     viewState: .loaded("preview-user-1234"),
-                    onStartRequested: {},
-                    onHomeRequested: {}
+                    onStartRequested: {}
                 )
             }.previewDisplayName("読み込み完了")
         }
