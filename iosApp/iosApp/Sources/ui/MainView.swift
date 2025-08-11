@@ -157,14 +157,14 @@ struct MainView_Previews: PreviewProvider {
 
             NavigationStack {
                 MainContents(
-                    viewState: .error("プレビュー用エラー"),
+                    viewState: .error(message: "プレビュー用エラー"),
                     onStartRequested: {}
                 )
             }.previewDisplayName("エラー")
             
             NavigationStack {
                 MainContents(
-                    viewState: .loaded("preview-user-1234"),
+                    viewState: .loaded(userId: "preview-user-1234"),
                     onStartRequested: {}
                 )
             }.previewDisplayName("読み込み完了")

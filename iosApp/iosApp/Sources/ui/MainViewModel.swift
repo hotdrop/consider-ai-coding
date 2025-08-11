@@ -17,24 +17,22 @@ class MainViewModel: ObservableObject {
         do {
             let user = try await userUseCase.findForIos()
             if user.isInitialized(), let userId = user.userId {
-                self.viewState = .loaded(userId)
-            } else if user.isInitialized() {
-                self.viewState = .error("User ID is missing despite being initialized.")
+                self.viewState = .loaded(userId: userId)
             } else {
                 self.viewState = .firstTime
             }
         } catch is CancellationError {
-            // 何もしない（UIを変えない）
+            // no operation(not change UI)
             return
         }  catch {
-            self.viewState = .error(error.localizedDescription)
+            self.viewState = .error(message: error.localizedDescription)
         }
     }
 }
 
 enum MainViewState: Equatable {
     case loading
-    case loaded(String) // userId
+    case loaded(userId: String)
     case firstTime
-    case error(String)
+    case error(message: String)
 }
