@@ -1,6 +1,7 @@
 import SwiftUI
 import shared
 
+// MARK: - HomeView
 struct HomeView: View {
     @StateObject var viewModel: HomeViewModel
     

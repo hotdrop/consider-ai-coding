@@ -4,7 +4,7 @@ import shared
 
 class StartViewModel: ObservableObject {
     @Published var viewState: StartViewState = .idle
-    @Published var errorAlertItem: ErrorAlertItem?
+    @Published var errorAlertItem: StartErrorAlertItem?
 
     private let userUseCase: UserUseCase
 
@@ -22,15 +22,16 @@ class StartViewModel: ObservableObject {
             try await userUseCase.registerUserForIos(nickname: nickname, email: email)
             viewState = .success
         } catch is CancellationError {
-            // TODO UIを変えない/戻すなどの処理を行う
+            // no operation(not change UI)
+            return
         } catch {
             viewState = .idle
-            errorAlertItem = ErrorAlertItem(message: error.localizedDescription)
+            errorAlertItem = StartErrorAlertItem(message: error.localizedDescription)
         }
     }
 }
 
-struct ErrorAlertItem: Identifiable, Equatable {
+struct StartErrorAlertItem: Identifiable {
     let id = UUID()
     let message: String
 }
