@@ -4,11 +4,18 @@ import shared
 // MARK: - HomeView
 struct HomeView: View {
     @StateObject var viewModel: HomeViewModel
+    let onNavigateToPointGet: () -> Void
+    
+    init(viewModel: HomeViewModel, onNavigateToPointGet: @escaping () -> Void = {}) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+        self.onNavigateToPointGet = onNavigateToPointGet
+    }
     
     var body: some View {
         HomeContents(
             viewState: viewModel.viewState,
-            historyState: viewModel.historyState
+            historyState: viewModel.historyState,
+            onNavigateToPointGet: onNavigateToPointGet
         )
         .task {
             await viewModel.load()
@@ -20,6 +27,7 @@ struct HomeView: View {
 private struct HomeContents: View {
     let viewState: HomeViewState
     let historyState: HistoryState
+    let onNavigateToPointGet: () -> Void
     
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -36,12 +44,20 @@ private struct HomeContents: View {
                 )
                 
                 HStack(spacing: 20) {
-                    PointActionButton(
-                        titleKey: "home_menu_get_point",
-                        icon: "account_balance_wallet"
-                    ) {
-                        // TODO: ポイント獲得画面への遷移
+                    Button(action: onNavigateToPointGet) {
+                        VStack {
+                            Image("account_balance_wallet")
+                                .resizable()
+                                .frame(width: 30, height: 30)
+                                .foregroundColor(Color("themeColor"))
+                            Text("home_menu_get_point")
+                                .foregroundColor(Color("themeColor"))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
                     }
+                    .buttonStyle(.plain)
+                    .tint(Color("themeColor"))
                     PointActionButton(
                         titleKey: "home_menu_use_point",
                         icon: "shopping_cart"
@@ -215,21 +231,24 @@ struct HomeView_Previews: PreviewProvider {
             NavigationStack {
                 HomeContents(
                     viewState: .initialLoading,
-                    historyState: .loading
+                    historyState: .loading,
+                    onNavigateToPointGet: {}
                 )
             }.previewDisplayName("初回ロード中")
 
             NavigationStack {
                 HomeContents(
                     viewState: .loaded(user: previewUser, point: 1000),
-                    historyState: .loading
+                    historyState: .loading,
+                    onNavigateToPointGet: {}
                 )
             }.previewDisplayName("履歴ロード中")
             
             NavigationStack {
                 HomeContents(
                     viewState: .loaded(user: previewUser, point: 1000),
-                    historyState: .loaded(histories: [])
+                    historyState: .loaded(histories: []),
+                    onNavigateToPointGet: {}
                 )
             }.previewDisplayName("履歴なし")
 
@@ -264,14 +283,16 @@ struct HomeView_Previews: PreviewProvider {
                             second: 56,
                             nanosecond: 0
                         ), point: 200, detail: "利用")
-                    ])
+                    ]),
+                    onNavigateToPointGet: {}
                 )
             }.previewDisplayName("履歴あり")
 
             NavigationStack {
                 HomeContents(
                     viewState: .error(message: "不明なエラーが発生しました。"),
-                    historyState: .error(message: "履歴の読み込みに失敗しました。")
+                    historyState: .error(message: "履歴の読み込みに失敗しました。"),
+                    onNavigateToPointGet: {}
                 )
             }.previewDisplayName("エラー")
         }

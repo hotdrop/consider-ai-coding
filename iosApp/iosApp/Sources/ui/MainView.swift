@@ -4,11 +4,13 @@ import SwiftUI
 private enum MainRoute: Hashable {
     case start
     case home
+    case pointGet
 }
 
 // MARK: - MainView
 struct MainView: View {
     @StateObject private var viewModel: MainViewModel
+    @StateObject private var pointGetViewModel = PointGetViewModel()
     
     @State private var path = NavigationPath()
     @State private var didTriggerInitialLoad = false
@@ -40,7 +42,28 @@ struct MainView: View {
                         }
                     })
                 case .home:
-                    HomeView(viewModel: HomeViewModel())
+                    HomeView(
+                        viewModel: HomeViewModel(),
+                        onNavigateToPointGet: {
+                            path.append(MainRoute.pointGet)
+                        }
+                    )
+                case .pointGet:
+                    PointGetView(viewModel: pointGetViewModel, rootPath: $path)
+                }
+            }
+            // PointGet フローのルート定義（ルート NavigationStack に集約）
+            .navigationDestination(for: PointGetRoute.self) { route in
+                switch route {
+                case .input:
+                    PointGetInputView(
+                        viewModel: pointGetViewModel,
+                        onNavigateToConfirm: {
+                            path.append(PointGetRoute.confirm)
+                        }
+                    )
+                case .confirm:
+                    PointGetConfirmView(viewModel: pointGetViewModel)
                 }
             }
         }

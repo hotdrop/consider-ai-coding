@@ -1,89 +1,57 @@
-# iOS SwiftUI 学習UI用の実装計画書
+# iOS PointGet 実装計画（Android 実装を準拠）
 
-## 1. 画面IA（iOS 16+前提 / NavigationStack）
-1. 登録/プロフィール画面（初回のみ or 設定から再編集）
-2. ホーム（ポイントダッシュボード）
-   1. 残高カード
-   2. 「獲得」「使用」アクション
-   3. 直近履歴プレビュー（上位3件）
-3. ポイント獲得モーダル（sheet）
-4. ポイント使用モーダル（sheet）
-5. 履歴一覧画面（検索/絞り込み/ページング）
-6. （任意）設定：再登録、デバッグ、アクセシビリティ調整
-7. 学習フォーカス
-  NavigationStack / sheet・dismiss管理 / .task(id:) / .refreshable / List+Identifiable / フォーム+FocusState / エラーバナー / スナップショット・Preview設計
+## 目的と範囲
+- iOS の PointGet フロー（入力 → 確認 → 完了）を SwiftUI で実装し、Android と同等のUX/バリデーション/非同期処理を再現する。
+- 既存の `shared`（KMM）`PointUseCase` を利用してポイント取得・獲得を行う。
 
-## 2. 各画面のUI仕様（学習ポイント付き）
-1. 登録/プロフィール
-   1. 入力: ニックネーム、メール（任意可）
-   2. アクション: 「登録」→ 成功でホームへ
-   3. 学習:
-      1. フォームバリデーション（同期/確定時分離）
-      2. FocusStateでフィールド遷移
-      3. 非同期中のフォームロックとプログレス表示
-      4. エラーのUI状態への畳み込み
-2. ホーム（ポイントダッシュボード）
-   1. 上部: ユーザー名＋残高カード（単位/フォーマット統一）
-   2. 中央: 「獲得」「使用」CTA（sheet起動）
-   3. 下部: 直近履歴プレビュー（タップで履歴一覧へ）
-   4. Pull to refresh で 残高＋直近履歴再取得
-   5. 学習:
-      1. .task 初期ロード / .refreshable
-      2. 直列/並列取得（残高と履歴の同時呼び出し → UI整形）
-      3. エラーバナー vs リトライボタンの出し分け
-      4. スケルトン表示（Shimmer不要。プレースホルダで十分）
-3. ポイント獲得（sheet）
-   1. 入力: 数値ステッパー/テキスト + 事前検証
-   2. 実行: acquire() 成功→ 残高/履歴を親側で再同期して自動反映、sheet閉
-   3. 学習:
-      1. sheetの親状態での制御（子はイベント通知のみ）
-      2. .task(id:)で成功フラグ変化→再取得の自動化
-      3. キーボード回避・数値入力UX
-4. ポイント使用（sheet）
-   1. 仕様は獲得と対称
-   2. バリデーション: 残高未満エラーの即時表示
-   3. 学習:
-      1. 入力依存のCTA活性/非活性
-      2. 競合中操作のキャンセル（最新のみ有効戦略）
-5. 履歴一覧
-   1. List（Identifiable）/ セクション（年月日）
-   2. フィルタ（獲得/使用/期間）＋ 検索（メモやカテゴリがあれば）
-   3. ページング: スクロール末尾で追加取得 or 「さらに読み込む」
-   4. 学習:
-      1. ForEachキー安定化
-      2. .task(id: query) で条件変更時にリロード
-      3. 空状態/終端到達/エラー時のUI）
+## 参照（Android 実装）
+- VM: `androidApp/.../pointget/PointGetViewModel.kt`
+- 画面: `PointGetInputScreen.kt`, `PointGetConfirmScreen.kt`
+- ルーティング: `PointGetNavigationHost.kt`
 
-## 3. 状態とデータフロー（衝突しない非同期）
-- 単一ソース: ルート（ホーム）に AppState 相当を集約
-  - user: Loadable<User>
-  - balance: Loadable<Point>
-  - recentHistory: Loadable<[PointHistory]>
-- 子sheetの責務: 入力→UseCase呼び出し→結果イベントのみ親へ（成功/失敗）
-- 再同期のトリガ: 親の .task(id: reloadToken) で 成功イベントをキーに再取得
-- キャンセル戦略: ユーザ操作時は既存Taskキャンセル→新規起動。Pull to refresh中の自動取得はスキップ。
+## 現状の iOS 実装（確認）
+- ルーティング: `PointGetView`（`NavigationStack` + `PointGetRouter`）
+- VM: `PointGetViewModel.swift`（`load`, `inputPoint`, `acquirePoint`, `validateInput` 実装済）
+- 画面: `PointGetInputView.swift`（入力画面はほぼ実装済、Confirm 遷移は TODO）
+- 画面: `PointGetConfirmView.swift`（未実装）
 
-## 4. Preview/モック運用（効率化のキモ）
-- 各ViewにPureなコンポーネントを作り、Previewは固定データで
-- VMの API 呼出しは View から分離（PreviewがAPIを叩かない）
-- 履歴一覧は多量データ・長文・Dynamic Type・ダーク/ライトをテンプレで用意
-- スナップショットはホーム/履歴/シートの代表3画面だけでも十分に価値
+## 実装タスク
+1) ルーティング接続
+   - `PointGetRouter.input(...)` の `onNavigateToConfirm` で `path.append(.confirm)` を呼ぶ。
+   - Confirm → 完了: `acquirePoint` 成功で `PointGetView` の `onChange(acquireEventState)` が `.complete` に遷移済（維持）。
+2) Confirm 画面の実装（`iosApp/.../screen/PointGetConfirmView.swift`）
+   - 引数: `viewModel: PointGetViewModel` を受け取り、`viewModel.viewState` から `inputPoint` を参照。
+   - UI: 概要文、入力ポイント表示、実行ボタン、処理中インジケータ、エラーダイアログ（Alert）。
+   - 実行: ボタンで `Task { await viewModel.acquirePoint(inputPoint: inputPoint) }`。
+   - 成功: 画面内では何もしない（遷移は `PointGetView` の `onChange` が担当）。
+   - 失敗: `acquireEventState == .error` を監視して `Alert` 表示、閉じると `acquireEventState = nil` に戻す。
+3) 入力画面からの遷移
+   - `PointGetInputView` の `onNavigateToConfirm` コールバックで画面遷移を発火（Router 経由）。
+   - 併せて `PointGetViewModel` の `viewState` に保持されている `inputPoint` をそのまま Confirm で表示。
+4) バリデーション/上限
+   - 現在 `maxPoint=20000` を `PointGetViewModel` に保持。将来は設定/定数化（`Localizable` or Config）を TODO コメントで明示。
+5) 文言/多言語
+   - 既存キー（例: `point_get_input_*`）に合わせて Confirm 用キーを `Localizable.xcstrings` に追加（例: `point_get_confirm_overview`, `..._execute_button`, `..._error`）。
+6) アクセシビリティ/デザイン
+   - ボタン活性/非活性、カラー（`Color("themeColor")` 等）を入力画面と揃える。
 
-## 5. 実装順（最短で学べる導線）
-1. ホーム骨格（静的UI） → 状態型 Loadable 適用
-2. 残高＋直近履歴の取得（.task / .refreshable）
-3. 履歴一覧（List・セクション・空状態）
-4. 獲得sheet（フォーム・成功時ハンドバック→親で再同期）
-5. 使用sheet（対称設計 + 残高バリデーション）
-6. 登録画面（初回導線 + 設定からの再編集）
-7. エラーハンドリング/バナー/アクセシビリティ磨き
-8. スナップショット/Previewテンプレ拡充
+## 画面と状態の要点
+- ViewState
+  - `.loading` → 初期取得（`load()`）
+  - `.success(currentPoint, inputPoint, errorMessage, isEnableConfirm)`
+  - `.error(message)`
+- Acquire イベント
+  - `.success` → `PointGetView` で履歴クリアし `.complete` へ
+  - `.error(message)` → Confirm 画面で Alert 表示
 
-## 6. 学習テーマ × 画面マッピング
-- NavigationStack / sheet → ホーム／獲得・使用sheet
-- .task / .task(id:) / .refreshable → ホーム／履歴
-- List/ForEach/Identifiable → 履歴
-- Form / FocusState / バリデーション → 登録／獲得／使用
-- 状態設計（Loading/Content/Error/Empty） → 全画面
-- イベントハンドバック（親が状態更新） → sheet → ホーム
-- アクセシビリティ（Dynamic Type/ヒット領域） → 全画面
+## テスト計画（手動）
+- 初期起動で `load()` 成功し Input に遷移する。
+- 0 以下/上限超過でエラー文言表示、Confirm ボタン非活性。
+- 正常値で Confirm 遷移、実行中スピナー表示、成功で Complete へ遷移。
+- 失敗時にエラー Alert が表示され閉じると再操作可能。
+
+## 完了の定義（DoD）
+- 入力→確認→完了の一連の遷移が再現できる。
+- Android と同等のバリデーション/メッセージ/ローディングが実装。
+- 文言が `Localizable.xcstrings` に登録され、日本語/英語で崩れない。
+- `shared` の `PointUseCase` を経由して処理できる。
