@@ -14,8 +14,6 @@ struct PointGetRouter {
             input(viewModel: viewModel, path: path, dismiss: dismiss)
         case .confirm:
             confirm(viewModel: viewModel, path: path)
-        case .complete:
-            complete(dismiss: dismiss)
         }
     }
     
@@ -54,23 +52,6 @@ struct PointGetRouter {
                         path.wrappedValue.removeLast()
                     } label: {
                         Image(systemName: "arrow.backward")
-                    }
-                }
-            }
-    }
-    
-    // MARK: - Complete
-    private static func complete(
-        dismiss: DismissAction
-    ) -> some View {
-        PointGetCompleteView()
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
                     }
                 }
             }

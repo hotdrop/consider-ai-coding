@@ -4,7 +4,6 @@ import shared
 enum PointGetRoute: Hashable {
     case input
     case confirm
-    case complete
 }
 
 struct PointGetView: View {
@@ -56,21 +55,6 @@ struct PointGetView: View {
             // success 到達でフロー開始（input へ）
             if case .success = state, currentRoute == nil {
                 path.append(.input)
-            }
-        }
-        .onChange(of: viewModel.acquireEventState) { eventState in
-            // 獲得イベントで complete へ（戻れない仕様）
-            guard let eventState else { return }
-            switch eventState {
-            case .success:
-                // 完了後は入力画面や確認画面には戻らない仕様のため、履歴を消して complete 画面のみ残す
-                path.removeAll()
-                path.append(.complete)
-            case .error(let message):
-                // ここでアラート表示などのエラー処理を行う（今回は Router 側でも各画面側でも処理可能）
-                break
-            default:
-                break
             }
         }
         .onChange(of: path) { newPath in

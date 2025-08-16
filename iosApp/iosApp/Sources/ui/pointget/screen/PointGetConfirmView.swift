@@ -2,10 +2,10 @@ import SwiftUI
 import shared
 
 struct PointGetConfirmView: View {
+    @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: PointGetViewModel
-    @State private var isAcquiring: Bool = false
-    @State private var showError: Bool = false
-    @State private var errorMessage: String = ""
+    // ローカルの実行フラグのみ保持（結果はVMのEventを参照）
+    @State private var startedAcquire: Bool = false
 
     var body: some View {
         ZStack {
@@ -21,45 +21,38 @@ struct PointGetConfirmView: View {
             case .success(_, let inputPoint, _, _):
                 PointGetConfirmContents(
                     inputPoint: inputPoint,
-                    isAcquiring: isAcquiring,
+                    isAcquiring: startedAcquire && (viewModel.acquireEventState == nil),
+                    acquireEventState: viewModel.acquireEventState,
                     onExecute: {
-                        guard !isAcquiring else { return }
-                        isAcquiring = true
+                        guard !(startedAcquire && (viewModel.acquireEventState == nil)) else { return }
+                        startedAcquire = true
                         Task { await viewModel.acquirePoint(inputPoint: inputPoint) }
+                    },
+                    onCompleteOk: {
+                        startedAcquire = false
+                        viewModel.acquireEventState = nil
+                        dismiss()
+                    },
+                    onErrorOk: {
+                        startedAcquire = false
+                        viewModel.acquireEventState = nil
                     }
                 )
             }
         }
-        .onChange(of: viewModel.acquireEventState) { event in
-            guard let event else { return }
-            switch event {
-            case .success:
-                // 遷移は PointGetView 側の onChange で行う
-                isAcquiring = false
-            case .error(let message):
-                isAcquiring = false
-                errorMessage = message
-                showError = true
-            }
-        }
-        .alert("point_get_confirm_error", isPresented: $showError) {
-            Button("dialog_ok") {
-                showError = false
-                viewModel.acquireEventState = nil
-            }
-        } message: {
-            Text(errorMessage)
-        }
+        // アラートは Contents 側で表示
     }
 
 }
 
 // MARK: - Contents (for Preview)
-
 private struct PointGetConfirmContents: View {
     let inputPoint: Int
     let isAcquiring: Bool
+    let acquireEventState: PointAcquireEventState?
     let onExecute: () -> Void
+    let onCompleteOk: () -> Void
+    let onErrorOk: () -> Void
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
@@ -110,6 +103,33 @@ private struct PointGetConfirmContents: View {
             Spacer()
         }
         .padding(.horizontal, 24)
+        // 完了ダイアログ
+        .alert(
+            "point_get_confirm_complete_dialog_message",
+            isPresented: Binding(
+                get: { acquireEventState == .success },
+                set: { presented in if !presented { onCompleteOk() } }
+            )
+        ) {
+            Button("dialog_ok") { onCompleteOk() }
+        }
+        // エラーダイアログ
+        .alert(
+            "point_get_confirm_error",
+            isPresented: Binding(
+                get: {
+                    if case .error = acquireEventState { return true }
+                    return false
+                },
+                set: { presented in if !presented { onErrorOk() } }
+            )
+        ) {
+            Button("dialog_ok") { onErrorOk() }
+        } message: {
+            if case let .error(message) = acquireEventState {
+                Text(message)
+            }
+        }
     }
 }
 
@@ -122,7 +142,10 @@ struct PointGetConfirmView_Previews: PreviewProvider {
                 PointGetConfirmContents(
                     inputPoint: 100,
                     isAcquiring: false,
-                    onExecute: {}
+                    acquireEventState: nil,
+                    onExecute: {},
+                    onCompleteOk: {},
+                    onErrorOk: {}
                 )
             }.previewDisplayName("確認 初期")
 
@@ -130,13 +153,34 @@ struct PointGetConfirmView_Previews: PreviewProvider {
                 PointGetConfirmContents(
                     inputPoint: 100,
                     isAcquiring: true,
-                    onExecute: {}
+                    acquireEventState: nil,
+                    onExecute: {},
+                    onCompleteOk: {},
+                    onErrorOk: {}
                 )
             }.previewDisplayName("実行中")
 
             NavigationStack {
-                VStack { Text("point_get_confirm_error").foregroundColor(.red) }
+                PointGetConfirmContents(
+                    inputPoint: 100,
+                    isAcquiring: false,
+                    acquireEventState: .error(message: "エラーが発生しました。"),
+                    onExecute: {},
+                    onCompleteOk: {},
+                    onErrorOk: {}
+                )
             }.previewDisplayName("エラー表示例")
+
+            NavigationStack {
+                PointGetConfirmContents(
+                    inputPoint: 120,
+                    isAcquiring: false,
+                    acquireEventState: .success,
+                    onExecute: {},
+                    onCompleteOk: {},
+                    onErrorOk: {}
+                )
+            }.previewDisplayName("完了ダイアログ")
         }
     }
 }
