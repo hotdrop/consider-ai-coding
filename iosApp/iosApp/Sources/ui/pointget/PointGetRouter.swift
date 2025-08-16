@@ -27,7 +27,9 @@ struct PointGetRouter {
     ) -> some View {
         PointGetInputView(
             viewModel: viewModel,
-            onNavigateToConfirm: {} // TODO
+            onNavigateToConfirm: {
+                path.wrappedValue.append(.confirm)
+            }
         ).navigationBarBackButtonHidden(false)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -44,7 +46,7 @@ struct PointGetRouter {
         path: Binding<[PointGetRoute]>
     ) -> some View {
         // navigationBarBackButtonHidden(true) を設定し、戻る操作は自前で用意したボタンからのみ行う
-        PointGetConfirmView()
+        PointGetConfirmView(viewModel: viewModel)
             .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

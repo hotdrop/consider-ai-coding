@@ -153,7 +153,7 @@ private func PointGetConfirmButton(
         Text("point_get_input_confirm_button")
             .frame(maxWidth: .infinity)
             .padding()
-            .background(isEnabled ? Color.blue : Color.gray)
+            .background(isEnabled ? Color("themeColor") : Color.gray)
             .foregroundColor(.white)
             .cornerRadius(8)
     }
@@ -175,7 +175,19 @@ struct PointGetInputView_Previews: PreviewProvider {
                     onNavigateToConfirm: { _ in }
                 )
             }.previewDisplayName("初期画面")
-
+            
+            NavigationStack {
+                PointGetInputContents(
+                    viewState: .success(
+                        currentPoint: Point(balance: Int32(2000)),
+                        inputPoint: 1500, errorMessage: nil,
+                        isEnableConfirm: true
+                    ),
+                    onInputPoint: { _ in },
+                    onNavigateToConfirm: { _ in }
+                )
+            }.previewDisplayName("ポイント入力画面")
+            
             NavigationStack {
                 PointGetInputContents(
                     viewState: .loading,
