@@ -29,13 +29,14 @@ struct PointGetRouter {
                 path.wrappedValue.append(.confirm)
             }
         ).navigationBarBackButtonHidden(false)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "arrow.backward")
-                    }
+        .toolbar {
+            // フローの先頭：戻る＝フローを閉じる（親に戻る）
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "arrow.backward")
                 }
             }
+        }
     }
     
     // MARK: - Confirm

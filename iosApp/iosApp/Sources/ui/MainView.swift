@@ -4,15 +4,26 @@ import SwiftUI
 private enum MainRoute: Hashable {
     case start
     case home
+}
+
+// 機能ごとのモーダル
+private enum FeatureSheet: Identifiable {
     case pointGet
+    var id: String {
+        switch self { case .pointGet: return "pointGet" }
+    }
 }
 
 // MARK: - MainView
 struct MainView: View {
     @StateObject private var viewModel: MainViewModel
-    @StateObject private var pointGetViewModel = PointGetViewModel()
     
+    // トップレベルナビゲーション
     @State private var path = NavigationPath()
+    
+    // スタック外の境界（モーダル）「で機能フローを分割
+    @State private var activeSheet: FeatureSheet?
+    
     @State private var didTriggerInitialLoad = false
     @State private var hasNavigatedToHome = false
     @State private var hasNavigatedToStart = false
@@ -36,35 +47,24 @@ struct MainView: View {
                 switch route {
                 case .start:
                     StartView(onRegisterSuccess: {
-                        if !hasNavigatedToHome {
-                            path.append(MainRoute.home)
-                            hasNavigatedToHome = true
-                        }
+                        guard !hasNavigatedToHome else { return }
+                        path.append(MainRoute.home)
+                        hasNavigatedToHome = true
                     })
                 case .home:
-                    HomeView(
-                        viewModel: HomeViewModel(),
-                        onNavigateToPointGet: {
-                            path.append(MainRoute.pointGet)
-                        }
-                    )
-                case .pointGet:
-                    PointGetView(viewModel: pointGetViewModel, rootPath: $path)
+                    HomeView(onNavigateToPointGet: {
+                        activeSheet = .pointGet
+                    })
                 }
             }
-            // PointGet フローのルート定義（ルート NavigationStack に集約）
-            .navigationDestination(for: PointGetRoute.self) { route in
-                switch route {
-                case .input:
-                    PointGetInputView(
-                        viewModel: pointGetViewModel,
-                        onNavigateToConfirm: {
-                            path.append(PointGetRoute.confirm)
-                        }
-                    )
-                case .confirm:
-                    PointGetConfirmView(viewModel: pointGetViewModel)
-                }
+        }
+        .fullScreenCover(item: $activeSheet) { sheet in
+            switch sheet {
+            case .pointGet:
+                // サブフローのルート
+                PointGetView(
+                    onClose: { activeSheet = nil }
+                )
             }
         }
         .task {
@@ -73,14 +73,9 @@ struct MainView: View {
             await viewModel.load()
         }
         .onChange(of: viewModel.viewState) { state in
-            switch state {
-            case .loaded:
-                if !hasNavigatedToHome {
-                    path.append(MainRoute.home)
-                    hasNavigatedToHome = true
-                }
-            default:
-                break
+            if case .loaded = state, !hasNavigatedToHome {
+                path.append(MainRoute.home)
+                hasNavigatedToHome = true
             }
         }
     }

@@ -6,7 +6,7 @@ struct HomeView: View {
     @StateObject var viewModel: HomeViewModel
     let onNavigateToPointGet: () -> Void
     
-    init(viewModel: HomeViewModel, onNavigateToPointGet: @escaping () -> Void = {}) {
+    init(viewModel: HomeViewModel = HomeViewModel(), onNavigateToPointGet: @escaping () -> Void = {}) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.onNavigateToPointGet = onNavigateToPointGet
     }
@@ -44,20 +44,12 @@ private struct HomeContents: View {
                 )
                 
                 HStack(spacing: 20) {
-                    Button(action: onNavigateToPointGet) {
-                        VStack {
-                            Image("account_balance_wallet")
-                                .resizable()
-                                .frame(width: 30, height: 30)
-                                .foregroundColor(Color("themeColor"))
-                            Text("home_menu_get_point")
-                                .foregroundColor(Color("themeColor"))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
+                    PointActionButton(
+                        titleKey: "home_menu_get_point",
+                        icon: "account_balance_wallet"
+                    ) {
+                        self.onNavigateToPointGet()
                     }
-                    .buttonStyle(.plain)
-                    .tint(Color("themeColor"))
                     PointActionButton(
                         titleKey: "home_menu_use_point",
                         icon: "shopping_cart"
