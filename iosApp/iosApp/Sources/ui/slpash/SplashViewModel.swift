@@ -2,8 +2,8 @@ import Foundation
 import Combine
 import shared
 
-class MainViewModel: ObservableObject {
-    @Published var viewState: MainViewState = .loading
+class SplashViewModel: ObservableObject {
+    @Published var viewState: SplashViewState = .loading
 
     private let userUseCase: UserUseCase
 
@@ -30,7 +30,7 @@ class MainViewModel: ObservableObject {
     }
 }
 
-enum MainViewState: Equatable {
+enum SplashViewState: Equatable {
     case loading
     case loaded(userId: String)
     case firstTime

@@ -1,71 +1,30 @@
 import SwiftUI
 
-// ルートを表す値オブジェクト
-private enum MainRoute: Hashable {
-    case start
-    case home
-}
-
-// 機能ごとのモーダル
-private enum FeatureSheet: Identifiable {
-    case pointGet
-    var id: String {
-        switch self { case .pointGet: return "pointGet" }
-    }
-}
-
 // MARK: - MainView
-struct MainView: View {
-    @StateObject private var viewModel: MainViewModel
-    
-    // トップレベルナビゲーション
-    @State private var path = NavigationPath()
-    
-    // スタック外の境界（モーダル）「で機能フローを分割
-    @State private var activeSheet: FeatureSheet?
-    
+struct SplashView: View {
+    let navigateToStart: () -> Void
+    let navigateToHome: () -> Void
+
+    @StateObject private var viewModel: SplashViewModel
     @State private var didTriggerInitialLoad = false
-    @State private var hasNavigatedToHome = false
-    @State private var hasNavigatedToStart = false
+    @State private var routed = false
     
-    init(viewModel: MainViewModel = MainViewModel()) {
+    init(
+        viewModel: SplashViewModel = SplashViewModel(),
+        navigateToStart: @escaping () -> Void,
+        navigateToHome: @escaping () -> Void
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.navigateToStart = navigateToStart
+        self.navigateToHome = navigateToHome
     }
 
     var body: some View {
-        NavigationStack(path: $path) {
+        VStack {
             MainContents(
                 viewState: viewModel.viewState,
-                onStartRequested: {
-                    if !hasNavigatedToStart {
-                        path.append(MainRoute.start)
-                        hasNavigatedToStart = true
-                    }
-                }
+                navigateToStart: navigateToStart
             )
-            .navigationDestination(for: MainRoute.self) { route in
-                switch route {
-                case .start:
-                    StartView(onRegisterSuccess: {
-                        guard !hasNavigatedToHome else { return }
-                        path.append(MainRoute.home)
-                        hasNavigatedToHome = true
-                    })
-                case .home:
-                    HomeView(onNavigateToPointGet: {
-                        activeSheet = .pointGet
-                    })
-                }
-            }
-        }
-        .fullScreenCover(item: $activeSheet) { sheet in
-            switch sheet {
-            case .pointGet:
-                // サブフローのルート
-                PointGetView(
-                    onClose: { activeSheet = nil }
-                )
-            }
         }
         .task {
             guard !didTriggerInitialLoad else { return }
@@ -73,9 +32,9 @@ struct MainView: View {
             await viewModel.load()
         }
         .onChange(of: viewModel.viewState) { state in
-            if case .loaded = state, !hasNavigatedToHome {
-                path.append(MainRoute.home)
-                hasNavigatedToHome = true
+            guard !routed else { return }
+            if case .loaded = state {
+                navigateToHome()
             }
         }
     }
@@ -83,8 +42,8 @@ struct MainView: View {
 
 // MARK: - MainContents
 private struct MainContents: View {
-    let viewState: MainViewState
-    let onStartRequested: () -> Void
+    let viewState: SplashViewState
+    let navigateToStart: () -> Void
     
     var body: some View {
         VStack {
@@ -103,7 +62,7 @@ private struct MainContents: View {
                 LoadedView(userId: userId)
             
             case .firstTime:
-                FirstTimeView(onStartRequested: onStartRequested)
+                FirstTimeView(navigateToStart: navigateToStart)
                 
             case .error(let message):
                 Text("\(message)").foregroundColor(.red)
@@ -132,7 +91,7 @@ private struct LoadedView: View {
 
 // MARK: - FirstTimeView
 private struct FirstTimeView: View {
-    let onStartRequested: () -> Void
+    let navigateToStart: () -> Void
     
     var body: some View {
         VStack {
@@ -140,7 +99,7 @@ private struct FirstTimeView: View {
                 .font(.title2)
                 .foregroundColor(Color("themeColor"))
 
-            Button(action: onStartRequested) {
+            Button(action: navigateToStart) {
                 Text("splash_first_time_button")
                     .font(.headline)
                     .foregroundColor(Color("white"))
@@ -162,28 +121,28 @@ struct MainView_Previews: PreviewProvider {
             NavigationStack {
                 MainContents(
                     viewState: .loading,
-                    onStartRequested: {}
+                    navigateToStart: {}
                 )
             }.previewDisplayName("読み込み中")
 
             NavigationStack {
                 MainContents(
                     viewState: .firstTime,
-                    onStartRequested: {}
+                    navigateToStart: {}
                 )
             }.previewDisplayName("初回起動")
 
             NavigationStack {
                 MainContents(
                     viewState: .error(message: "プレビュー用エラー"),
-                    onStartRequested: {}
+                    navigateToStart: {}
                 )
             }.previewDisplayName("エラー")
             
             NavigationStack {
                 MainContents(
                     viewState: .loaded(userId: "preview-user-1234"),
-                    onStartRequested: {}
+                    navigateToStart: {}
                 )
             }.previewDisplayName("読み込み完了")
         }

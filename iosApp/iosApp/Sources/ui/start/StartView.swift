@@ -2,13 +2,19 @@ import SwiftUI
 import shared
 
 struct StartView: View {
-    @Environment(\.dismiss) private var dismiss
+    let onBack: () -> Void
+    let onRegisterSuccess: () -> Void
+    
     @StateObject private var viewModel: StartViewModel
-    private let onRegisterSuccess: () -> Void
     @State private var didNavigateOnSuccess = false
 
-    init(viewModel: StartViewModel = StartViewModel(), onRegisterSuccess: @escaping () -> Void) {
+    init(
+        viewModel: StartViewModel = StartViewModel(),
+        onBack: @escaping () -> Void,
+        onRegisterSuccess: @escaping () -> Void
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.onBack = onBack
         self.onRegisterSuccess = onRegisterSuccess
     }
 
@@ -20,7 +26,7 @@ struct StartView: View {
                 await viewModel.registerUser(nickname: nickname, email: email)
             },
             onTapToolbarBackButton: {
-                dismiss()
+                onBack()
             }
         )
         .onChange(of: viewModel.viewState) { newState in
@@ -51,56 +57,59 @@ private struct StartContents: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("start_overview")
-                .font(.body)
-                .padding(.bottom, 16)
+        NavigationView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("start_overview")
+                    .font(.body)
+                    .padding(.bottom, 16)
 
-            NicknameTextField(
-                text: $inputNickname,
-                onSubmitNext: {
-                    focusedField = .email
-                }
-            ).focused($focusedField, equals: .nickname)
+                NicknameTextField(
+                    text: $inputNickname,
+                    onSubmitNext: {
+                        focusedField = .email
+                    }
+                ).focused($focusedField, equals: .nickname)
 
-            EmailTextField(
-                text: $inputEmail,
-                onSubmitDone: {
-                    guard !isRegisterDisabled else { return }
-                    Task { await onRegisterUser(inputNickname, inputEmail) }
-                }
-            ).focused($focusedField, equals: .email)
+                EmailTextField(
+                    text: $inputEmail,
+                    onSubmitDone: {
+                        guard !isRegisterDisabled else { return }
+                        Task { await onRegisterUser(inputNickname, inputEmail) }
+                    }
+                ).focused($focusedField, equals: .email)
 
-            RegisterButton(
-                isLoading: viewState == .loading,
-                isDisabled: isRegisterDisabled,
-                action: {
-                    Task { await onRegisterUser(inputNickname, inputEmail) }
-                }
-            )
-            .padding(.top, 16)
+                RegisterButton(
+                    isLoading: viewState == .loading,
+                    isDisabled: isRegisterDisabled,
+                    action: {
+                        Task { await onRegisterUser(inputNickname, inputEmail) }
+                    }
+                )
+                .padding(.top, 16)
 
-            Spacer()
-        }
-        .padding()
-        .navigationTitle("start_title")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: onTapToolbarBackButton) {
-                    Image(systemName: "arrow.backward")
-                        .foregroundColor(Color("white"))
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("start_title")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(false)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: onTapToolbarBackButton) {
+                        Image(systemName: "arrow.backward")
+                            .foregroundColor(Color("white"))
+                    }
                 }
             }
+            .alert(item: $errorAlertItem) { item in
+                Alert(
+                    title: Text("dialog_error_title"),
+                    message: Text(item.message),
+                    dismissButton: .default(Text("dialog_ok"))
+                )
+            }
         }
-        .alert(item: $errorAlertItem) { item in
-            Alert(
-                title: Text("dialog_error_title"),
-                message: Text(item.message),
-                dismissButton: .default(Text("dialog_ok"))
-            )
-        }
+        .navigationViewStyle(StackNavigationViewStyle()) // iOS15
     }
 }
 
