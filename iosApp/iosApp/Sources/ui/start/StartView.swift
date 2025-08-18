@@ -19,16 +19,18 @@ struct StartView: View {
     }
 
     var body: some View {
-        StartContents(
-            viewState: viewModel.viewState,
-            errorAlertItem: $viewModel.errorAlertItem,
-            onRegisterUser: { nickname, email async in
-                await viewModel.registerUser(nickname: nickname, email: email)
-            },
-            onTapToolbarBackButton: {
-                onBack()
-            }
-        )
+        VStack {
+            StartContents(
+                viewState: viewModel.viewState,
+                errorAlertItem: $viewModel.errorAlertItem,
+                onRegisterUser: { nickname, email async in
+                    await viewModel.registerUser(nickname: nickname, email: email)
+                },
+                onTapToolbarBackButton: {
+                    onBack()
+                }
+            )
+        }
         .onChange(of: viewModel.viewState) { newState in
             if case .success = newState, !didNavigateOnSuccess {
                 didNavigateOnSuccess = true
@@ -97,7 +99,7 @@ private struct StartContents: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: onTapToolbarBackButton) {
                         Image(systemName: "arrow.backward")
-                            .foregroundColor(Color("white"))
+                            .foregroundColor(Color("themeColor"))
                     }
                 }
             }

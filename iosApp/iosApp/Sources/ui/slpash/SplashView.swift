@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - MainView
+// MARK: - SplashView
 struct SplashView: View {
     let navigateToStart: () -> Void
     let navigateToHome: () -> Void
@@ -20,12 +20,13 @@ struct SplashView: View {
     }
 
     var body: some View {
-        VStack {
-            MainContents(
+        NavigationView {
+            SplashContents(
                 viewState: viewModel.viewState,
                 navigateToStart: navigateToStart
             )
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .task {
             guard !didTriggerInitialLoad else { return }
             didTriggerInitialLoad = true
@@ -40,8 +41,8 @@ struct SplashView: View {
     }
 }
 
-// MARK: - MainContents
-private struct MainContents: View {
+// MARK: - SplashContents
+private struct SplashContents: View {
     let viewState: SplashViewState
     let navigateToStart: () -> Void
     
@@ -57,10 +58,10 @@ private struct MainContents: View {
             case .loading:
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
-
+                
             case .loaded(let userId):
                 LoadedView(userId: userId)
-            
+                
             case .firstTime:
                 FirstTimeView(navigateToStart: navigateToStart)
                 
@@ -118,33 +119,29 @@ private struct FirstTimeView: View {
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NavigationStack {
-                MainContents(
+            NavigationView {
+                SplashContents(
                     viewState: .loading,
                     navigateToStart: {}
-                )
-            }.previewDisplayName("読み込み中")
+                ).previewDisplayName("読み込み中")
+            }
+            .background(Color("appbarColor"))
+            .navigationViewStyle(StackNavigationViewStyle())
 
-            NavigationStack {
-                MainContents(
-                    viewState: .firstTime,
-                    navigateToStart: {}
-                )
-            }.previewDisplayName("初回起動")
+            SplashContents(
+                viewState: .firstTime,
+                navigateToStart: {}
+            ).previewDisplayName("初回起動")
 
-            NavigationStack {
-                MainContents(
-                    viewState: .error(message: "プレビュー用エラー"),
-                    navigateToStart: {}
-                )
-            }.previewDisplayName("エラー")
+            SplashContents(
+                viewState: .error(message: "プレビュー用エラー"),
+                navigateToStart: {}
+            ).previewDisplayName("エラー")
             
-            NavigationStack {
-                MainContents(
-                    viewState: .loaded(userId: "preview-user-1234"),
-                    navigateToStart: {}
-                )
-            }.previewDisplayName("読み込み完了")
+            SplashContents(
+                viewState: .loaded(userId: "preview-user-1234"),
+                navigateToStart: {}
+            ).previewDisplayName("読み込み完了")
         }
     }
 }

@@ -2,19 +2,16 @@
 このファイルは次の実行タスクで追加してほしい機能や修正内容を詳細に記載するドキュメントです。ユーザーに更新権限があり、あなたは更新しないでください。
 
 # やりたいこと
-iOS側の以下のswiftファイルを更新し、ポイント獲得機能を実装したいです。
-- `iosApp/iosApp/Sources/ui/pointget/PointGetInputView.swift`
-- `iosApp/iosApp/Sources/ui/pointget/PointGetConfirmView.swift`
-- `iosApp/iosApp/Sources/ui/pointget/PointGetViewModel.swift`
+iOSのナビゲーションを再興
+iOSでのベストプラクティスは"`StatusBar`背景色は`NavigationBar`や背景ビューに委ねる"なのに、`NavigationBar`の色を変えても`StatusBar`の背景色が白のままとなる。
+これはUINavigationControllerをベースViewにおいているのに`NavigationBar`をSwiftUIで実装しているため。
+`UINavigationController`（外側）と `SwiftUI.NavigationView`（内側）の二重ナビにしており、さらに外側のバーを 非表示 にしている状態になっている。すると
+- `StatusBar` 背面の色は 表示されている最上位ビューの背景に委ねられる。
+- 外側のバーを隠しているので`StatusBar`背面には外側`UINavigationController.view`（既定=白）が出る。
+- 内側の `SwiftUI.NavigationView` は **StatusBarの下“側”**に描画されるだけで、上の白帯は塗れない。
 
-## ポイント獲得仕様
-- ポイント獲得機能はAndroid側で実装済みです。実装コードは以下の通りです。それぞれAndroidの実装を確認し、iOSをSwiftUIで実装してください。
-  - `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetActivity.kt`
-  - `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetConfirmScreen.kt`
-  - `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetInputScreen.kt`
-  - `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetNavigationHost.kt`
-  - `androidApp/src/main/java/jp/hotdrop/considercline/android/ui/pointget/PointGetViewModel.kt`
+つまり"NavigationBarに委ねさせる条件を満たしていない"となる。
+これを解消するため、以下の方針とする。
 
-##　厳守事項
-- コード中で利用する文字列は全てLocalizableで定義してください。ただし、LocalizableをXCode以外で追加すると壊れてしまうため、追加したい文字列は実装計画段階で全て洗い出し、ユーザーに追加依頼をしてください。
-- Swiftコードは必ず既存の`homeView.swift`や`HomeViewModel.swift`を参考に、同様の設計方針としてください。
+- UIKit(`UINavigationController` + `Coordinator`)を**唯一のナビゲーション権威**にする
+- SwiftUIはUIのみ。ナビゲーションは一切制御しない。

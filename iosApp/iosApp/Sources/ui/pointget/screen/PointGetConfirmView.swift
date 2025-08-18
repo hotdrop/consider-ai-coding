@@ -115,7 +115,7 @@ private struct PointGetConfirmContents: View {
         }
         // エラーダイアログ
         .alert(
-            "エラーです",
+            "dialog_error_title",
             isPresented: Binding(
                 get: {
                     if case .error = acquireEventState { return true }
