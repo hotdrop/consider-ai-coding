@@ -2,60 +2,35 @@ import SwiftUI
 import shared
 
 struct PointGetRouter {
-    @ViewBuilder
-    static func destination(
-        for route: PointGetRoute,
+    // MARK: - Input (root)
+    static func input(
         viewModel: PointGetViewModel,
-        path: Binding<[PointGetRoute]>,
-        dismiss: DismissAction
-    ) -> some View {
-        switch route {
-        case .input:
-            input(viewModel: viewModel, path: path, dismiss: dismiss)
-        case .confirm:
-            confirm(viewModel: viewModel, path: path)
-        }
-    }
-    
-    // MARK: - Input
-    private static func input(
-        viewModel: PointGetViewModel,
-        path: Binding<[PointGetRoute]>,
-        dismiss: DismissAction
+        onCloseFlow: @escaping () -> Void,
+        onNavigateToConfirm: @escaping () -> Void
     ) -> some View {
         PointGetInputView(
             viewModel: viewModel,
-            onNavigateToConfirm: {
-                path.wrappedValue.append(.confirm)
-            }
+            onNavigateToConfirm: onNavigateToConfirm
         )
         .navigationBarBackButtonHidden(false)
         .toolbar {
             // フローの先頭：戻る＝フローを閉じる（親に戻る）
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { dismiss() }) {
+                Button(action: { onCloseFlow() }) {
                     Image(systemName: "chevron.backward")
+                        .foregroundColor(Color("white"))
                 }
             }
         }
     }
     
     // MARK: - Confirm
-    private static func confirm(
+    static func confirm(
         viewModel: PointGetViewModel,
-        path: Binding<[PointGetRoute]>
+        onCloseFlow: @escaping () -> Void
     ) -> some View {
-        // navigationBarBackButtonHidden(true) を設定し、戻る操作は自前で用意したボタンからのみ行う
-        PointGetConfirmView(viewModel: viewModel)
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button  {
-                        path.wrappedValue.removeLast()
-                    } label: {
-                        Image(systemName: "chevron.backward")
-                    }
-                }
-            }
+        // iOS15系ではデフォルトのBackボタンでInputへ戻れるため隠さない
+        PointGetConfirmView(viewModel: viewModel, onCloseFlow: onCloseFlow)
+            .navigationBarBackButtonHidden(false)
     }
 }

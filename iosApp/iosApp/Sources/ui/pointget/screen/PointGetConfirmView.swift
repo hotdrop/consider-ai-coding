@@ -7,6 +7,7 @@ import shared
 struct PointGetConfirmView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: PointGetViewModel
+    let onCloseFlow: () -> Void
     // ローカルの実行フラグのみ保持（結果はVMのEventを参照）
     @State private var startedAcquire: Bool = false
 
@@ -34,7 +35,8 @@ struct PointGetConfirmView: View {
                     onCompleteOk: {
                         startedAcquire = false
                         viewModel.acquireEventState = nil
-                        dismiss()
+                        // フロー完了時は親(UIKit)のナビゲーションスタックを閉じる
+                        onCloseFlow()
                     },
                     onErrorOk: {
                         startedAcquire = false

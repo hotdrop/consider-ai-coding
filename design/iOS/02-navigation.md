@@ -25,7 +25,7 @@
   - 例外（ログイン要求、外部設定、他タブ遷移など）は `Intent通知` に変換してViewControllerへ。
 
 # OSバージョン差分
-`NavigationStack`を採用したいがiOS16+のため、iOS14をサポートする現場では利用不可。したがって、`NavigationView` + `NavigationLink`を使う。基本は「ViewController=フロー開始/終了」「フロー内=SwiftUIで遷移」
+`NavigationStack`を採用したいがiOS16+のため、iOS15をサポートする現場では利用不可。したがって、`NavigationView` + `NavigationLink`を使う。基本は「ViewController=フロー開始/終了」「フロー内=SwiftUIで遷移」
 どうしてもViewControllerが介入したい場合は 各画面を別HostingControllerでpush しかなく、アンチパターン寄り（戻り操作やState保持で崩れやすい）。この世代は "ViewControllerは入口/出口のみ" を強く推奨。
 
 # まとめ（意思決定）
