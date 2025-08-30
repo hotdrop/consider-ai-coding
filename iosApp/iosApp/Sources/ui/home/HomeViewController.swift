@@ -15,7 +15,12 @@ final class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let host = UIHostingController(rootView: HomeView(onNavigateToPointGet: onTapPointGet))
+        
+        let root = HomeView(
+            onNavigateToPointGet: onTapPointGet
+        )
+        let host = UIHostingController(rootView: root)
+        
         addChild(host)
         view.addSubview(host.view)
         host.view.translatesAutoresizingMaskIntoConstraints = false

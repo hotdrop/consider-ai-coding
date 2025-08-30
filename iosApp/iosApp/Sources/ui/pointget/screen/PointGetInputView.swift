@@ -1,6 +1,9 @@
 import SwiftUI
 import shared
 
+///
+/// このViewはPointGetViewを親に持ち、Navigationは全て親Viewが責務を持つ
+///
 struct PointGetInputView: View {
     let viewModel: PointGetViewModel
     let onNavigateToConfirm: () -> Void
@@ -164,37 +167,31 @@ private func PointGetConfirmButton(
 struct PointGetInputView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NavigationStack {
-                PointGetInputContents(
-                    viewState: .success(
-                        currentPoint: Point(balance: Int32(2000)),
-                        inputPoint: 0, errorMessage: nil,
-                        isEnableConfirm: false
-                    ),
-                    onInputPoint: { _ in },
-                    onNavigateToConfirm: { _ in }
-                )
-            }.previewDisplayName("初期画面")
+            PointGetInputContents(
+                viewState: .success(
+                    currentPoint: Point(balance: Int32(2000)),
+                    inputPoint: 0, errorMessage: nil,
+                    isEnableConfirm: false
+                ),
+                onInputPoint: { _ in },
+                onNavigateToConfirm: { _ in }
+            ).previewDisplayName("初期画面")
             
-            NavigationStack {
-                PointGetInputContents(
-                    viewState: .success(
-                        currentPoint: Point(balance: Int32(2000)),
-                        inputPoint: 1500, errorMessage: nil,
-                        isEnableConfirm: true
-                    ),
-                    onInputPoint: { _ in },
-                    onNavigateToConfirm: { _ in }
-                )
-            }.previewDisplayName("ポイント入力画面")
+            PointGetInputContents(
+                viewState: .success(
+                    currentPoint: Point(balance: Int32(2000)),
+                    inputPoint: 1500, errorMessage: nil,
+                    isEnableConfirm: true
+                ),
+                onInputPoint: { _ in },
+                onNavigateToConfirm: { _ in }
+            ).previewDisplayName("ポイント入力画面")
             
-            NavigationStack {
-                PointGetInputContents(
-                    viewState: .loading,
-                    onInputPoint: { _ in },
-                    onNavigateToConfirm: { _ in }
-                )
-            }.previewDisplayName("ロード中")
+            PointGetInputContents(
+                viewState: .loading,
+                onInputPoint: { _ in },
+                onNavigateToConfirm: { _ in }
+            ).previewDisplayName("ロード中")
         }
     }
 }

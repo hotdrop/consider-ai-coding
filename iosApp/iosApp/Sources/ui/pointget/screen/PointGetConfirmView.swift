@@ -1,6 +1,9 @@
 import SwiftUI
 import shared
 
+///
+/// このViewはPointGetViewを親に持ち、Navigationは全て親Viewが責務を持つ
+///
 struct PointGetConfirmView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: PointGetViewModel
@@ -138,49 +141,41 @@ private struct PointGetConfirmContents: View {
 struct PointGetConfirmView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NavigationStack {
-                PointGetConfirmContents(
-                    inputPoint: 100,
-                    isAcquiring: false,
-                    acquireEventState: nil,
-                    onExecute: {},
-                    onCompleteOk: {},
-                    onErrorOk: {}
-                )
-            }.previewDisplayName("確認 初期")
+            PointGetConfirmContents(
+                inputPoint: 100,
+                isAcquiring: false,
+                acquireEventState: nil,
+                onExecute: {},
+                onCompleteOk: {},
+                onErrorOk: {}
+            ).previewDisplayName("確認 初期")
 
-            NavigationStack {
-                PointGetConfirmContents(
-                    inputPoint: 100,
-                    isAcquiring: true,
-                    acquireEventState: nil,
-                    onExecute: {},
-                    onCompleteOk: {},
-                    onErrorOk: {}
-                )
-            }.previewDisplayName("実行中")
+            PointGetConfirmContents(
+                inputPoint: 100,
+                isAcquiring: true,
+                acquireEventState: nil,
+                onExecute: {},
+                onCompleteOk: {},
+                onErrorOk: {}
+            ).previewDisplayName("実行中")
 
-            NavigationStack {
-                PointGetConfirmContents(
-                    inputPoint: 100,
-                    isAcquiring: false,
-                    acquireEventState: .error(message: "エラーが発生しました。"),
-                    onExecute: {},
-                    onCompleteOk: {},
-                    onErrorOk: {}
-                )
-            }.previewDisplayName("エラー表示例")
+            PointGetConfirmContents(
+                inputPoint: 100,
+                isAcquiring: false,
+                acquireEventState: .error(message: "エラーが発生しました。"),
+                onExecute: {},
+                onCompleteOk: {},
+                onErrorOk: {}
+            ).previewDisplayName("エラー表示例")
 
-            NavigationStack {
-                PointGetConfirmContents(
-                    inputPoint: 120,
-                    isAcquiring: false,
-                    acquireEventState: .success,
-                    onExecute: {},
-                    onCompleteOk: {},
-                    onErrorOk: {}
-                )
-            }.previewDisplayName("完了ダイアログ")
+            PointGetConfirmContents(
+                inputPoint: 120,
+                isAcquiring: false,
+                acquireEventState: .success,
+                onExecute: {},
+                onCompleteOk: {},
+                onErrorOk: {}
+            ).previewDisplayName("完了ダイアログ")
         }
     }
 }

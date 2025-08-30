@@ -16,11 +16,8 @@ struct PointGetView: View {
     @State private var didTriggerInitialLoad = false
     @State private var didPushedInput = false
     
-    let onClose: () -> Void
-
-    init(viewModel: PointGetViewModel = PointGetViewModel(), onClose: @escaping () -> Void) {
+    init(viewModel: PointGetViewModel = PointGetViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
-        self.onClose = onClose
     }
 
     var body: some View {

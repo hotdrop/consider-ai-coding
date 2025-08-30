@@ -28,12 +28,13 @@ struct PointGetRouter {
             onNavigateToConfirm: {
                 path.wrappedValue.append(.confirm)
             }
-        ).navigationBarBackButtonHidden(false)
+        )
+        .navigationBarBackButtonHidden(false)
         .toolbar {
             // フローの先頭：戻る＝フローを閉じる（親に戻る）
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { dismiss() }) {
-                    Image(systemName: "arrow.backward")
+                    Image(systemName: "chevron.backward")
                 }
             }
         }
@@ -52,7 +53,7 @@ struct PointGetRouter {
                     Button  {
                         path.wrappedValue.removeLast()
                     } label: {
-                        Image(systemName: "arrow.backward")
+                        Image(systemName: "chevron.backward")
                     }
                 }
             }

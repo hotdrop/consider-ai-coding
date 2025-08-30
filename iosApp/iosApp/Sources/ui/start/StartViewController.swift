@@ -18,7 +18,10 @@ final class StartViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let root = StartView(onBack: onBack, onRegisterSuccess: onRegisterSuccess)
+        let root = StartView(
+            onBack: onBack,
+            onRegisterSuccess: onRegisterSuccess
+        )
         let host = UIHostingController(rootView: root)
 
         addChild(host)

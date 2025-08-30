@@ -5,9 +5,10 @@ final class PointGetViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let host = UIHostingController(rootView: PointGetView(onClose: {
-            // TODO
-        }))
+        
+        let root = PointGetView()
+        let host = UIHostingController(rootView: root)
+
         addChild(host)
         view.addSubview(host.view)
         host.view.translatesAutoresizingMaskIntoConstraints = false
