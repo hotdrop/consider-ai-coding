@@ -20,12 +20,10 @@ struct SplashView: View {
     }
 
     var body: some View {
-        NavigationView {
-            SplashContents(
-                viewState: viewModel.viewState,
-                navigateToStart: navigateToStart
-            )
-        }
+        SplashContents(
+            viewState: viewModel.viewState,
+            navigateToStart: navigateToStart
+        )
         .task {
             guard !didTriggerInitialLoad else { return }
             didTriggerInitialLoad = true
@@ -46,31 +44,34 @@ private struct SplashContents: View {
     let navigateToStart: () -> Void
     
     var body: some View {
-        VStack {
-            Image("start")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 264, height: 264)
-                .padding(.vertical, 32)
-            
-            switch viewState {
-            case .loading:
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
+        NavigationView {
+            VStack {
+                Image("start")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 264, height: 264)
+                    .padding(.vertical, 32)
                 
-            case .loaded(let userId):
-                LoadedView(userId: userId)
-                
-            case .firstTime:
-                FirstTimeView(navigateToStart: navigateToStart)
-                
-            case .error(let message):
-                Text("\(message)").foregroundColor(.red)
+                switch viewState {
+                case .loading:
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
+                    
+                case .loaded(let userId):
+                    LoadedView(userId: userId)
+                    
+                case .firstTime:
+                    FirstTimeView(navigateToStart: navigateToStart)
+                    
+                case .error(let message):
+                    Text("\(message)").foregroundColor(.red)
+                }
             }
+            .navigationTitle("splash_title")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationViewStyle(StackNavigationViewStyle())
         }
-        .navigationTitle("splash_title")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationViewStyle(StackNavigationViewStyle())
+        .navigationViewStyle(StackNavigationViewStyle()) // iOS15
     }
 }
 

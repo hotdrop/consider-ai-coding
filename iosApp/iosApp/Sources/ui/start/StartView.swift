@@ -1,6 +1,7 @@
 import SwiftUI
 import shared
 
+// MARK: - StartView
 struct StartView: View {
     let onBack: () -> Void
     let onRegisterSuccess: () -> Void

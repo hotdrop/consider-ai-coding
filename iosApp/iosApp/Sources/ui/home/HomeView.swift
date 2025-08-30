@@ -3,10 +3,14 @@ import shared
 
 // MARK: - HomeView
 struct HomeView: View {
-    @StateObject var viewModel: HomeViewModel
     let onNavigateToPointGet: () -> Void
     
-    init(viewModel: HomeViewModel = HomeViewModel(), onNavigateToPointGet: @escaping () -> Void = {}) {
+    @StateObject var viewModel: HomeViewModel
+    
+    init(
+        viewModel: HomeViewModel = HomeViewModel(),
+        onNavigateToPointGet: @escaping () -> Void = {}
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.onNavigateToPointGet = onNavigateToPointGet
     }
@@ -36,38 +40,42 @@ private struct HomeContents: View {
     }()
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 20) {
-                HomeCardView(
-                    viewState: viewState,
-                    dateFormatter: Self.dateFormatter
-                )
-                
-                HStack(spacing: 20) {
-                    PointActionButton(
-                        titleKey: "home_menu_get_point",
-                        icon: "account_balance_wallet"
-                    ) {
-                        self.onNavigateToPointGet()
+        NavigationView {
+            // TODO スクロールはHistorySectionViewに対してのみ行いたい
+            ScrollView {
+                LazyVStack(spacing: 20) {
+                    HomeCardView(
+                        viewState: viewState,
+                        dateFormatter: Self.dateFormatter
+                    )
+                    
+                    HStack(spacing: 20) {
+                        PointActionButton(
+                            titleKey: "home_menu_get_point",
+                            icon: "account_balance_wallet"
+                        ) {
+                            self.onNavigateToPointGet()
+                        }
+                        PointActionButton(
+                            titleKey: "home_menu_use_point",
+                            icon: "shopping_cart"
+                        ) {
+                            // TODO: ポイント利用画面への遷移
+                        }
                     }
-                    PointActionButton(
-                        titleKey: "home_menu_use_point",
-                        icon: "shopping_cart"
-                    ) {
-                        // TODO: ポイント利用画面への遷移
-                    }
+                    .padding(.horizontal)
+                    
+                    HistorySectionView(
+                        historyState: historyState
+                    )
                 }
-                .padding(.horizontal)
-                
-                HistorySectionView(
-                    historyState: historyState
-                )
+                .padding(.vertical)
             }
-            .padding(.vertical)
+            .navigationTitle("home_title")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
         }
-        .navigationTitle("home_title")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
+        .navigationViewStyle(StackNavigationViewStyle()) // iOS15
     }
 }
 
@@ -220,73 +228,63 @@ struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         let previewUser = User(userId: "123", nickName: "テスト太郎", email: "preview@example.com")
         Group {
-            NavigationStack {
-                HomeContents(
-                    viewState: .initialLoading,
-                    historyState: .loading,
-                    onNavigateToPointGet: {}
-                )
-            }.previewDisplayName("初回ロード中")
+            HomeContents(
+                viewState: .initialLoading,
+                historyState: .loading,
+                onNavigateToPointGet: {}
+            ).previewDisplayName("初回ロード中")
 
-            NavigationStack {
-                HomeContents(
-                    viewState: .loaded(user: previewUser, point: 1000),
-                    historyState: .loading,
-                    onNavigateToPointGet: {}
-                )
-            }.previewDisplayName("履歴ロード中")
+            HomeContents(
+                viewState: .loaded(user: previewUser, point: 1000),
+                historyState: .loading,
+                onNavigateToPointGet: {}
+            ).previewDisplayName("履歴ロード中")
             
-            NavigationStack {
-                HomeContents(
-                    viewState: .loaded(user: previewUser, point: 1000),
-                    historyState: .loaded(histories: []),
-                    onNavigateToPointGet: {}
-                )
-            }.previewDisplayName("履歴なし")
+            HomeContents(
+                viewState: .loaded(user: previewUser, point: 1000),
+                historyState: .loaded(histories: []),
+                onNavigateToPointGet: {}
+            ).previewDisplayName("履歴なし")
 
-            NavigationStack {
-                HomeContents(
-                    viewState: .loaded(user: previewUser, point: 1000),
-                    historyState: .loaded(histories: [
-                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
-                            year: 2025,
-                            monthNumber: 6,
-                            dayOfMonth: 21,
-                            hour: 10,
-                            minute: 20,
-                            second: 10,
-                            nanosecond: 0
-                        ), point: 100, detail: "獲得"),
-                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
-                            year: 2025,
-                            monthNumber: 6,
-                            dayOfMonth: 22,
-                            hour: 15,
-                            minute: 25,
-                            second: 20,
-                            nanosecond: 0
-                        ), point: 50, detail: "利用"),
-                        PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
-                            year: 2025,
-                            monthNumber: 6,
-                            dayOfMonth: 22,
-                            hour: 18,
-                            minute: 32,
-                            second: 56,
-                            nanosecond: 0
-                        ), point: 200, detail: "利用")
-                    ]),
-                    onNavigateToPointGet: {}
-                )
-            }.previewDisplayName("履歴あり")
+            HomeContents(
+                viewState: .loaded(user: previewUser, point: 1000),
+                historyState: .loaded(histories: [
+                    PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                        year: 2025,
+                        monthNumber: 6,
+                        dayOfMonth: 21,
+                        hour: 10,
+                        minute: 20,
+                        second: 10,
+                        nanosecond: 0
+                    ), point: 100, detail: "獲得"),
+                    PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                        year: 2025,
+                        monthNumber: 6,
+                        dayOfMonth: 22,
+                        hour: 15,
+                        minute: 25,
+                        second: 20,
+                        nanosecond: 0
+                    ), point: 50, detail: "利用"),
+                    PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
+                        year: 2025,
+                        monthNumber: 6,
+                        dayOfMonth: 22,
+                        hour: 18,
+                        minute: 32,
+                        second: 56,
+                        nanosecond: 0
+                    ), point: 200, detail: "利用")
+                ]),
+                onNavigateToPointGet: {}
+            ).previewDisplayName("履歴あり")
 
-            NavigationStack {
-                HomeContents(
-                    viewState: .error(message: "不明なエラーが発生しました。"),
-                    historyState: .error(message: "履歴の読み込みに失敗しました。"),
-                    onNavigateToPointGet: {}
-                )
-            }.previewDisplayName("エラー")
+            HomeContents(
+                viewState: .error(message: "不明なエラーが発生しました。"),
+                historyState: .error(message: "履歴の読み込みに失敗しました。"),
+                onNavigateToPointGet: {}
+            ).previewDisplayName("エラー")
         }
     }
 }

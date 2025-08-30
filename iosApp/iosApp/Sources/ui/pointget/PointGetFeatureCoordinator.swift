@@ -4,12 +4,14 @@ import SwiftUI
 final class PointGetFeatureCoordinator: FeatureCoordinator {
     private let nav: UINavigationController
     private let router: AppRouter
+    
     init(nav: UINavigationController, router: AppRouter) {
         self.nav = nav
         self.router = router
     }
     
     func makeEntry() -> UIViewController {
-        PointGetViewController()
+        let vc = PointGetViewController()
+        return vc
     }
 }

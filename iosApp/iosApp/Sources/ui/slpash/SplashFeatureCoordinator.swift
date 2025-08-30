@@ -11,8 +11,12 @@ final class SplashFeatureCoordinator: FeatureCoordinator {
     
     func makeEntry() -> UIViewController {
         let vc = SplashViewController(
-            navigateToStart: { [router] in router.route(to: .start, style: .push) },
-            navigateToHome: { [router] in router.route(to: .home, style: .replaceRoot) }
+            navigateToStart: { [router] in
+                router.route(to: .start, style: .push)
+            },
+            navigateToHome: { [router] in
+                router.route(to: .home, style: .replaceRoot)
+            }
         )
         return vc
     }

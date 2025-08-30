@@ -2,7 +2,6 @@ import UIKit
 import SwiftUI
 
 final class PointGetViewController: UIViewController {
-    // TODO ここでViewModelを作成する
     
     override func viewDidLoad() {
         super.viewDidLoad()

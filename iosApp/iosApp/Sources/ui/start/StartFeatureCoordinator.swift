@@ -11,7 +11,7 @@ final class StartFeatureCoordinator: FeatureCoordinator {
     }
     
     func makeEntry() -> UIViewController {
-        StartViewController(
+        let vc = StartViewController(
             onBack: { [weak nav] in
                 nav?.popViewController(animated: true)
             },
@@ -19,5 +19,6 @@ final class StartFeatureCoordinator: FeatureCoordinator {
                 router.route(to: .home, style: .replaceRoot)
             }
         )
+        return vc
     }
 }
