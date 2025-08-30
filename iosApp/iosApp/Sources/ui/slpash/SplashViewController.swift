@@ -17,12 +17,14 @@ final class SplashViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         let root = SplashView(
             navigateToStart: navigateToStart,
             navigateToHome: navigateToHome
         )
         let host = UIHostingController(rootView: root)
+        // SwiftUI 側の背景はクリアにし、親（RootHost）の appbarColor が透けるようにする
+        host.view.backgroundColor = .clear
         
         addChild(host)
         view.addSubview(host.view)

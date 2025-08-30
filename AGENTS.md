@@ -42,6 +42,8 @@
 - Commits: Use concise, present‑tense messages (scope optional), e.g., `android: fix Hilt setup` or `shared: add PointUse repository`.
 - PRs: Include summary, modules touched, test steps, and screenshots for UI changes (Android/iOS). Link related issues.
 - Keep changes small and focused; update `design/` docs if architecture decisions change.
+  - `design/Android/`: android implementation Rules.
+  - `desing/iOS/`: iOS implementation Rules.
 
 ## Security & Configuration Tips
 - Do not commit secrets. Keep keys in `local.properties` (Android) or Xcode project settings (iOS). Add any new secrets to `.gitignore`.

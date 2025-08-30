@@ -119,14 +119,10 @@ private struct FirstTimeView: View {
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NavigationView {
-                SplashContents(
-                    viewState: .loading,
-                    navigateToStart: {}
-                ).previewDisplayName("読み込み中")
-            }
-            .background(Color("appbarColor"))
-            .navigationViewStyle(StackNavigationViewStyle())
+            SplashContents(
+                viewState: .loading,
+                navigateToStart: {}
+            ).previewDisplayName("読み込み中")
 
             SplashContents(
                 viewState: .firstTime,
