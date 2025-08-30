@@ -6,7 +6,7 @@ final class RootHostViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         addChild(nav)
         view.addSubview(nav.view)
         nav.view.translatesAutoresizingMaskIntoConstraints = false
@@ -17,7 +17,10 @@ final class RootHostViewController: UIViewController {
             nav.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
         nav.didMove(toParent: self)
-        
+
+        // UIKit 側のナビゲーションバーは非表示にし、各々のView の NavigationView/NavigationStack 側でバーを描画・制御する。
+        nav.setNavigationBarHidden(true, animated: false)
+
         appCoordinator = AppCoordinator(navigationController: nav)
         appCoordinator.start()
     }

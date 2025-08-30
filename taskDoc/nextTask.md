@@ -2,7 +2,7 @@
 このファイルは次の実行タスクで追加してほしい機能や修正内容を詳細に記載するドキュメントです。ユーザーに更新権限があり、あなたは更新しないでください。
 
 # やりたいこと
-iOSのナビゲーションを再興
+iOSのナビゲーションを再考
 iOSでのベストプラクティスは"`StatusBar`背景色は`NavigationBar`や背景ビューに委ねる"なのに、`NavigationBar`の色を変えても`StatusBar`の背景色が白のままとなる。
 これはUINavigationControllerをベースViewにおいているのに`NavigationBar`をSwiftUIで実装しているため。
 `UINavigationController`（外側）と `SwiftUI.NavigationView`（内側）の二重ナビにしており、さらに外側のバーを 非表示 にしている状態になっている。すると
