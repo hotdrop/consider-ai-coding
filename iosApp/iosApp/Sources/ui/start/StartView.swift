@@ -98,8 +98,8 @@ private struct StartContents: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: onTapToolbarBackButton) {
-                        Image(systemName: "arrow.backward")
-                            .foregroundColor(Color("themeColor"))
+                        Image(systemName: "chevron.backward")
+                            .foregroundColor(Color("white"))
                     }
                 }
             }
@@ -190,41 +190,33 @@ private struct RegisterButton: View {
 struct StartView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NavigationStack {
-                StartContents(
-                    viewState: .idle,
-                    errorAlertItem: .constant(nil),
-                    onRegisterUser: {_,_ in },
-                    onTapToolbarBackButton: {}
-                )
-            }.previewDisplayName("画面初期表示")
+            StartContents(
+                viewState: .idle,
+                errorAlertItem: .constant(nil),
+                onRegisterUser: {_,_ in },
+                onTapToolbarBackButton: {}
+            ).previewDisplayName("画面初期表示")
             
-            NavigationStack {
-                StartContents(
-                    viewState: .loading,
-                    errorAlertItem: .constant(nil),
-                    onRegisterUser: {_,_ in },
-                    onTapToolbarBackButton: {}
-                )
-            }.previewDisplayName("実行中")
+            StartContents(
+                viewState: .loading,
+                errorAlertItem: .constant(nil),
+                onRegisterUser: {_,_ in },
+                onTapToolbarBackButton: {}
+            ).previewDisplayName("実行中")
 
-            NavigationStack {
-                StartContents(
-                    viewState: .success,
-                    errorAlertItem: .constant(nil),
-                    onRegisterUser: {_,_ in },
-                    onTapToolbarBackButton: {}
-                )
-            }.previewDisplayName("成功")
+            StartContents(
+                viewState: .success,
+                errorAlertItem: .constant(nil),
+                onRegisterUser: {_,_ in },
+                onTapToolbarBackButton: {}
+            ).previewDisplayName("成功")
 
-            NavigationStack {
-                StartContents(
-                    viewState: .idle,
-                    errorAlertItem: .constant(StartErrorAlertItem(message: "プレビューエラーメッセージ")),
-                    onRegisterUser: {_,_ in },
-                    onTapToolbarBackButton: {}
-                )
-            }.previewDisplayName("エラー")
+            StartContents(
+                viewState: .idle,
+                errorAlertItem: .constant(StartErrorAlertItem(message: "プレビューエラーメッセージ")),
+                onRegisterUser: {_,_ in },
+                onTapToolbarBackButton: {}
+            ).previewDisplayName("エラー")
         }
     }
 }

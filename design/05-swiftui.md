@@ -103,18 +103,6 @@ Text("home_title") // LocalizedStringKey
 - ViewModelは状態 (`@Published`/`@State`) の管理と副作用の実行に責任を持つ。
 - UIロジック（ボタンの色や表示文言の判定）もViewModelが担う。
 
-### 状態管理ルール
-- 画面の状態は `enum ViewState `で定義し`@Published var viewState: ViewState`で管理。
-- 状態遷移は明示的に `updateState(to:)` のような関数で管理する。
-```swift
-enum LoginViewState {
-  case idle
-  case loading
-  case success(User)
-  case error(String)
-}
-```
-
 ### 非同期処理の書き方
 - 非同期処理には `Task { await ... }`を使用。
 - Swift Concurrency（async/await）により`ViewModel.load()`のような関数を通して非同期処理を行う。

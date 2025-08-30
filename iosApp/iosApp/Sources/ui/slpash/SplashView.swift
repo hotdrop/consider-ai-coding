@@ -26,7 +26,6 @@ struct SplashView: View {
                 navigateToStart: navigateToStart
             )
         }
-        .navigationViewStyle(StackNavigationViewStyle())
         .task {
             guard !didTriggerInitialLoad else { return }
             didTriggerInitialLoad = true
@@ -71,6 +70,7 @@ private struct SplashContents: View {
         }
         .navigationTitle("splash_title")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
