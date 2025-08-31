@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import jp.hotdrop.considercline.android.R
 import jp.hotdrop.considercline.android.ui.pointget.PointAcquireEvent
 import jp.hotdrop.considercline.android.ui.theme.ConsiderClineTheme
+import jp.hotdrop.considercline.model.AppError
 
 @Composable
 fun PointUseConfirmScreen(
@@ -151,7 +152,7 @@ private fun PointUseConfirmContent(
        when (val event = uiState.pointUseEvent) {
            is PointUseEvent.ShowErrorDialog -> {
                ErrorDialog(
-                   errorMessage = event.throwable.message!!,
+                   errorMessage = event.error.message,
                    onDismiss = errorDialogDismiss
                )
            }
@@ -245,7 +246,7 @@ fun PreviewPointUseConfirmContentError() {
        PointUseConfirmContent(
            uiState = UiState(
                inputPoint = 100,
-               pointUseEvent = PointUseEvent.ShowErrorDialog(Throwable("エラーが発生しました"))
+               pointUseEvent = PointUseEvent.ShowErrorDialog(AppError.ProgramError("予期せぬエラーが発生しました"))
            ),
            onConfirmUsePoint = {},
            errorDialogDismiss = {},

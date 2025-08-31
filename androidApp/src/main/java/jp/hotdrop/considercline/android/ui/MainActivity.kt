@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observe() {
-        viewModel.appSettingLiveData.observe(this) {
+        viewModel.userLiveData.observe(this) {
             if (it.isInitialized()) {
                 binding.userId.text = getString(R.string.splash_user_id_label, it.userId)
                 binding.userId.isVisible = true

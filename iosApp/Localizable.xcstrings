@@ -11,17 +11,6 @@
         }
       }
     },
-    "%d" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%d"
-          }
-        }
-      }
-    },
     "app_name" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -29,6 +18,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "KMPアプリ"
+          }
+        }
+      }
+    },
+    "common_back_button_content_description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "戻る"
           }
         }
       }
@@ -49,6 +49,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        }
+      }
+    },
+    "dialog_title_success" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成功"
           }
         }
       }
@@ -114,6 +125,149 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ニックネーム未設定"
+          }
+        }
+      }
+    },
+    "point_get_confirm_complete_dialog_message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポイントを獲得しました！"
+          }
+        }
+      }
+    },
+    "point_get_confirm_detail" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "よろしければ「ポイントを獲得する」ボタンをタップしてください。"
+          }
+        }
+      }
+    },
+    "point_get_confirm_error_dialog_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー"
+          }
+        }
+      }
+    },
+    "point_get_confirm_execute_button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポイントを獲得する"
+          }
+        }
+      }
+    },
+    "point_get_confirm_overview" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポイントを獲得します！"
+          }
+        }
+      }
+    },
+    "point_get_confirm_point_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "獲得ポイント"
+          }
+        }
+      }
+    },
+    "point_get_input_attention %d" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(※最大で保持できるポイントは%dです)"
+          }
+        }
+      }
+    },
+    "point_get_input_confirm_button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確認画面へ進む"
+          }
+        }
+      }
+    },
+    "point_get_input_error_over_max" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最大で保持できるポイントを超えています。"
+          }
+        }
+      }
+    },
+    "point_get_input_error_over_zero" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0より大きい値を入力してください。"
+          }
+        }
+      }
+    },
+    "point_get_input_overview" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在保持しているポイント数"
+          }
+        }
+      }
+    },
+    "point_get_input_text_field_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポイントを入力"
+          }
+        }
+      }
+    },
+    "point_get_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポイント獲得"
           }
         }
       }

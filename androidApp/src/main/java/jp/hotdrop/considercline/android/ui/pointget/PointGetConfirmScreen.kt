@@ -34,6 +34,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.graphics.Color
+import jp.hotdrop.considercline.model.AppError
 
 @Composable
 fun PointGetConfirmScreen(
@@ -150,7 +151,7 @@ private fun PointGetConfirmContent(
         when (val event = uiState.acquireEvent) {
             is PointAcquireEvent.ShowErrorDialog -> {
                 ErrorDialog(
-                    errorMessage = event.throwable.message!!,
+                    errorMessage = event.error.message,
                     onDismiss = errorDialogDismiss
                 )
             }
@@ -227,12 +228,12 @@ fun PreviewPointGetConfirmContentLoading() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewPointGetConfirmContentError() {
-    val throwable = Throwable("エラーが発生しました")
+    val error = AppError.ProgramError("エラーが発生しました")
     ConsiderClineTheme {
         PointGetConfirmContent(
             uiState = PointGetUiState(
                 inputPoint = 100,
-                acquireEvent = PointAcquireEvent.ShowErrorDialog(throwable)
+                acquireEvent = PointAcquireEvent.ShowErrorDialog(error)
             ),
             onAcquirePoint = {},
             errorDialogDismiss = {},

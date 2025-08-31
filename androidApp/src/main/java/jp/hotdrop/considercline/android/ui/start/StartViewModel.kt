@@ -5,19 +5,21 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.hotdrop.considercline.android.ui.BaseViewModel
 import jp.hotdrop.considercline.di.KmpFactory
-import jp.hotdrop.considercline.usecase.AppSettingUseCase
+import jp.hotdrop.considercline.model.AppComplete
+import jp.hotdrop.considercline.model.AppError
+import jp.hotdrop.considercline.usecase.UserUseCase
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StartViewModel @Inject constructor() : BaseViewModel() {
-    private val appSettingUseCase: AppSettingUseCase by lazy { KmpFactory.useCaseFactory.appSettingUseCase }
+    private val userUseCase: UserUseCase by lazy { KmpFactory.useCaseFactory.userUseCase }
 
     private val mutableUiState = MutableLiveData<StartUiState>()
     val uiStateLiveData: LiveData<StartUiState> = mutableUiState
 
-    private val mutableError = MutableLiveData<String?>()
-    val errorLiveData: LiveData<String?> = mutableError
+    private val mutableError = MutableLiveData<AppError>()
+    val errorLiveData: LiveData<AppError> = mutableError
 
     private var _uiState = StartUiState()
 
@@ -29,18 +31,23 @@ class StartViewModel @Inject constructor() : BaseViewModel() {
         _uiState = _uiState.copyWith(email = newValue)
     }
 
-    fun save() {
+    /**
+     * ユーザー情報を登録する
+     */
+    fun register() {
         _uiState = _uiState.copyWith(isLoading = true)
         mutableUiState.postValue(_uiState)
         launch {
-            try {
-                appSettingUseCase.registerUser(_uiState.inputNickName, _uiState.inputEmail)
-                _uiState = _uiState.copyWith(isComplete = true)
-            } catch (e: Exception) {
-                mutableError.postValue(e.message)
-            } finally {
-                _uiState = _uiState.copyWith(isLoading = false)
-                mutableUiState.postValue(_uiState)
+            val nickName = _uiState.inputNickName
+            val email = _uiState.inputEmail
+            when (val result = dispatcherIO { userUseCase.registerUser(nickName, email) }) {
+                AppComplete.Complete -> {
+                    _uiState = _uiState.copyWith(isComplete = true)
+                }
+                is AppComplete.Error -> {
+                    _uiState = _uiState.copyWith(isLoading = false)
+                    mutableError.postValue(result.error)
+                }
             }
         }
     }

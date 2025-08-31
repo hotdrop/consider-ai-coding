@@ -1,5 +1,5 @@
 # SwiftUI View / ViewModel 実装ルール
-このドキュメントはSwiftUIアプリ開発における`View`および`ViewModel`の設計・実装方針を統一するためのルールです。AIコーディング支援ツール(Cline, Roo Code 等)がこれを読み取り、プロジェクト全体に一貫した構造を生成できるようにすることを目的とします。
+このドキュメントはSwiftUIアプリ開発における`View`および`ViewModel`の設計・実装方針を統一するためのルールです。AIコーディング支援ツール(Roo Code 等)がこれを読み取り、プロジェクト全体に一貫した構造を生成できるようにすることを目的とします。
 
 ## 全体方針
 - 状態駆動型UI
@@ -29,6 +29,9 @@ iosApp/
     data/ # KMPのSharedのうちLocalDataとのIF
     ui/   # 機能毎のUIディレクトリをここに作成していく
       start/ # 機能毎のディレクトリ。このディレクトリにViewとViewModel、Componentsを定義する
+      home/
+      pointget/
+      pointuse/
     MainView.swift # アプリ起動時のView。このViewだけはuiディレクトリの直下におく
     MainViewModel.swift # アプリ起動時のViewに対応したViewModel。このViewModelだけはuiディレクトリの直下に置く
   usecase/ # SwiftUIのPreview用としてMockのUseCaseを使いたいため、このディレクトリにProtocolを定義する
@@ -92,7 +95,6 @@ Text("home_title") // LocalizedStringKey
 - 背景色は `ZStack + Color.white.ignoresSafeArea()` で一括管理。
 - 色やサイズは `Color("themeColor")` のように `Asset Catalog` または定数を通して管理。
 
-
 ### サブビューは関数ではなく Struct に分離
 `CardView()` や `ActionButton()` を 独立した `View` Struct にすることで、SwiftUI の差分計算が局所化され再描画範囲を最小化でき、可読性も向上します。特に switch viewModel.viewState を持つ View は単体ファイルに分けます。
 
@@ -100,18 +102,6 @@ Text("home_title") // LocalizedStringKey
 ###  責務の範囲
 - ViewModelは状態 (`@Published`/`@State`) の管理と副作用の実行に責任を持つ。
 - UIロジック（ボタンの色や表示文言の判定）もViewModelが担う。
-
-### 状態管理ルール
-- 画面の状態は `enum ViewState `で定義し`@Published var viewState: ViewState`で管理。
-- 状態遷移は明示的に `updateState(to:)` のような関数で管理する。
-```swift
-enum LoginViewState {
-  case idle
-  case loading
-  case success(User)
-  case error(String)
-}
-```
 
 ### 非同期処理の書き方
 - 非同期処理には `Task { await ... }`を使用。

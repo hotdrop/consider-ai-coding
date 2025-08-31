@@ -40,7 +40,7 @@ class StartActivity : AppCompatActivity() {
         }
 
         binding.registerButton.setOnClickListener {
-            viewModel.save()
+            viewModel.register()
         }
     }
 
@@ -60,7 +60,7 @@ class StartActivity : AppCompatActivity() {
         }
         viewModel.errorLiveData.observe(this) {
             MaterialAlertDialogBuilder(this)
-                .setMessage(it)
+                .setMessage(it.toString()) // TODO ここおかしい
                 .setPositiveButton("OK", null)
                 .show()
         }

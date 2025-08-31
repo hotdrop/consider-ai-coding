@@ -1,8 +1,37 @@
 import SwiftUI
 import shared
 
+// MARK: - HomeView
 struct HomeView: View {
+    let onNavigateToPointGet: () -> Void
+    
     @StateObject var viewModel: HomeViewModel
+    
+    init(
+        viewModel: HomeViewModel = HomeViewModel(),
+        onNavigateToPointGet: @escaping () -> Void = {}
+    ) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+        self.onNavigateToPointGet = onNavigateToPointGet
+    }
+    
+    var body: some View {
+        HomeContents(
+            viewState: viewModel.viewState,
+            historyState: viewModel.historyState,
+            onNavigateToPointGet: onNavigateToPointGet
+        )
+        .task {
+            await viewModel.load()
+        }
+    }
+}
+
+// MARK: - HomeContents
+private struct HomeContents: View {
+    let viewState: HomeViewState
+    let historyState: HistoryState
+    let onNavigateToPointGet: () -> Void
     
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -11,41 +40,42 @@ struct HomeView: View {
     }()
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 20) {
-                HomeCardView(
-                    viewState: viewModel.viewState,
-                    dateFormatter: Self.dateFormatter
-                )
-                
-                HStack(spacing: 20) {
-                    PointActionButton(
-                        titleKey: "home_menu_get_point",
-                        icon: "account_balance_wallet"
-                    ) {
-                        // TODO: ポイント獲得画面への遷移
+        NavigationView {
+            // TODO スクロールはHistorySectionViewに対してのみ行いたい
+            ScrollView {
+                LazyVStack(spacing: 20) {
+                    HomeCardView(
+                        viewState: viewState,
+                        dateFormatter: Self.dateFormatter
+                    )
+                    
+                    HStack(spacing: 20) {
+                        PointActionButton(
+                            titleKey: "home_menu_get_point",
+                            icon: "account_balance_wallet"
+                        ) {
+                            self.onNavigateToPointGet()
+                        }
+                        PointActionButton(
+                            titleKey: "home_menu_use_point",
+                            icon: "shopping_cart"
+                        ) {
+                            // TODO: ポイント利用画面への遷移
+                        }
                     }
-                    PointActionButton(
-                        titleKey: "home_menu_use_point",
-                        icon: "shopping_cart"
-                    ) {
-                        // TODO: ポイント利用画面への遷移
-                    }
+                    .padding(.horizontal)
+                    
+                    HistorySectionView(
+                        historyState: historyState
+                    )
                 }
-                .padding(.horizontal)
-                
-                HistorySectionView(
-                    historyState: viewModel.historyState
-                )
+                .padding(.vertical)
             }
-            .padding(.vertical)
+            .navigationTitle("home_title")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
         }
-        .navigationTitle("home_title")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        .task {
-            await viewModel.load()
-        }
+        .navigationViewStyle(StackNavigationViewStyle()) // iOS15
     }
 }
 
@@ -74,7 +104,7 @@ private struct HomeCardView: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: Color("white")))
                             .padding(.top, 64)
-                    case .loaded(_, _, let point):
+                    case .loaded(_, let point):
                         Text("home_point_value \(point)")
                             .font(.title)
                             .fontWeight(.bold)
@@ -91,11 +121,15 @@ private struct HomeCardView: View {
                 switch viewState {
                 case .initialLoading:
                     EmptyView()
-                case .loaded(let nickname, let email, _):
-                    Text(nickname.isEmpty ? NSLocalizedString("home_un_setting_nickname", comment: "") : nickname)
+                case .loaded(let user, _):
+                    let nickName = user.nickName ?? ""
+                    let nickNameLabel = nickName.isEmpty ? NSLocalizedString("home_un_setting_nickname", comment: "") : nickName
+                    Text(nickNameLabel)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
-                    Text(email.isEmpty ? NSLocalizedString("home_un_setting_email", comment: "") : email)
+                    let email = user.email ?? ""
+                    let emailLabel = email.isEmpty ? NSLocalizedString("home_un_setting_email", comment: "") : email
+                    Text(emailLabel)
                         .font(.subheadline)
                         .foregroundColor(Color("white"))
                 case .error(_):
@@ -188,37 +222,33 @@ private struct HistoryRow: View {
     }
 }
 
-// MARK: - HomeView_Previews
+// MARK: - Previews
  
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
+        let previewUser = User(userId: "123", nickName: "テスト太郎", email: "preview@example.com")
         Group {
-            // データ読み込み中
-            // 初回ロード中
-            HomeView(viewModel: HomeViewModel.mock(
+            HomeContents(
                 viewState: .initialLoading,
-                historyState: .loading
-            ))
-            .previewDisplayName("初回ロード中")
+                historyState: .loading,
+                onNavigateToPointGet: {}
+            ).previewDisplayName("初回ロード中")
 
-            // 履歴ロード中
-            HomeView(viewModel: HomeViewModel.mock(
-                viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
-                historyState: .loading
-            ))
-            .previewDisplayName("履歴ロード中")
+            HomeContents(
+                viewState: .loaded(user: previewUser, point: 1000),
+                historyState: .loading,
+                onNavigateToPointGet: {}
+            ).previewDisplayName("履歴ロード中")
             
-            // 正常表示(履歴なし)
-            HomeView(viewModel: HomeViewModel.mock(
-                viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
-                historyState: .loaded([])
-            ))
-            .previewDisplayName("履歴なし")
+            HomeContents(
+                viewState: .loaded(user: previewUser, point: 1000),
+                historyState: .loaded(histories: []),
+                onNavigateToPointGet: {}
+            ).previewDisplayName("履歴なし")
 
-            // 正常表示(履歴あり)
-            HomeView(viewModel: HomeViewModel.mock(
-                viewState: .loaded(nickname: "プレビューユーザー", email: "preview@example.com", point: 1000),
-                historyState: .loaded([
+            HomeContents(
+                viewState: .loaded(user: previewUser, point: 1000),
+                historyState: .loaded(histories: [
                     PointHistory(dateTime: Kotlinx_datetimeLocalDateTime(
                         year: 2025,
                         monthNumber: 6,
@@ -246,16 +276,15 @@ struct HomeView_Previews: PreviewProvider {
                         second: 56,
                         nanosecond: 0
                     ), point: 200, detail: "利用")
-                ])
-            ))
-            .previewDisplayName("履歴あり")
+                ]),
+                onNavigateToPointGet: {}
+            ).previewDisplayName("履歴あり")
 
-            // エラー表示
-            HomeView(viewModel: HomeViewModel.mock(
-                viewState: .error("不明なエラーが発生しました。"),
-                historyState: .error("履歴の読み込みに失敗しました。")
-            ))
-            .previewDisplayName("エラー")
+            HomeContents(
+                viewState: .error(message: "不明なエラーが発生しました。"),
+                historyState: .error(message: "履歴の読み込みに失敗しました。"),
+                onNavigateToPointGet: {}
+            ).previewDisplayName("エラー")
         }
     }
 }
