@@ -6,8 +6,8 @@ struct PointGetConfirmView: View {
     let onClose: () -> Void
     
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel: PointGetViewModel
-    
+    // ViewModel のオーナーではないため @ObservedObject
+    @ObservedObject private var viewModel: PointGetViewModel
     // ローカルの実行フラグのみ保持（結果はVMのEventを参照）
     @State private var startedAcquire: Bool = false
     
@@ -18,7 +18,7 @@ struct PointGetConfirmView: View {
     ) {
         self.onBack = onBack
         self.onClose = onClose
-        _viewModel = StateObject(wrappedValue: viewModel)
+        self._viewModel = ObservedObject(initialValue: viewModel)
     }
 
     var body: some View {

@@ -5,7 +5,8 @@ final class PointGetViewController: UIViewController {
     private let onBack: () -> Void
     private let onClose: () -> Void
     
-    @StateObject private var viewModel: PointGetViewModel
+    // UIViewController は SwiftUI の @StateObject を使わない
+    private let viewModel: PointGetViewModel
     
     init(
         onBack: @escaping () -> Void,
@@ -14,7 +15,7 @@ final class PointGetViewController: UIViewController {
     ) {
         self.onBack = onBack
         self.onClose = onClose
-        _viewModel = StateObject(wrappedValue: viewModel)
+        self.viewModel = viewModel
         super.init(nibName:nil,bundle:nil)
     }
     

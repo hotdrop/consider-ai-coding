@@ -5,7 +5,9 @@ struct PointGetInputView: View {
     let onBack: () -> Void
     let onClose: () -> Void
     
-    @StateObject private var viewModel: PointGetViewModel
+    // ViewModel のオーナーではないため @ObservedObject
+    @ObservedObject private var viewModel: PointGetViewModel
+    // 確認画面に遷移する
     @State private var isActiveConfirm: Bool = false
     
     init(
@@ -15,7 +17,7 @@ struct PointGetInputView: View {
     ) {
         self.onBack = onBack
         self.onClose = onClose
-        _viewModel = StateObject(wrappedValue: viewModel)
+        self._viewModel = ObservedObject(initialValue: viewModel)
     }
 
     var body: some View {
