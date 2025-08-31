@@ -32,8 +32,6 @@ struct PointGetConfirmView: View {
                 Task { await viewModel.acquirePoint(inputPoint: inputPoint) }
             },
             onCompleteOk: {
-                startedAcquire = false
-                viewModel.acquireEventState = nil
                 // フロー完了時は親(UIKit)のナビゲーションスタックを閉じる
                 onClose()
             },
