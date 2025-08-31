@@ -47,7 +47,3 @@ final class DefaultAppRouter: AppRouter {
         app.dispatch(route: to, style: style)
     }
 }
-
-protocol FeatureCoordinator {
-    func makeEntry() -> UIViewController
-}

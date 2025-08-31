@@ -2,7 +2,6 @@ import SwiftUI
 import shared
 
 struct PointGetInputView: View {
-    let onBack: () -> Void
     let onClose: () -> Void
     
     // ViewModel のオーナーではないため @ObservedObject
@@ -11,11 +10,9 @@ struct PointGetInputView: View {
     @State private var isActiveConfirm: Bool = false
     
     init(
-        onBack: @escaping () -> Void,
         onClose: @escaping () -> Void,
         viewModel: PointGetViewModel
     ) {
-        self.onBack = onBack
         self.onClose = onClose
         self._viewModel = ObservedObject(initialValue: viewModel)
     }
@@ -28,7 +25,6 @@ struct PointGetInputView: View {
                 // TODO NavigationBarが表示されてしまう
                 NavigationLink(
                     destination: PointGetConfirmView(
-                        onBack: onBack,
                         onClose: onClose,
                         viewModel: viewModel
                     ),
@@ -73,7 +69,6 @@ private struct PointGetInputContents: View {
     
     var body: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
             switch viewState {
             case .loading:
                 ProgressView()

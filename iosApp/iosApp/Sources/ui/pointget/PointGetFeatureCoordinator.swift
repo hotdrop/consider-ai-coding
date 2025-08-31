@@ -12,10 +12,6 @@ final class PointGetFeatureCoordinator: FeatureCoordinator {
     
     func makeEntry() -> UIViewController {
         let vc = PointGetViewController(
-            onBack: { [weak nav] in
-                // TODO ホーム画面まで戻ってしまう、PointGetInputViewに戻ってほしい
-                nav?.popViewController(animated: true)
-            },
             onClose: { [weak nav] in
                 nav?.popViewController(animated: true)
             }

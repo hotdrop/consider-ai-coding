@@ -2,18 +2,15 @@ import UIKit
 import SwiftUI
 
 final class PointGetViewController: UIViewController {
-    private let onBack: () -> Void
     private let onClose: () -> Void
     
     // UIViewController は SwiftUI の @StateObject を使わない
     private let viewModel: PointGetViewModel
     
     init(
-        onBack: @escaping () -> Void,
         onClose: @escaping () -> Void,
         viewModel: PointGetViewModel = PointGetViewModel()
     ) {
-        self.onBack = onBack
         self.onClose = onClose
         self.viewModel = viewModel
         super.init(nibName:nil,bundle:nil)
@@ -29,7 +26,6 @@ final class PointGetViewController: UIViewController {
         // ViewModelをVCで生成し、Input/Confirmで共有する
         // 閉じる処理はUIKitのナビゲーションスタックをpopしてHomeへ戻す
         let root = PointGetInputView(
-            onBack: onBack,
             onClose: onClose,
             viewModel: viewModel
         )
