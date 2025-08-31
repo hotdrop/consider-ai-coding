@@ -56,43 +56,41 @@ private struct PointGetConfirmContents: View {
     let onErrorOk: () -> Void
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                switch viewState {
-                case .loading:
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
-                
-                case .success(_, let inputPoint, _, _):
-                    LoadedView(
-                        inputPoint: inputPoint,
-                        isAcquiring: isAcquiring,
-                        acquireEventState: acquireEventState,
-                        onBack: onBack,
-                        onExecute: onExecute,
-                        onCompleteOk: onCompleteOk,
-                        onErrorOk: onErrorOk
-                    )
-                case .error(let message):
-                    Text(message)
-                        .foregroundColor(.red)
-                        .font(.system(size: 16))
-                }
+        ZStack {
+            switch viewState {
+            case .loading:
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
+            
+            case .success(_, let inputPoint, _, _):
+                LoadedView(
+                    inputPoint: inputPoint,
+                    isAcquiring: isAcquiring,
+                    acquireEventState: acquireEventState,
+                    onBack: onBack,
+                    onExecute: onExecute,
+                    onCompleteOk: onCompleteOk,
+                    onErrorOk: onErrorOk
+                )
+            case .error(let message):
+                Text(message)
+                    .foregroundColor(.red)
+                    .font(.system(size: 16))
             }
-            .padding(.horizontal, 24)
-            .navigationTitle("point_get_title")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                // 確認画面の戻るは SwiftUI 内で1画面戻す
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { onBack() }) {
-                        Image(systemName: "chevron.backward")
-                            .foregroundColor(Color("white"))
-                    }
+        }
+        .padding(.horizontal, 24)
+        .navigationTitle("point_get_title")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            // 確認画面の戻るは SwiftUI 内で1画面戻す
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { onBack() }) {
+                    Image(systemName: "chevron.backward")
+                        .foregroundColor(Color("white"))
                 }
             }
         }
-        
     }
 }
 
@@ -112,8 +110,6 @@ private struct LoadedView: View {
                 .foregroundColor(Color("themeColor"))
                 .fontWeight(.bold)
 
-            Spacer().frame(height: 8)
-
             Text("point_get_confirm_detail")
                 .foregroundColor(.black)
 
@@ -123,8 +119,6 @@ private struct LoadedView: View {
                 .foregroundColor(Color("themeColor"))
                 .font(.title3)
                 .fontWeight(.semibold)
-
-            Spacer().frame(height: 8)
 
             Text(String(inputPoint))
                 .foregroundColor(Color("themeColor"))
@@ -153,6 +147,8 @@ private struct LoadedView: View {
                 }
             }
             .disabled(isAcquiring)
+            
+            Spacer()
         }
         // 完了ダイアログ
         .alert(

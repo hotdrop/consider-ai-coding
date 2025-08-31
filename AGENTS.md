@@ -6,6 +6,7 @@
 - Please provide all the implementation code without omissions.
 - Please clearly explain the justification and reason for the change, and the intention of the implementation.
 - Please adhere to the basic principles of software development, such as the DRY principle, YAGNI, and SOLID principle. However, it is okay to prioritize the conventions of Android, Kotlin, iOS, and Swift over the principles.
+- Never use NavigationStack in SwiftUI!!!
 
 ## Project Structure & Module Organization
 - `androidApp/`: Android app (Jetpack Compose, Hilt, DataStore). Entry points, activities, themes, and navigation live under `.../android/ui/`.

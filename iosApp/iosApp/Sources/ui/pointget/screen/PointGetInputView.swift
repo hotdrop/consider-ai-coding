@@ -22,7 +22,6 @@ struct PointGetInputView: View {
         NavigationView {
             ZStack {
                 // 非表示のNavigationLinkでConfirmへ遷移
-                // TODO NavigationBarが表示されてしまう
                 NavigationLink(
                     destination: PointGetConfirmView(
                         onClose: onClose,

@@ -19,7 +19,7 @@ final class RootHostViewController: UIViewController {
         ])
         nav.didMove(toParent: self)
 
-        // UIKit 側のナビゲーションバーは非表示にし、各々のView の NavigationView/NavigationStack 側でバーを描画・制御する。
+        // UIKit 側のナビゲーションバーは非表示にし、各々のView の NavigationView 側でバーを描画・制御する。
         nav.setNavigationBarHidden(true, animated: false)
 
         appCoordinator = AppCoordinator(navigationController: nav)
