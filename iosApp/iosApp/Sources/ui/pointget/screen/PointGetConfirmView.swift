@@ -61,7 +61,6 @@ private struct PointGetConfirmContents: View {
             case .loading:
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
-            
             case .success(_, let inputPoint, _, _):
                 LoadedView(
                     inputPoint: inputPoint,

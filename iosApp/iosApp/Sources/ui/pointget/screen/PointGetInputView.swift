@@ -18,7 +18,6 @@ struct PointGetInputView: View {
     }
 
     var body: some View {
-        // TODO NavigationViewをPointGetInputContentsに持っていく
         NavigationView {
             ZStack {
                 // 非表示のNavigationLinkでConfirmへ遷移
@@ -38,19 +37,9 @@ struct PointGetInputView: View {
                     },
                     onNavigateToConfirm: { _ in
                         isActiveConfirm = true
-                    }
+                    },
+                    onClose: onClose
                 )
-            }
-            .navigationTitle("point_get_title")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                // ルート：戻る＝フローを閉じる（親に戻る）
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { onClose() }) {
-                        Image(systemName: "chevron.backward")
-                            .foregroundColor(Color("white"))
-                    }
-                }
             }
         }
         .navigationViewStyle(StackNavigationViewStyle()) // iOS15
@@ -65,14 +54,16 @@ private struct PointGetInputContents: View {
     let viewState: PointGetViewState
     let onInputPoint: (Int) -> Void
     let onNavigateToConfirm: (Int) -> Void
+    let onClose: () -> Void
     
     var body: some View {
         ZStack {
             switch viewState {
             case .loading:
                 ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: Color("themeColor")))
             case .success(let currentPoint, let inputPoint, let errorMessage, let isEnableConfirm):
-                PointGetInputContentView(
+                LoadedView(
                     currentPoint: currentPoint,
                     inputPoint: inputPoint,
                     errorMessage: errorMessage,
@@ -90,43 +81,57 @@ private struct PointGetInputContents: View {
                     .font(.system(size: 16))
             }
         }
+        .padding(.horizontal, 24)
+        .navigationTitle("point_get_title")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            // ルート：戻る＝フローを閉じる（親に戻る）
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { onClose() }) {
+                    Image(systemName: "chevron.backward")
+                        .foregroundColor(Color("white"))
+                }
+            }
+        }
     }
 }
 
-@ViewBuilder
-private func PointGetInputContentView(
-    currentPoint: Point,
-    inputPoint: Int,
-    errorMessage: String?,
-    isEnableConfirm: Bool,
-    onInputChanged: @escaping (Int) -> Void,
-    onNavigateToConfirm: @escaping () -> Void
-) -> some View {
-    VStack(alignment: .center, spacing: 0) {
-        PointGetOverview(
-            balance: Int(currentPoint.balance),
-            maxAvailable: 20000 - Int(currentPoint.balance) // TODO
-        )
-        .padding(.top, 16)
+// MARK: - LoadedView
+private struct LoadedView: View {
+    let currentPoint: Point
+    let inputPoint: Int
+    let errorMessage: String?
+    let isEnableConfirm: Bool
+    let onInputChanged: (Int) -> Void
+    let onNavigateToConfirm: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .center, spacing: 0) {
+            PointGetOverview(
+                balance: Int(currentPoint.balance),
+                maxAvailable: 20000 - Int(currentPoint.balance) // TODO
+            )
+            .padding(.top, 16)
 
-        Spacer().frame(height: 24)
+            Spacer().frame(height: 24)
 
-        PointGetInputField(
-            inputPoint: inputPoint,
-            errorMessage: errorMessage,
-            onValueChange: onInputChanged
-        )
+            PointGetInputField(
+                inputPoint: inputPoint,
+                errorMessage: errorMessage,
+                onValueChange: onInputChanged
+            )
 
-        Spacer().frame(height: 32)
+            Spacer().frame(height: 32)
 
-        PointGetConfirmButton(
-            isEnabled: isEnableConfirm,
-            onNavigateToConfirm: onNavigateToConfirm
-        )
+            PointGetConfirmButton(
+                isEnabled: isEnableConfirm,
+                onNavigateToConfirm: onNavigateToConfirm
+            )
 
-        Spacer()
+            Spacer()
+        }
     }
-    .padding(.horizontal, 24)
 }
 
 @ViewBuilder
@@ -209,7 +214,8 @@ struct PointGetInputView_Previews: PreviewProvider {
                     isEnableConfirm: false
                 ),
                 onInputPoint: { _ in },
-                onNavigateToConfirm: { _ in }
+                onNavigateToConfirm: { _ in },
+                onClose: {}
             ).previewDisplayName("初期画面")
             
             PointGetInputContents(
@@ -219,13 +225,15 @@ struct PointGetInputView_Previews: PreviewProvider {
                     isEnableConfirm: true
                 ),
                 onInputPoint: { _ in },
-                onNavigateToConfirm: { _ in }
+                onNavigateToConfirm: { _ in },
+                onClose: {}
             ).previewDisplayName("ポイント入力画面")
             
             PointGetInputContents(
                 viewState: .loading,
                 onInputPoint: { _ in },
-                onNavigateToConfirm: { _ in }
+                onNavigateToConfirm: { _ in },
+                onClose: {}
             ).previewDisplayName("ロード中")
         }
     }
