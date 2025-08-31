@@ -1,5 +1,10 @@
 import UIKit
 
+/// SwiftUI の `CoordinatorHost` から表示される UIKit のルートコンテナ。
+/// - アプリでただ一つの `UINavigationController` を子として保持し、
+///   全ての画面遷移をここに集約します（NavigationStack は使用しない）。
+/// - ステータスバー直下の背景色を安定して制御するため、Window 直下に
+///   オーバーレイを敷く実装を持ちます。
 final class RootHostViewController: UIViewController {
     private let nav = UINavigationController()
     private var appCoordinator: AppCoordinator!
@@ -8,6 +13,7 @@ final class RootHostViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        // 子として UINavigationController を組み込み、レイアウトを全画面に制約します。
         addChild(nav)
         view.addSubview(nav.view)
         nav.view.translatesAutoresizingMaskIntoConstraints = false
@@ -22,6 +28,7 @@ final class RootHostViewController: UIViewController {
         // UIKit 側のナビゲーションバーは非表示にし、各々のView の NavigationView 側でバーを描画・制御する。
         nav.setNavigationBarHidden(true, animated: false)
 
+        // 画面遷移の統括を AppCoordinator に委譲し、アプリを開始します。
         appCoordinator = AppCoordinator(navigationController: nav)
         appCoordinator.start()
     }
@@ -38,6 +45,8 @@ final class RootHostViewController: UIViewController {
         installOrUpdateStatusBarOverlay()
     }
     
+    /// ステータスバー背景用のオーバーレイビューを Window 直下に敷設/更新します。
+    /// SwiftUI/UIView の階層や回転・SafeArea の変化に影響されない安定した背景色を実現します。
     private func installOrUpdateStatusBarOverlay() {
         guard let window = view.window else { return }
 
@@ -67,7 +76,7 @@ final class RootHostViewController: UIViewController {
         window.bringSubviewToFront(overlay)
     }
 
-    /// Window 階層を走査して、可視な UINavigationBar 群のうち最も上にあるバーの上端Y（Window座標）を返す
+    /// Window 階層を走査して、可視な UINavigationBar 群のうち最も上にあるバーの上端Y（Window座標）を返します。
     private func findTopMostNavigationBarMinY(in window: UIWindow) -> CGFloat? {
         var minY: CGFloat?
 
