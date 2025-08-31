@@ -5,7 +5,10 @@ final class StartViewController: UIViewController {
     private let onBack: () -> Void
     private let onRegisterSuccess: () -> Void
     
-    init(onBack: @escaping () -> Void, onRegisterSuccess: @escaping () -> Void) {
+    init(
+        onBack: @escaping () -> Void,
+        onRegisterSuccess: @escaping () -> Void
+    ) {
         self.onBack = onBack
         self.onRegisterSuccess = onRegisterSuccess
         super.init(nibName:nil,bundle:nil)

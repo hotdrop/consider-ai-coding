@@ -1,23 +1,62 @@
 import SwiftUI
 import shared
 
-///
-/// このViewはPointGetViewを親に持ち、Navigationは全て親Viewが責務を持つ
-///
 struct PointGetInputView: View {
-    let viewModel: PointGetViewModel
-    let onNavigateToConfirm: () -> Void
+    let onBack: () -> Void
+    let onClose: () -> Void
+    
+    @StateObject private var viewModel: PointGetViewModel
+    @State private var isActiveConfirm: Bool = false
+    
+    init(
+        onBack: @escaping () -> Void,
+        onClose: @escaping () -> Void,
+        viewModel: PointGetViewModel
+    ) {
+        self.onBack = onBack
+        self.onClose = onClose
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
 
     var body: some View {
-        PointGetInputContents(
-            viewState: viewModel.viewState,
-            onInputPoint: { newValue in
-                viewModel.inputPoint(newInputPoint: newValue)
-            },
-            onNavigateToConfirm: { newValue in
-                onNavigateToConfirm()
+        // TODO NavigationViewをPointGetInputContentsに持っていく
+        NavigationView {
+            ZStack {
+                // 非表示のNavigationLinkでConfirmへ遷移
+                // TODO NavigationBarが表示されてしまう
+                NavigationLink(
+                    destination: PointGetConfirmView(
+                        onBack: onBack,
+                        onClose: onClose,
+                        viewModel: viewModel
+                    ),
+                    isActive: $isActiveConfirm
+                ) { EmptyView() }
+                .hidden()
+
+                PointGetInputContents(
+                    viewState: viewModel.viewState,
+                    onInputPoint: { newValue in
+                        viewModel.inputPoint(newInputPoint: newValue)
+                    },
+                    onNavigateToConfirm: { _ in
+                        isActiveConfirm = true
+                    }
+                )
             }
-        )
+            .navigationTitle("point_get_title")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                // ルート：戻る＝フローを閉じる（親に戻る）
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { onClose() }) {
+                        Image(systemName: "chevron.backward")
+                            .foregroundColor(Color("white"))
+                    }
+                }
+            }
+        }
+        .navigationViewStyle(StackNavigationViewStyle()) // iOS15
         .task {
             await viewModel.load()
         }
