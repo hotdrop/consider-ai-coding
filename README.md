@@ -19,6 +19,63 @@ iOS は「SwiftUI と UIKit を橋渡ししつつ、ナビゲーションは UIK
 - Rootコンテナはアプリで唯一の `UINavigationController` を子に持ち、アプリ内のすべての画面遷移をこのスタックに集約します。
 - 画面遷移の統括はCoordinatorが担い、機能単位のエントリ組み立ては各 Feature のCoordinatorに委譲されます。
 
+## 設計俯瞰
+以下は、具体的な列挙値や画面名に依存しない、クラス間の関係を示す高レベルの図です。
+
+```mermaid
+classDiagram
+    direction LR
+
+    class iOSApp {
+      +App
+    }
+    class CoordinatorHost {
+      +UIViewControllerRepresentable
+    }
+    class RootHostViewController {
+      +UIViewController
+      -UINavigationController nav
+    }
+    class UINavigationController
+
+    class AppCoordinator {
+      -UINavigationController nav
+      -AppRouter router
+      +start()
+      +dispatch(route, style)
+    }
+
+    class AppRouter {
+      <<protocol>>
+      +route(to, style)
+    }
+    class DefaultAppRouter {
+      -unowned AppCoordinator app
+    }
+
+    class FeatureCoordinator {
+      <<protocol>>
+      +makeEntry() UIViewController
+    }
+    class SomeFeatureCoordinator {
+      +makeEntry() UIViewController
+    }
+
+    iOSApp --> CoordinatorHost : shows
+    CoordinatorHost --> RootHostViewController : creates
+    RootHostViewController o-- UINavigationController : contains
+    RootHostViewController --> AppCoordinator : creates
+
+    AppCoordinator --> AppRouter : uses
+    DefaultAppRouter ..|> AppRouter : implements
+    DefaultAppRouter --> AppCoordinator : delegates
+
+    AppCoordinator --> UINavigationController : controls
+    AppCoordinator --> FeatureCoordinator : creates
+    SomeFeatureCoordinator ..|> FeatureCoordinator : implements
+    FeatureCoordinator --> UIViewController : returns
+```
+
 ## 責務分割（役割）
 - Rootコンテナ: 単一のナビゲーションスタックを保持し、見た目や配置（全画面制約）、ステータスバー背景の安定制御など UI コンテナとしての責務を負います。
 - アプリ用Coordinator: 抽象的な「行き先」を受け取り、該当する Feature のエントリ画面を組み立てて遷移を実行します（push/root置換/modal）。
