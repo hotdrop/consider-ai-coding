@@ -19,8 +19,14 @@ class StartViewModel: ObservableObject {
         viewState = .loading
         
         do {
-            try await userUseCase.registerUserForIos(nickname: nickname, email: email)
-            viewState = .success
+            let result = try await userUseCase.registerUser(nickname: nickname, email: email)
+            switch asEnumComplete(complete: result) {
+            case .complete:
+                viewState = .success
+            case .error(let error):
+                viewState = .idle
+                errorAlertItem = StartErrorAlertItem(message: error.message)
+            }
         } catch is CancellationError {
             // no operation(not change UI)
             return

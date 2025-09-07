@@ -25,34 +25,46 @@ class HomeViewModel: ObservableObject {
         viewState = .initialLoading
         
         do {
-            async let userDefered = userUseCase.findForIos()
-            async let pointDefered = pointUseCase.findForIos()
-            async let historyDefered = historyUseCase.findAllForIos()
+            async let userDefered = userUseCase.find()
+            async let pointDefered = pointUseCase.find()
+            async let historyDefered = historyUseCase.findAll()
 
             let (userResult, pointResult, historiesResult) = try await (userDefered, pointDefered, historyDefered)
-            viewState = .loaded(
-                user: userResult,
-                point: Int(pointResult.balance)
-            )
-            historyState = .loaded(histories: historiesResult)
+            
+            var user: User?
+            
+            switch asEnumResult(result: userResult) {
+            case .success(let data):
+                if let userResult = data as? User {
+                    user = userResult
+                }
+            case .error(let error):
+                viewState = .error(message: error.message)
+            }
+            
+            switch asEnumResult(result: pointResult) {
+            case .success(let data):
+                if let pointResult = data as? Point {
+                    viewState = .loaded(
+                        user: user!,
+                        point: Int(pointResult.balance)
+                    )
+                }
+            case .error(let error):
+                viewState = .error(message: error.message)
+            }
+            
+            switch asEnumResult(result: historiesResult) {
+            case .success(let data):
+                if let historiesResult = data as? [PointHistory] {
+                    historyState = .loaded(histories: historiesResult)
+                }
+            case .error(let error):
+                viewState = .error(message: error.message)
+            }
         } catch is CancellationError {
             // no operation(not change UI)
             return
-        } catch let e as AppError {
-            switch (e) {
-            case is AppError.NetworkError:
-                viewState = .error(message: e.message)
-                break
-            case is AppError.ProgramError:
-                viewState = .error(message: e.message)
-                break
-            case is AppError.UnknownError:
-                viewState = .error(message: e.message)
-                break
-            default:
-                viewState = .error(message: e.message)
-                break
-            }
         } catch {
             viewState = .error(message: "Unknown Error")
         }
