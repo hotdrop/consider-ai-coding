@@ -34,28 +34,26 @@ class HomeViewModel: ObservableObject {
             var user: User?
             
             switch asEnumResult(result: userResult) {
-            case .success(let data):
-                if let userResult = data as? User {
-                    user = userResult
-                }
+            case .success(let userResult):
+                user = userResult
             case .error(let error):
                 viewState = .error(message: error.message)
             }
             
             switch asEnumResult(result: pointResult) {
-            case .success(let data):
-                if let pointResult = data as? Point {
-                    viewState = .loaded(
-                        user: user!,
-                        point: Int(pointResult.balance)
-                    )
-                }
+            case .success(let pointResult):
+                viewState = .loaded(
+                    user: user!,
+                    point: Int(pointResult.balance)
+                )
             case .error(let error):
                 viewState = .error(message: error.message)
             }
             
             switch asEnumResult(result: historiesResult) {
             case .success(let data):
+                // Kotlin/Native の List<T> は Swift 側では [T] ではない場合があります。
+                // そのため、ここは既存動作を保ちつつ安全にキャストを試みます。
                 if let historiesResult = data as? [PointHistory] {
                     historyState = .loaded(histories: historiesResult)
                 }

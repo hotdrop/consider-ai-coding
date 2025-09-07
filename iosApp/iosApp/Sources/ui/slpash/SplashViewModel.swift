@@ -17,13 +17,11 @@ class SplashViewModel: ObservableObject {
         do {
             let result = try await userUseCase.find()
             switch asEnumResult(result: result) {
-            case .success(data: let data):
-                if let user = data as? User {
-                    if user.isInitialized(), let userId = user.userId {
-                        self.viewState = .loaded(userId: userId)
-                    } else {
-                        self.viewState = .firstTime
-                    }
+            case .success(data: let user):
+                if user.isInitialized(), let userId = user.userId {
+                    self.viewState = .loaded(userId: userId)
+                } else {
+                    self.viewState = .firstTime
                 }
             case .error(error: let error):
                 self.viewState = .error(message: error.message)

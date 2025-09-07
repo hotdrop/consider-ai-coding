@@ -6,14 +6,18 @@ import Foundation
 import shared
 
 // Sealed Classが使いづらいのでAppResultをEnumにする
-enum AppResultEx {
-    case success(data: Any)
+enum AppResultEx<T> {
+    case success(data: T)
     case error(error: AppError)
 }
 
-func asEnumResult<T>(result: AppResult<T>) -> AppResultEx {
+func asEnumResult<T>(result: AppResult<T>) -> AppResultEx<T> {
     if let success = result as? AppResultSuccess<T> {
-        return .success(data: success.data as Any)
+        // Kotlin/Native ではジェネリクス T が Swift 側で T? として表現されることがあるため明示的にアンラップ
+        if let data = success.data {
+            return .success(data: data)
+        }
+        fatalError(#function + ": Success の data が nil です（想定外）")
     }
     if let failure = result as? AppResultError {
         return .error(error: failure.error)

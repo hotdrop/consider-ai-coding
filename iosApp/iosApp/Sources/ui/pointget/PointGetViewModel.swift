@@ -19,15 +19,13 @@ class PointGetViewModel: ObservableObject {
         do {
             let result = try await pointUseCase.find()
             switch asEnumResult(result: result) {
-            case .success(let data):
-                if let point = data as? Point {
-                    viewState = .success(
-                        currentPoint: point,
-                        inputPoint: 0,
-                        errorMessage: nil,
-                        isEnableConfirm: false
-                    )
-                }
+            case .success(let point):
+                viewState = .success(
+                    currentPoint: point,
+                    inputPoint: 0,
+                    errorMessage: nil,
+                    isEnableConfirm: false
+                )
             case .error(error: let error):
                 viewState = .error(message: error.message)
             }
@@ -87,4 +85,3 @@ enum PointAcquireEventState: Equatable {
     case success
     case error(message: String)
 }
-
