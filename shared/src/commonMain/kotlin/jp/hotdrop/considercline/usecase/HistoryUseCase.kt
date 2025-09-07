@@ -1,25 +1,22 @@
 package jp.hotdrop.considercline.usecase
 
+import jp.hotdrop.considercline.model.AppError
 import jp.hotdrop.considercline.model.AppResult
 import jp.hotdrop.considercline.model.PointHistory
-import jp.hotdrop.considercline.model.mapToDomain
 import jp.hotdrop.considercline.repository.HistoryRepository
+import kotlin.coroutines.cancellation.CancellationException
 
 class HistoryUseCase(
     private val repository: HistoryRepository
 ) {
     suspend fun findAll(): AppResult<List<PointHistory>> {
-        return fetchHistories()
-    }
-
-    suspend fun findAllForIos(): List<PointHistory> {
-        return when(val result = fetchHistories()) {
-            is AppResult.Success -> result.data
-            is AppResult.Error -> throw mapToDomain(result.error)
+        return runCatching {
+            repository.findAll()
+        }.getOrElse { throwable ->
+            if (throwable is CancellationException) {
+                throw throwable
+            }
+            AppResult.Error(AppError.UnknownError(throwable))
         }
-    }
-
-    private suspend fun fetchHistories(): AppResult<List<PointHistory>> {
-        return repository.findAll()
     }
 }
