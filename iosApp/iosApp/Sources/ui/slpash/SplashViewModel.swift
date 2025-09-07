@@ -15,11 +15,16 @@ class SplashViewModel: ObservableObject {
     func load() async {
         viewState = .loading
         do {
-            let user = try await userUseCase.findForIos()
-            if user.isInitialized(), let userId = user.userId {
-                self.viewState = .loaded(userId: userId)
-            } else {
-                self.viewState = .firstTime
+            let result = try await userUseCase.find()
+            switch asEnumResult(result: result) {
+            case .success(data: let user):
+                if user.isInitialized(), let userId = user.userId {
+                    self.viewState = .loaded(userId: userId)
+                } else {
+                    self.viewState = .firstTime
+                }
+            case .error(error: let error):
+                self.viewState = .error(message: error.message)
             }
         } catch is CancellationError {
             // no operation(not change UI)
